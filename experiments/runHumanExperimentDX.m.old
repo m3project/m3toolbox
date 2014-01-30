@@ -1,0 +1,187 @@
+function [paramSet resultSet] = runHumanExperimentDX()         
+
+global dir;
+global msgStr;
+global msgColor;
+global response;
+global roundOver
+global t0;
+
+msgStr      = [];
+msgColor    = [];
+roundOver   = [];
+t0          = [];
+response   = [];
+
+expt.funcRender = @render;
+expt.start = @start;
+expt.abort = @abort;
+
+% Ms = [0.3 0.7 1.4 2.8 5.7 7.1 8.8];
+% 
+% DXs = [50 100 250 500];      
+  
+n = 20;
+
+Ms = [1 2 4 10 12 16 20 24 30 40 48 60];
+
+DXs = 50 : (250-50)/(n-1) : 250;
+ 
+paramSet = createRandTrial(Ms, DXs);
+
+total = size(paramSet, 1);
+
+resultSet = zeros(total,     2);
+
+for i=1:total
+    
+    dir = 2 * (rand > 0.5) - 1;
+    
+    roundOver = [];
+    
+    t0 = [];
+    
+    expt.funcMotionX = @(t) dir * t * 500 ;
+    
+    expt.M = paramSet(i, 1);
+    
+    expt.stepDX = paramSet(i, 2);
+    
+    [t exitCode] =  runAnimation(expt);
+    
+     clc;
+    
+    fprintf('Completed %i trials (%1.0f%%)', i, i/total*100);    
+    
+    if (exitCode == -1)
+        
+        disp('Experiment aborted .')
+        
+        break;
+        
+    end
+     
+    resultSet(i, :) = [response t];
+    
+end
+
+clearWindow();
+
+end
+
+function start(window, t, sW, sH)
+
+Screen('Preference', 'TextAlphaBlending', 1);
+
+Screen('Preference', 'TextRenderer', 2);
+
+Screen(window, 'TextSize', 70);
+
+Screen(window, 'TextFont', 'AlteHaasGroteskRegular' );
+
+global str;
+
+str = 'test';
+
+end
+
+function b = abort(window, t, sW, sH)
+
+global roundOver;
+
+b = ~isempty(roundOver);
+
+end
+
+
+function render(window, t, sW, sH)
+
+% draw text
+
+global msgStr;
+global roundOver
+global t0;
+global dir;
+global response;
+
+[keyIsDown, secs, keyCode ] = KbCheck;
+
+if isempty(roundOver)
+    
+    if (keyCode(KbName('left')))
+        
+        t0 = t;
+       
+        msgStr = 'Left';
+        
+        response = (dir == -1);        
+        
+    end
+    
+    if (keyCode(KbName('right')))
+        
+        t0 = t;
+       
+        msgStr = 'Right';
+        
+        response = (dir == 1); 
+        
+    end
+    
+    if (keyCode(KbName('space')))
+        
+        t0 = t;
+        
+        msgStr = 'Can''t Tell';
+           
+        response = 2; 
+        
+    end
+    
+end
+
+if ~isempty(t0)
+    
+    if isempty(roundOver)
+        
+        if isempty(msgStr)
+            msgStr = ' ';
+        end
+        
+        
+        rect1 = Screen(window, 'TextBounds',  msgStr);
+        
+        x = sW/2 - rect1(3)/2;
+        
+        y = sH/2 - rect1(4)/2;
+        
+        td = t - t0;
+        
+        if td>0.5
+            
+            roundOver = 1;
+            
+        else
+            
+            color0 = [0 0 0 0.5];
+            
+            w = rect1(3);
+            h = rect1(4);
+            
+            m = 0.26 ;
+            
+            Screen(window, 'FillRect', color0, [x-w*m y-h*m x+w*(1+m) y+h*(1+m)] )
+                    
+               color1 = [0 0 0 0.5];
+            color2 = [1 1 1 1];             
+           
+            Screen(window, 'DrawText', msgStr, x+4, y+4, color1);
+            Screen(window, 'DrawText', msgStr, x, y, color2);
+            
+        end
+        
+    end
+    
+end
+
+end

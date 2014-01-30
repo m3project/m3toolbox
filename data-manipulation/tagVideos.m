@@ -1,0 +1,109 @@
+% This script will play the trial videos in the folder where it is ran.
+% For each video it will ask the user to input numeric values for a number
+% of parameters (specified in colNames). The values are stored in a file
+% results2.mat which is placed in the same directory.
+%
+% Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk)
+%
+% 5/12/2013
+
+function tagVideos
+
+colNames = {'Head Movements', 'Body Movements'};
+
+dir = pwd;
+
+paramsFile = fullfile(dir, 'params.mat');
+
+resultsFile = fullfile(dir, 'results.mat');
+
+resultsFile2 = fullfile(dir, 'results2.mat');
+
+if ~exist(paramsFile, 'file') || ~exist(resultsFile, 'file')
+    
+    error(['Could not locate params and results files ' ...
+        '(are you sure you are in an experiment results folder?)']);
+    
+end
+
+load(paramsFile);
+
+load(resultsFile);
+
+n = size(paramSet, 1);
+
+m = length(colNames);
+
+% make sure all video files are present before starting
+
+for i=1:n
+    
+    vfile = sprintf('trial%i.mp4', i);
+    
+    vpath = fullfile(dir, vfile);
+    
+    if ~exist(vpath, 'file')
+        
+        msg = ['could not locate file ' vfile];
+        
+        error(msg);
+        
+    end
+    
+end
+
+for i=1:n
+    
+    vfile = sprintf('trial%i.mp4', i);
+    
+    vpath = fullfile(dir, vfile);
+    
+    clc;
+    
+    fprintf('Playing file %s (%d out of %d) ...\n\n', vfile, i, n);
+    
+    playMP4(vpath);
+    
+    fprintf('Enter parameters (or hit enter to replay video) ...\n\n');
+    
+    j = 1;
+    
+    newResultSet.colNames = colNames;
+    
+    while j<=m
+        
+        prompt = sprintf('%s : ', colNames{j});
+        
+        s = input(prompt, 's');
+        
+        v = str2double(s);
+        
+        if isempty(s)
+            
+            playMP4(vpath);
+            
+            continue;
+            
+        end        
+        
+        if isnan(v) || ~isreal(v)
+            
+            disp('Incorrect input, please re-enter.')
+            
+            continue;
+            
+        end
+        
+        newResultSet.values(i, j) = v;
+        
+        j = j+1;
+        
+    end
+    
+    save(resultsFile2, 'newResultSet');
+    
+end
+
+
+
+end

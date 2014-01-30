@@ -1,0 +1,23 @@
+function record(cam1, seconds)
+
+cam1.FrameGrabInterval = 1;
+
+totalFrames = 1e5;
+
+cam1.FramesPerTrigger = totalFrames;
+
+start(cam1)
+
+tic
+
+trigger(cam1);
+
+while (toc<=seconds)
+    
+    drawnow
+    
+end
+
+stop(cam1);
+
+end

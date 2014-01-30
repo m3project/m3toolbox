@@ -1,0 +1,172 @@
+function runMantisExperimentGrating()
+
+%KbName('UnifyKeyNames');
+
+try
+    
+    workDir         = 'V:\\readlab\\Ghaith\\m3\\data\\mantisGrating\\';
+    
+    trialVideoFile  = [workDir 'trial%u.mp4'];
+    
+    paramFile       = [workDir 'params.mat'];
+    
+    resultsFile     = [workDir 'results.mat'];
+    
+    recordVideos    = 0;    
+    
+    samplingMode    = 2;
+    
+    if samplingMode == 3
+        
+        error('not implemented');
+    
+    elseif samplingMode == 2
+        
+        gratingTypes = [0 1];
+        
+        contrast = [0 0.0625/4 0.0625/2 0.0625 0.125 0.25 0.5 1];  
+        
+        spatialFreqs = [4] / 1600;
+        
+        temporalFreqs = [0.25, 0.5, 0.75, 1, 8, 16, 20, 24, 28, 30];
+        
+        dirs = [+1 -1];
+        
+        paramSet = createRandTrial(gratingTypes, contrast, spatialFreqs, temporalFreqs, dirs);        
+        
+    elseif samplingMode == 1
+        
+        gratingTypes = [0 1];
+        
+        contrast = [0 0.0625/4 0.0625/2 0.0625 0.125 0.25 0.5 1];        
+        
+        spatialFreqs = [1 4 16 80] / 1600;        
+        
+        temporalFreqs = [1 8 16];
+        
+        dirs = [+1 -1];
+        
+        paramSet = createRandTrial(gratingTypes, contrast, spatialFreqs, temporalFreqs, dirs);
+        
+    end
+    
+    save(paramFile, 'paramSet');
+    
+    total = size(paramSet, 1);
+    
+    resultSet = zeros(total, 1);
+    
+    if recordVideos
+    
+        cam1 = initCam(); % initialize camera
+        
+    end
+    
+    % start trials
+    
+    ticID = tic;
+    
+    for i=1:total
+        
+        clc;
+        
+        fprintf('Trial %3i of %3i (%3.1f%%) ... \n', i, total, i/total*100);
+        
+        if (i>2)
+            
+            elaspedTime = toc(ticID);
+            
+            totalTime = elaspedTime / (i-1) * total;
+            
+            remainingTime = totalTime - elaspedTime;
+            
+            avgTime = elaspedTime/i;
+            
+            fprintf('Time Spent       : %s\n', datestr(elaspedTime/3600/24, 'HH:MM:SS'));
+            
+            fprintf('Time Total       : %s\n', datestr(totalTime/3600/24, 'HH:MM:SS'));
+            
+            fprintf('Remaining        : %s\n', datestr(remainingTime/3600/24, 'HH:MM:SS'));
+            
+            fprintf('Time (per trial) : %s\n', datestr(avgTime/3600/24, 'HH:MM:SS'));
+            
+        end
+        
+        runAlignmentStimulus();
+        
+        % prepare parameters
+        
+        expt2 = struct;
+        expt2.enaAbort = 0;
+        expt2.timeLimit = 5;
+        expt2.gratingType = paramSet(i, 1);
+        expt2.contrast = paramSet(i, 2);
+        expt2.spatialFreq = paramSet(i, 3);
+        expt2.temporalFreq = paramSet(i, 4);
+        expt2.dir = paramSet(i, 5);
+        
+        disp('rendering stimulus ...');
+        
+        if recordVideos
+            
+            % start recording
+            
+            startRecording(cam1);
+            
+        end
+        
+        % render stimulus
+        
+        runGrating(expt2);
+        
+        if recordVideos
+            
+            % save and compress video
+            
+            stopRecording(cam1);
+            
+            outputFile = sprintf(trialVideoFile, i);
+            
+            saveMP4(cam1, outputFile);
+            
+        end
+        
+        % User input
+        
+        key = getKey();
+        
+        if (key == 0)
+            userDir = -1;
+        elseif (key == 1)
+            userDir = 1;
+        else
+            userDir = 0;
+        end
+        
+        resultSet(i) = userDir;
+        
+        save(resultsFile, 'resultSet');
+        
+    end
+    
+    if recordVideos
+    
+        deallocCam(cam1);
+        
+    end
+    
+catch exception
+    
+    try
+        deallocCam(cam1);
+        
+    catch exception2
+        
+    end
+    
+    rethrow(exception);    
+    
+end
+
+end
+

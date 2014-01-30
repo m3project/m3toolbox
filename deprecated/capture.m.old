@@ -1,0 +1,135 @@
+% obj.FramesPerTrigger = 10;
+%
+% obj.FrameGrabInterval = 25;
+%
+%   start(obj);
+%
+%     trigger(obj);
+
+%for i=1:obj.FramesAvailable
+
+clc;
+
+iptsetpref('ImshowInitialMagnification', 'fit');
+
+clf
+
+if isrunning(cam1)
+    stop(cam1);
+end
+
+if isrunning(cam2)
+    stop(cam2);
+end
+
+cam1.FrameGrabInterval = 25;
+cam2.FrameGrabInterval = 25;
+
+start(cam1);
+start(cam2);
+
+trigger(cam1);
+trigger(cam2);
+
+i = 0;
+
+while(1)
+    
+    i = i + 1;
+    
+    if cam1.FramesAvailable > 1
+        
+        set(gcf, 'Name', 'lagging');
+        
+    else
+        
+        set(gcf, 'Name', '');
+        
+    end
+    
+    [data1 time1] = getdata(cam1, 1);
+    [data2 time2] = getdata(cam2, 1);
+    
+    frame1 = data1(:, :, 3, 1);
+    frame2 = data2(:, :, 3, 1);
+    
+    %     frame1 = YUY2toRGB(frame1);
+    %     frame2 = YUY2toRGB(frame2);
+    %
+    %     frame1 = rgb2hsv(frame1);
+    %     frame2 = rgb2hsv(frame2);
+    %
+    %     frame1 = frame1(:, :, 1);
+    %     frame2 = frame2(:, :, 1);
+    %
+    %     frame1 = imadjust(frame1);
+    %     frame2 = imadjust(frame2);
+    %
+    %     k1 = find(frame1<200); frame1(k1) = 0;
+    %     k2 = find(frame2<200); frame2(k2) = 0;
+    
+%     frame1 = frame1 > 200;
+%     frame2 = frame2 > 200;
+%     
+%     frame1 = imfill(frame1, 'holes');
+%     frame2 = imfill(frame2, 'holes');
+%     
+%     frame1 = medfilt2(frame1, [15 15]);
+%     frame2 = medfilt2(frame2, [15 15]);
+%     
+%     bb1 = regionprops(frame1, 'BoundingBox', 'MajorAxisLength', 'MinorAxisLength');
+%     bb2 = regionprops(frame2, 'BoundingBox', 'MajorAxisLength', 'MinorAxisLength');
+%     
+%     bb1 = bb1(1);
+%     bb2 = bb2(1);
+%     
+%     bord1 = bwperim(frame1);
+%     bord1 = bwmorph(bord1, 'diag');
+%     bord1 = bwmorph(bord1, 'Thicken',2);
+%     
+%     bord2 = bwperim(frame2);
+%     bord2 = bwmorph(bord2, 'diag');
+%     bord2 = bwmorph(bord2, 'Thicken',2);
+%     
+%     img1(:,:,1) = data1(:,:,1,1);
+%     img1(:,:,2) = data1(:,:,1,1);
+%     img1(:,:,3) = data1(:,:,1,1) + uint8(bord1)*255;
+%     
+%     img2(:,:,1) = data2(:,:,1,1);
+%     img2(:,:,2) = data2(:,:,1,1);
+%     img2(:,:,3) = data2(:,:,1,1) + uint8(bord2)*255;
+%     
+%     m1 = bb1.MajorAxisLength / bb1.MinorAxisLength;
+%     m2 = bb2.MajorAxisLength / bb2.MinorAxisLength;
+    
+    % Camera 1:
+    
+    subplot(1,2,2); cla; imshow(img1) ; title(sprintf('Camera 1 (%1.2f)', m1));
+    
+    hold on;
+
+    % Camera 2:
+    
+    subplot(1,2,1); cla; imshow(img2); title(sprintf('Camera 2 (%1.2f)', m2));
+    
+    hold on;
+    
+    drawnow;
+    
+    % checking for Escape key presses
+    
+    [keyIsDown, secs, keyCode ] = KbCheck;
+    
+    if (keyCode(KbName('Esc')))
+        
+        break;
+        
+    end
+    
+end
+
+stop(cam1);
+stop(cam2);
+
+
+

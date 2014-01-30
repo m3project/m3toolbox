@@ -1,0 +1,33 @@
+function savetoavi(cam1, file)
+
+totalFrames = cam1.FramesAvailable;
+
+if (totalFrames == 0)
+    
+    error('no frames acquired');
+    
+end
+
+[data time] = getdata(cam1, totalFrames);
+
+fps = totalFrames / time(end);
+
+aviobj = avifile(file, 'compression', 'none', 'fps',fps);
+
+for i=1:totalFrames
+    
+    frame = data(:,:,:,i);
+    
+    frame = YUY2toRGB(frame);
+    
+    aviobj = addframe(aviobj, frame);
+    
+end
+
+aviobj = close(aviobj); % output argument is mandatory
+
+stop(cam1);
+
+
+
+end

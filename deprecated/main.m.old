@@ -1,0 +1,19 @@
+tempFile = 'c:/temp.avi';
+
+outputFile = 'd:/video.avi';
+
+cam1 = initCam(); % initialize camera
+
+%record(cam1, 10); % record video
+
+startRecoding(cam1);
+
+pause(2);
+
+stopRecording(cam1);
+
+savetoavi(cam1, tempFile); % save recorded video to temp file
+
+compressVideo(tempFile, outputFile); % compress temp file and store in output file
+
+deallocCam(cam1);
