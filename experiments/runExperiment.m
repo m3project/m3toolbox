@@ -4,7 +4,7 @@ try
     
     % initialize experiment settings:
     
-    workDir             = 'C:\';
+    workDir             = 'D:\test experiment\';
     
     genParamSetFun      = @genParamSet;
     
@@ -14,11 +14,15 @@ try
     
     runAfterTrialFun    = @runAfterTrial;
     
-    recordVideos        = 1;
+    recordVideos        = 0;
     
-    resultSet           = zeros(1, 1);
+    resultSet           = [];
     
     dumps               = cell(1, 1);
+    
+    name                = 'Test Experiment';
+    
+    addTags             = {};
     
     if nargin>0
         
@@ -26,17 +30,35 @@ try
         
     end
     
+    exptDir =  chooseExperimentDir(name, workDir, '', addTags);
+    
+    if isempty(exptDir)
+        
+        return
+        
+    end
+    
+    fullDir = fullfile(workDir, exptDir);
+    
+    if exist(fullDir, 'dir')
+        
+        error('Directory %s already exists', fullDir);
+        
+    end
+    
+    mkdir(fullDir);        
+    
     paramSet = genParamSetFun();
     
     % pre-experiment preparation:
     
-    trialVideoFile      = [workDir 'trial%u.mp4'];
+    trialVideoFile      = fullfile(fullDir, 'trial%u.mp4');
     
-    paramFile           = [workDir 'params.mat'];
+    paramFile           = fullfile(fullDir, 'params.mat');
     
-    resultsFile         = [workDir 'results.mat'];  
+    resultsFile         = fullfile(fullDir, 'results.mat');  
     
-    dumpsFile           = [workDir 'dumps.mat'];
+    dumpsFile           = fullfile(fullDir, 'dumps.mat');
     
     trialCount          = size(paramSet, 1);    
     
@@ -56,7 +78,9 @@ try
         
         clc;
         
-        fprintf('Trial %3i of %3i (%3.1f%%) ... \n', i, trialCount, i/trialCount*100);
+        fprintf('Experiment Folder:\n\n%s\n\n', fullDir);
+        
+        fprintf('Trial %3i of %3i (%3.1f%%) ... \n\n', i, trialCount, i/trialCount*100);
         
         if (i>2)
             
@@ -75,6 +99,8 @@ try
             fprintf('Remaining        : %s\n', datestr(remainingTime/3600/24, 'HH:MM:SS'));
             
             fprintf('Time (per trial) : %s\n', datestr(avgTime/3600/24, 'HH:MM:SS'));
+            
+            fprintf('\n');
             
         end
         
@@ -132,6 +158,22 @@ try
         
     end
     
+    if trialCount == 0
+       
+        error('This experiment contains no trials');
+        
+    end
+    
+    if exitCode == 0
+        
+        disp('Experiment completed');
+        
+    else
+        
+        disp('Experiment aborted');
+        
+    end
+    
     if recordVideos
     
         deallocCam(cam1);
@@ -165,7 +207,13 @@ function paramSet = genParamSet()
 
 % template function
 
-error('Please overload genParamSet()');
+warning('Please overload genParamSet()');
+
+a = [1 2 3];
+
+b = [-1 1];
+
+paramSet = createRandTrial(a, b);
 
 end
 
@@ -173,7 +221,7 @@ function runBeforeTrial(varargin)
 
 % template function
 
-error('Please overload runBeforeTrial()');
+warning('Please overload runBeforeTrial()');
 
 end
 
@@ -181,7 +229,9 @@ function [exitCode, dump] = runTrial(paramSetRow)
 
 % template function
 
-error('Please overload runTrial()');
+warning('Please overload runTrial()');
+
+exitCode = 0; dump = [];
 
 end
 
@@ -189,7 +239,11 @@ function resultRow = runAfterTrial(varargin)
 
 % template function
 
-error('Please overload runAfterTrial()');
+warning('Please overload runAfterTrial()');
+
+disp('Press any key to continue'); pause;
+
+resultRow = [1];
 
 end
 

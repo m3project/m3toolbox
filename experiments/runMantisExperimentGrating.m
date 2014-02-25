@@ -12,7 +12,11 @@ expt.runAfterTrialFun = @runAfterTrial;
 
 expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisGrating\';
 
-expt.recordVideos = 1;
+expt.name = 'Mantis Grating';
+
+expt.addTags = {'GRID2'};
+
+expt.recordVideos = 0;
 
 runExperiment(expt);
 
@@ -20,11 +24,21 @@ end
 
 function paramSet = genParamSet()
 
-samplingMode    = 2;
+samplingMode    = 3;
 
 if samplingMode == 3
     
-    error('not implemented');
+    gratingTypes = [0 1];
+    
+    contrast = [0 0.0625/4 0.0625/2 0.0625 0.125 0.25 0.5 1];
+    
+    spatialFreqs = [1 4 16 32] / 1600;
+    
+    temporalFreqs = [0.25, 8, 30];
+    
+    dirs = [+1 -1];
+    
+    paramSet = createRandTrial(gratingTypes, contrast, spatialFreqs, temporalFreqs, dirs);
     
 elseif samplingMode == 2
     

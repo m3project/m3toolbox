@@ -21,7 +21,7 @@ groupRows = r / numel(ids);
 
 if mod(groupRows, 1) ~= 0 % sanity check
    
-    error('paramSet cannot be split into equally-sized groups')
+    error('The matrix paramSet cannot be split into equally-sized groups. This is probably because data was loaded from experiment folders with different sampling spaces.')
     
 end
 

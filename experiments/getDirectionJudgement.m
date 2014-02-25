@@ -8,6 +8,8 @@ pause(0.1);
 
 while (1)
     
+    drawnow
+    
     [~, ~, keyCode ] = KbCheck;
     
     if (keyCode(KbName('LeftArrow')))

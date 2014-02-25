@@ -305,7 +305,7 @@ end
 tileID{1} = Screen(window, 'MakeTexture', tile(:, :, 1));
 tileID{2} = Screen(window, 'MakeTexture', tile(:, :, 2));
 
-%disp('done'); toc; drawnow
+clear tile K B1 B2 mask texture; % free up so that they won't be packed in dump
 
 fCount = length(bugFrames);
 

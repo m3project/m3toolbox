@@ -95,6 +95,10 @@ switch (id)
         
         frames{1} = repmat(ones(10, 10), 1, 1);
         
+ case 'dot'
+        
+        frames{1} = [1];   
+        
     otherwise
         
         frames{1} = [0];

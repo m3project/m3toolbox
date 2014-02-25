@@ -12,7 +12,7 @@ expt.runAfterTrialFun = @runAfterTrial;
 
 expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisDispCamo\';
 
-expt.recordVideos = 1;
+expt.recordVideos = 0;
 
 runExperiment(expt);
 

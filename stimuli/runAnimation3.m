@@ -22,7 +22,7 @@ timeLimit = 0; % in seconds (0 to disable)
 
 closeOnFinish = 0;
 
-enable3D = 0;
+enable3D = 1;
 
 % -------------------------------------------------------------------------
 %
@@ -40,7 +40,7 @@ enable3D = 0;
 %
 % -------------------------------------------------------------------------
 
-M = 40;
+M = 60;
 
 txtCount = 50; % don't bother
 
@@ -73,7 +73,7 @@ stepDX = 1; % in pixels
 
 bugFrames = getBugFrames('fly'); % stick, beetle, fly
 
-motionFuncs = getMotionFuncs('swirl'); % horizontal, zigzag, swirl, auto, keyboard
+motionFuncs = getMotionFuncs_temp('swirl'); % horizontal, zigzag, swirl, auto, keyboard
 
 disparity = 0;
 
@@ -386,6 +386,10 @@ while (1)
         
     end
     
+    disparity = 20 * abs(sin(2*pi*t/2));
+    
+    disparity = 10;
+    
     % draw board
     
     if (interactiveMode == 0)
@@ -416,7 +420,7 @@ while (1)
         switchBack=1;
     end
     
-    if enable3D && dynamicBackground && channel == 0
+    if enable3D && dynamicBackground && channel == 1
         switchBack=1;
     end
     
@@ -430,7 +434,7 @@ while (1)
         
         for x=1:w
             
-            s = [1 0 1 0] * disparity/2 * channel;
+            s = [1 0 1 0] * disparity/2 * channel * 0;
             
             drawRow(window, x, txtID, h, board, blockSide, [marginRight marginTop marginRight marginTop] + s, dx, dy, sW, sH)
             
@@ -455,6 +459,9 @@ while (1)
         %end
         bdx = d(1);
         bdy = d(2);
+        
+        %[d t channel]
+        
         
         %dy = motionFuncs.Y(t);
         
@@ -509,7 +516,7 @@ while (1)
                     
                     destRec = destRec + [bdx bdy bdx bdy];
                     
-                    destRec = destRec + [1 0 1 0] * -channel * disparity;
+                    destRec = destRec + [1 0 1 0] * -(channel*2 -1) * -disparity;
                     
                     m = 2 - (bugCamMask(y, x) || ~camouflage);
                     
@@ -535,7 +542,7 @@ while (1)
     
     % render drawings
     
-    if channel == 1 || ~enable3D
+    if channel == 0 || ~enable3D
     
         Screen(window, 'Flip');
     
@@ -569,7 +576,7 @@ while (1)
         
         if (keyCode(KbName('s')))
             
-            motionFuncs = getMotionFuncs('swirl');
+            motionFuncs = getMotionFuncs_temp('swirl');
             
             startTime = GetSecs();
             
