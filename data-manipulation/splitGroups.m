@@ -1,6 +1,6 @@
 % splits paramSet into a 3D matrix according to values of the column key
 %
-function G = splitGroups(paramSet, key)
+function [G, ids] = splitGroups(paramSet, key)
 
 [r, c] = size(paramSet);
 

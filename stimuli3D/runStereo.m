@@ -33,13 +33,13 @@ Screen('Flip', window);
 
 %% Stimulus Settings
 
-numDots         = 15000;
-dotRad          = 10;
+numDots         = 1000;
+dotRad          = 30;
 disparityBack   = -10; % minus for out of screen, plus for in screen
 disparityBug    = 10; 
 frameSkip       = 0;
 bugSize         = .5;
-motionMode      = 3;
+motionMode      = 2;
 w=200;
 l=100;
 
@@ -87,7 +87,7 @@ switch motionMode
         
         center = [W/2 H/2];
         
-        frequency   = 0.5;
+        frequency   = 0.25;
         
         radius = @(t) 400;
         

@@ -16,7 +16,7 @@ exitCode = 0;
 %
 % -------------------------------------------------------------------------
 
-interactiveMode = 1;
+interactiveMode = 0;
 
 timeLimit = 0; % in seconds (0 to disable)
 
@@ -40,7 +40,7 @@ enable3D = 0;
 %
 % -------------------------------------------------------------------------
 
-M = 40;
+M = 4;
 
 txtCount = 50; % don't bother
 
@@ -61,7 +61,7 @@ dynamicBackground = 0;
 %funcMotionX = @(t)  t * 500;
 funcMotionX = @(t) 0;
 
-stepDX = 1; % in pixels
+stepDX = 50; % in pixels
 
 % -------------------------------------------------------------------------
 %
@@ -589,13 +589,13 @@ while (1)
             
         end
         
-        if (keyCode(KbName('k')))
+        %if (keyCode(KbName('k')))
             
-            motionFuncs = getMotionFuncs('keyboard');
+            %motionFuncs = getMotionFuncs('keyboard');
             
-            startTime = GetSecs();
+            %startTime = GetSecs();
             
-        end
+        %end
         
         if (keyCode(KbName('h')))
             

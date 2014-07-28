@@ -1,5 +1,5 @@
 % returns dimensions of screen
-function [width height] = getResolution()
+function [width, height] = getResolution()
 
 window = getWindow();
 

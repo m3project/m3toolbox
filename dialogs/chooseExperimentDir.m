@@ -18,11 +18,11 @@ m1 = 25;
 
 n = 1;
 
-names = {'Lisa', 'Nat', 'Rob', 'Judith'};
+names = {'Lisa', 'Nat', 'Rob', 'Judith', 'Vivek', 'Ghaith', 'Will'};
 
 defNameInd = 1;
 
-if nargin == 3
+if nargin > 2
    
     k = find(strcmp(names, defName));
     

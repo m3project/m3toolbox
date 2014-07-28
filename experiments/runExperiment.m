@@ -16,6 +16,8 @@ try
     
     recordVideos        = 0;
     
+    makeBackup          = 1;
+    
     resultSet           = [];
     
     dumps               = cell(1, 1);
@@ -24,13 +26,15 @@ try
     
     addTags             = {};
     
+    defName             = '';
+    
     if nargin>0
         
         unpackStruct(expt); % unpack overloaded settings from expt
         
     end
     
-    exptDir =  chooseExperimentDir(name, workDir, '', addTags);
+    exptDir =  chooseExperimentDir(name, workDir, defName, addTags);
     
     if isempty(exptDir)
         
@@ -50,6 +54,8 @@ try
     
     paramSet = genParamSetFun();
     
+    hardwareInfo = getHardwareInfo();
+    
     % pre-experiment preparation:
     
     trialVideoFile      = fullfile(fullDir, 'trial%u.mp4');
@@ -60,9 +66,19 @@ try
     
     dumpsFile           = fullfile(fullDir, 'dumps.mat');
     
+    hardwareInfoFile    = fullfile(fullDir, 'hardware_info.mat');
+    
     trialCount          = size(paramSet, 1);    
     
     save(paramFile, 'paramSet');
+    
+    save(hardwareInfoFile, 'hardwareInfo');
+    
+    if makeBackup
+        
+        backupToolbox(fullDir);
+        
+    end
     
     if recordVideos
     
@@ -128,19 +144,27 @@ try
             
             disp('aborted'); break;
             
-        end        
+        end
         
-        if recordVideos
+        try
             
-            % save and compress video
+            if recordVideos
+                
+                % save and compress video
+                
+                stopRecording(cam1);
+                
+                %outputFile = sprintf(trialVideoFile, i);
+                
+                outputFile = strrep(trialVideoFile, '%u', num2str(i));
+                
+                saveMP4(cam1, outputFile);
+                
+            end
             
-            stopRecording(cam1);
+        catch except1
             
-            %outputFile = sprintf(trialVideoFile, i);
-            
-            outputFile = strrep(trialVideoFile, '%u', num2str(i));
-            
-            saveMP4(cam1, outputFile);
+            warning('Could not save video');
             
         end
         

@@ -54,7 +54,7 @@ for i=1:groups
     
     x = squeeze(S(1, key2, :));
     
-    data(:, :, i) = [x P L H];
+    data(:, :, i) = [x P L H m r*ones(size(m))];
     
 end
 

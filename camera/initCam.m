@@ -19,7 +19,7 @@ cam1 = videoinput('winvideo', 1, reso3);
 
 triggerconfig(cam1, 'manual');
 
-preview(cam1);
+%preview(cam1);
 
 disp('video object created');
 

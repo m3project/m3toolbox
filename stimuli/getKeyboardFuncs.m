@@ -219,7 +219,7 @@ if (x>xMax || x<xMin || y>yMax || y<yMin)
     xD = x-(xMin+xMax)/2;
     yD = y-(yMin+yMax)/2;
     
-    beta = ATand2(-yD, xD) + 180;    
+    beta = atand2(-yD, xD) + 180;    
     
     beta = mod(beta, 360);
     

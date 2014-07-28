@@ -7,9 +7,16 @@
 %
 % 5/12/2013
 
-function tagVideos
+function tagVideos(outputFile)
 
-colNames = {'Head Movements', 'Body Movements'};
+if nargin<1
+    
+    outputFile = 'results2.mat';
+    
+end
+
+colNames = {'Tracks', 'Strikes', 'Tension'};
+% colNames = {'Response (up=no-follow, down=follow-straight, and left/right): '};
 
 dir = pwd;
 
@@ -17,7 +24,7 @@ paramsFile = fullfile(dir, 'params.mat');
 
 resultsFile = fullfile(dir, 'results.mat');
 
-resultsFile2 = fullfile(dir, 'results2.mat');
+resultsFile2 = fullfile(dir, outputFile);
 
 if ~exist(paramsFile, 'file') || ~exist(resultsFile, 'file')
     
@@ -46,7 +53,9 @@ for i=1:n
         
         msg = ['could not locate file ' vfile];
         
-        error(msg);
+        %error(msg);
+        
+        warning('this experiment is incomplete.')
         
     end
     
@@ -57,6 +66,14 @@ for i=1:n
     vfile = sprintf('trial%i.mp4', i);
     
     vpath = fullfile(dir, vfile);
+    
+    if ~exist(vpath, 'file')
+        
+        warning('Could not locate file %s, skipping ...', vfile);
+        
+        continue;
+        
+    end
     
     clc;
     
@@ -72,23 +89,11 @@ for i=1:n
     
     while j<=m
         
-        prompt = sprintf('%s : ', colNames{j});
+        v = prompt1(colNames{j});      
         
-        s = input(prompt, 's');
-        
-        v = str2double(s);
-        
-        if isempty(s)
+        if isempty(v)
             
             playMP4(vpath);
-            
-            continue;
-            
-        end        
-        
-        if isnan(v) || ~isreal(v)
-            
-            disp('Incorrect input, please re-enter.')
             
             continue;
             
@@ -104,6 +109,76 @@ for i=1:n
     
 end
 
+end
 
+function v = prompt2(colName)
+
+KbName('UnifyKeyNames');
+
+prompt = sprintf('%s : ', colName);
+
+disp(prompt);
+
+v = -1;
+
+while v == -1
+
+    [~, KeyCode] = KbPressWait;
+    
+    if KeyCode(KbName('UpArrow'))
+        
+        v = 0;
+        
+    elseif KeyCode(KbName('LeftArrow'))
+        
+        v = 1;
+        
+    elseif KeyCode(KbName('RightArrow'))
+        
+        v = 2;
+        
+    elseif KeyCode(KbName('DownArrow'))
+        
+        v = 3;
+        
+    elseif KeyCode(KbName('Return'))
+        
+        v = [];        
+        
+    end
+    
+end
+
+
+
+end
+
+function v = prompt1(colName)
+
+prompt = sprintf('%s : ', colName);
+
+s = input(prompt, 's');
+
+v = str2double(s);
+
+if isempty(s)
+    
+    
+    
+    v = [];
+    
+    return;
+    
+end
+
+if isnan(v) || ~isreal(v)
+    
+    disp('Incorrect input, please re-enter.')
+    
+    v = [];
+    
+    return;
+    
+end
 
 end

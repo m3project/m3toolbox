@@ -1,4 +1,5 @@
-function runLoom
+
+function runTarget
 %% Initialization
 
 AssertOpenGL;
@@ -34,53 +35,66 @@ Screen('Flip', window);
 %% Stimulus Settings
 
 backColor       = 255;
-bugColor        = 1; 
-motionMode      = 1;
+bugColor        = 1;
+dotRad = 100;
+Xbound = W/3;
+Ybound = .5*H;
+% t2 = @(t) -min(mod(t, 1), 1)+1;
+% stepSize = @(t) t2(t)*10;
+stepSize = @(t) 10;
+motionMode = 0;
+
 
 switch motionMode
     
-    case 1 % looming in 3D
+    case 1 %3D target
+        disparity = 10;
         
-        t2 = @(t) min(mod(t, 8), 1)+4;
         
-        f1 = @(t) 12 / (20.02-4*t2(t));
+    otherwise % 2D target
         
-        disparity = @(t) f1(t)/10;        
-        
-        radFunc = @(t) 80;
-        
-    otherwise % looming in 2D
-        
-        disparity = @(t) 0;
-        
-        t2 = @(t) min(mod(t, 8), 1)+4;
-%         
-%           f1 = @(t) 12 / (20.02-4*t2(t));
-%         
-%         disparity = @(t) f1(t)/20;       
-        
-        radFunc = @(t) 8 / (20.02-4*t2(t));
-        
-     
-        %t2 = @(t) min(mod(t/2.5, 2), 1); radFunc = @(t) 6 * 12 ./ (4.2-4*t2(t));
+        disparity = 0;
         
 end
 
+a = [1 , -1];
+
+posnX = W/2;
+
+posnY = .75*H;
+
 i=0;
 
-tic;
+tstart=GetSecs;
 
 while 1
     
     i = i+1;
     
-    t = toc;    
+    t = GetSecs-tstart;
     
-    dotRad = radFunc(t);
+    if posnX < Xbound
+        
+        posnX=W/2;
+        
+    elseif posnX > (W-Xbound)
+        
+        posnX =W/2;
+        
+    end
     
-    dots = [W; H]/2 - [dotRad; dotRad/2]/2;
+    if posnY < Ybound
+        
+        posnY = .85*H;
+        
+    elseif posnY > H
+        
+        posnY =.75*H;
+        
+    end
     
-    d = disparity(t);
+    dots = [posnX; posnY] - [dotRad; dotRad/2];
+    d = disparity;
     
     dotsL = dots;
     dotsR = dots;
@@ -88,21 +102,35 @@ while 1
     dotsL(1,:) = dots(1,:) - d/2;
     dotsR(1,:) = dots(1,:) + d/2;
     
-    Screen('SelectStereoDrawBuffer', window, 0);    
+     Screen('FillRect', window, backColor);
     
-    Screen('FillRect', window, backColor);
+    Screen('SelectStereoDrawBuffer', window, 0);
+    
+   
     
     Screen('FillOval', window, bugColor, [dotsL; dotsL(1,:) + dotRad; dotsL(2,:)+dotRad/2]);
     
-    Screen('SelectStereoDrawBuffer', window, 1);    
+    Screen('SelectStereoDrawBuffer', window, 1);
     
-    Screen('FillRect', window, backColor);
+%     Screen('FillRect', window, backColor);
     
     Screen('FillOval', window, bugColor, [dotsR; dotsR(1,:) + dotRad; dotsR(2,:)+dotRad/2]);
-
+    
     Screen('DrawingFinished', window);
     
-    Screen('Flip', window);    
+    Screen('Flip', window);
+    
+    ind = randperm(2);
+    
+    dirX = a(ind(1));
+    
+    ind = randperm(2);
+    
+    dirY = a(ind(1));
+    posnX = posnX + dirX*stepSize(t);
+    
+    posnY= posnY + dirY*stepSize(t);
+    
     
     [pressed dummy keycode] = KbCheck;
     

@@ -1,8 +1,12 @@
 % creates a PTB window
 
-function createWindow()
+function createWindow(consts)
 
-consts = getConstants();
+if nargin<1
+    
+    consts = getConstants();
+
+end
 
 % set PTB message verbosity depending on constant SILENT_PTB
 

@@ -14,7 +14,7 @@ expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisGrating\';
 
 expt.name = 'Mantis Grating';
 
-expt.addTags = {'GRID2'};
+expt.addTags = {'GRID3'};
 
 expt.recordVideos = 0;
 
@@ -24,9 +24,26 @@ end
 
 function paramSet = genParamSet()
 
-samplingMode    = 3;
+samplingMode    = 4;
 
-if samplingMode == 3
+if samplingMode == 4
+    
+    % Ghaith, Jenny and Vivek
+    % 27/5/2014
+    
+    gratingTypes = 0; % only sine
+    
+    contrast = [0.0625/4 0.0625/2 0.0625 0.125 0.25 0.5 1];
+    
+    spatialFreqs = [1 2 4 8 16 1600/67 32 64 1600/12] / 1600;
+    
+    temporalFreqs = 8;
+    
+    dirs = [+1 -1];
+    
+    paramSet = createRandTrial(gratingTypes, contrast, spatialFreqs, temporalFreqs, dirs);
+
+elseif samplingMode == 3
     
     gratingTypes = [0 1];
     

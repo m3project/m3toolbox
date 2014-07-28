@@ -50,7 +50,7 @@ closeOnFinish = 0;
 
 M = 4;
 
-txtCount = 50; % don't bother
+txtCount = 150; % don't bother
 
 R = 0.5; % don't bother
 
@@ -68,7 +68,7 @@ dynamicBackground = 0;
 
 funcMotionX = @(t) 0;
 
-stepDX = 50; % in pixels
+stepDX = 1; % in pixels
 
 % -------------------------------------------------------------------------
 %
@@ -78,7 +78,7 @@ stepDX = 50; % in pixels
 
 bugFrames = getBugFrames('block'); % stick, beetle, fly
 
-motionFuncs = getMotionFuncs('zigzag'); % horizontal, zigzag, swirl, auto, keyboard
+motionFuncs = getMotionFuncs('swirl'); % horizontal, zigzag, swirl, auto, keyboard
 
 dir = 1;
 
@@ -350,14 +350,14 @@ theta1 = @(t) (t * 2 * pi);
 v = 1.005;
 
 X = @(t) dir * (mod(t * 500, 2000)- 300);
-
 Y = @(t) sin(theta1(t) * v) * 50 - 250;
-
 motionFuncs.XY      = @(t) [-X(t) Y(t)];
 motionFuncs.Angle   = @(t) sin(theta1(t) * v) * 25;
 motionFuncs.Angle = @(t) 180;
 motionFuncs.F       = @(t) t * 60;
 motionFuncs.S       = @(t) 1;
+
+%motionFuncs = getMotionFuncs('swirl'); % horizontal, zigzag, swirl, auto, keyboard
 
 % starting the rendering loop
 

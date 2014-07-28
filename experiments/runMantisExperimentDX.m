@@ -14,7 +14,7 @@ expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisDX\';
 
 expt.name = 'Mantis Dmax';
 
-expt.recordVideos = 0;
+expt.recordVideos = 1;
 
 runExperiment(expt);
 

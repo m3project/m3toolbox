@@ -3,27 +3,21 @@
 %
 % It returns the concatenated paramSet and resultSet.
 %
-function [paramSet, resultSet] = loadDirData(dir, include, exclude)
+function [paramSet, resultSet] = loadDirData(dir, include, exclude, allowIncomplete)
 
-if nargin < 2
-    include = {};
-end
-
-if nargin < 3
-    exclude = {};
+if nargin < 4
+    
+    allowIncomplete = 0;
+    
 end
 
 paramFile = 'params.mat';
 
 resultsFile = 'results.mat';
 
-dirFilter = [dir './F*'];
+list = getDirList(dir, include, exclude);
 
-dirs = ls(dir);
-
-dirs = dirs(3:end, :); % ls returns . and .. as the first two entries
-
-n = size(dirs, 1); % number of sub-directories
+n = size(list, 1); % number of sub-directories
 
 paramSet = [];
 
@@ -35,69 +29,15 @@ hashes = {};
 
 for i=1:n
     
-    dirI = strtrim(dirs(i, :));
-    
-    % note: exclude filters take priority over include filters
-    
-    % applying include filter
-    
-    if ~isempty(include)
-        
-        keep = 0;
-        
-        for j=1:length(include)
-            
-            ind = strfind(dirI, include{j});
-            
-            if ~isempty(ind)
-                
-                keep = 1; break;
-                
-            end
-            
-        end
-        
-        if ~keep
-            
-            continue
-            
-        end
-        
-    end
-    
-    % applying exclude filter
-    
-    if ~isempty(exclude)
-        
-        for j=1:length(exclude)
-            
-            keep = 1;
-            
-            ind = strfind(dirI, exclude{j});
-            
-            if ~isempty(ind)
-                
-                keep = 0; break;
-                
-            end
-            
-        end
-        
-        if ~keep
-            
-            continue
-            
-        end
-        
-    end
+    dirI = strtrim(list{i});
     
     % loading data from dir
     
-    fullPathI = [dir '\' dirI];
+    fullPathI = fullfile(dir, dirI);
     
-    pFile = [fullPathI '\' paramFile];
+    pFile = fullfile(fullPathI, paramFile);
     
-    rFile = [fullPathI '\' resultsFile];
+    rFile = fullfile(fullPathI, resultsFile);
 
     if ~exist(pFile, 'file')
         
@@ -121,7 +61,11 @@ for i=1:n
     n1 = size(fileData1.paramSet, 1);
     n2 = size(fileData2.resultSet, 1);
     
-    if n1 ~= n2
+    if n1 ~= n2 && ~isfield(fileData2.resultSet, 'app') && ~allowIncomplete
+        
+        % the second term in the expression above is to allow loading data
+        % from one of Vivek's experiments which has stores data in
+        % resultSet differently
        
         fprintf('Loading %-60s (either incomplete or in progress, ignored) ...\n', dirI);
         
@@ -129,9 +73,22 @@ for i=1:n
         
     end
     
+    k1 = size(fileData1.paramSet, 1);
+    k2 = size(fileData2.resultSet, 1);
+    
+    if k1 ~= k2
+        
+        fileData1.paramSet = fileData1.paramSet(1:k2, :);
+        
+    end
+        
+        
+    
     paramSet = [paramSet; fileData1.paramSet];
     
     resultSet = [resultSet; fileData2.resultSet];
+    
+    
     
     hash = DataHash(sort(fileData1.paramSet));
     
@@ -141,11 +98,7 @@ for i=1:n
         
     end
     
-    %     k = strfind(hashes, hash);
-    
-    %     k = find(k{:});
-    
-    k=find(ismember(hashes, hash));
+    k = find(ismember(hashes, hash));
     
     fprintf('Loading %-60s (%4d points, Parameter Set %c) ...\n', dirI, size(fileData1.paramSet, 1), 'A' + k-1);
     

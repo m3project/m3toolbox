@@ -13,13 +13,16 @@ window = getWindow();
 
 % parameters:
 
-gratingType     = 1;        % 0 for sin, 1 for square
-spatialFreq     = 0.0025;     % in cycles per pixel
-temporalFreq    = 0.25;       % in cycles per second
+gratingType     = 0;        % 0 for sin, 1 for square
+spatialFreq     = 0.025;     % in cycles per pixel
+temporalFreq    = 0.25*10;       % in cycles per second
 dir             = -1;       % direction
 enaAbort        = 1;        % 1 to enable user to abort by pressing Escape
 timeLimit       = 0;        % stimulus duration (seconds), 0 to disable
 contrast        = 1;        % [0, 1]
+
+
+spatialFreq = 4/1600;
 
 if nargin>0
     unpackStruct(expt);         % load overridden parameter values

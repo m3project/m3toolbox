@@ -26,6 +26,7 @@ switch (id)
         v = 0.5;
         
         X = @(t) centerX + cos(theta1(t) * v) * motionR(t);
+
         Y = @(t) centerY + sin(theta1(t) * v) * motionR(t);
         
         t1 = @(t) t;
@@ -80,7 +81,7 @@ switch (id)
         
         X = @(t) -(mod(t * 500, 2000)- 300);
         Y = @(t) sin(theta1(t) * v) * motionR(t) + 150;
-        %Y = @(t) 300;
+        Y = @(t) 300;
         
         motionFuncs.XY      = @(t) [-X(t) Y(t)];
         motionFuncs.Angle   = @(t) sin(theta1(t) * v) * 25;
