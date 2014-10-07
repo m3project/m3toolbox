@@ -1,7 +1,7 @@
 function exitCode = runDiscLoom
 %% parameters
 
-spatialPeriod = 200; % pixels
+spatialPeriod = 192; % pixels (use a divisor of the screen width)
 
 b = 1; % background brightness (0 to 1)
 
@@ -21,15 +21,19 @@ d0 = 4; % initial delay
 
 d1 = 4; % min-sequence delay ("stationary disc duration +looming duration")
 
-d2 = 4; % background motion buffer
+d2 = 2; % background motion buffer
 
 d3 = 0; % first x seconds when bug is invisible
+
+enaExtraSlide = 1; % when set to 1 the background will move in integer steps of spatialPeriod
 
 %% setup ptb windows
 
 KbName('UnifyKeyNames');
 
-createWindow();
+Gamma = 2.127; % for DELL U2413
+
+createWindow(Gamma);
 
 window = getWindow();
 
@@ -63,7 +67,7 @@ r1 = getR(viewD, virtDist1, virtDist2, speed);
 
 if preview
     
-    t = 0:1/60:30;
+    t = 0:1/1200:30;
     
     subplot(2, 1, 1);
     
@@ -82,6 +86,8 @@ end
 x = 1:sW;
 
 sin2 = @(x) (1+sin(x)*b)/2;
+
+cos2 = @(x) (1+cos(x)*b)/2;
 
 %% flicker box
 
@@ -123,11 +129,15 @@ end
 
 d = 0;
 
+% the initial shift (d) is chosen such that the screen center is white
+
 levels = [0 0];
 
 oldT = startTime;
 
 mEna = @(t) 0;
+
+dir = 1;
 
 while 1
     
@@ -135,9 +145,17 @@ while 1
     
     deltaT = t - oldT;
     
-    d = d + deltaT * gratingSpeed * mEna(t);
+    d = d + deltaT * gratingSpeed * mEna(t) * dir;
     
-    d = d + deltaT * jitterSpeed * rand * mEna(t);
+    d = d + deltaT * jitterSpeed * rand * mEna(t) * dir;
+    
+    shift_error = mod(d, spatialPeriod);
+    
+    if enaExtraSlide && ~mEna(t) && abs(shift_error)>15
+        
+        d = d + deltaT * gratingSpeed * dir;
+        
+    end
     
     oldT = t;    
     
@@ -171,7 +189,7 @@ while 1
     
     rect = [1 0 1 0] * sW * 0.5 + [0 1 0 1] * sH * bugY + [-1 -1 1 1] * r(t)/2;
     
-    texture1 = sin2(2*pi*(x-d)/spatialPeriod) * 255;
+    texture1 = cos2(2*pi*(x-d)/spatialPeriod) * 255;
 
     textureIndex = Screen(window, 'MakeTexture', texture1);    
     
@@ -209,41 +227,40 @@ while 1
             
         end
         
-    else
+    else        
         
-    
         if keyCode(KbName('UpArrow'))
-
+            
             r = @(ct) rLoom1(ct - t);
-
+            
             mEna = @(ct) backMotionEna1(ct - t);
-
+            
         end
-
+        
         if keyCode(KbName('DownArrow'))
-
+            
             r = @(ct) rReceed1(ct - t);
-
+            
             mEna = @(ct) backMotionEna1(ct - t);
-
+            
         end
-
+        
         if keyCode(KbName('RightArrow'))
-
+            
             r = @(ct) rLoom2(ct - t);
-
+            
             mEna = @(ct) backMotionEna2(ct - t);
-
+            
         end
-
+        
         if keyCode(KbName('LeftArrow'))
-
+            
             r = @(ct) rReceed2(ct - t);
-
+            
             mEna = @(ct) backMotionEna2(ct - t);
-
-        end   
-    
+            
+        end
+        
     end
     
     if keyCode(KbName('Escape'))
@@ -261,6 +278,22 @@ while 1
         break;
 
     end
+    
+    if keyCode(KbName('l')) && dir == 1
+        
+        dir = -1;
+        
+        disp('direction switched to left');
+        
+    end
+
+    if keyCode(KbName('r')) && dir == -1
+        
+        dir = 1;
+        
+        disp('direction switched to right');
+        
+    end    
     
 end
 

@@ -25,7 +25,7 @@ end
 
 function paramSet = genParamSet()
 
-blocks = 30;
+blocks = 25;
 % paramTable =[
 %     % Size, Disparity, Condition
 %     1     0     0;

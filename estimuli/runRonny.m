@@ -1,6 +1,8 @@
 function runRonny()
 
-funcs = {@runDiscLoom, @runGratingwithMenu, @runTargetwithMenu};
+funcs = {@runDiscLoom, @runGratingwithMenu, @runTargetwithMenuAnaglyph, @runSwirlAnaglyph, @runDotsAnaglyph_ephys};
+
+closeWindow();
 
 while 1
     

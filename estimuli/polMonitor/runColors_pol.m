@@ -1,4 +1,4 @@
-function exitCode = runColors(As)
+function exitCode = runColors_pol(As)
 %% Initialization
 
 if nargin < 1
@@ -13,21 +13,19 @@ KbName('UnifyKeyNames');
 
 closeWindow();
 
-Gamma = 2.127; % for DELL U2413
+Gamma = 2; % for Ronny's 3D monitor (AOC D2367PH)
 
-LeftGains = [0 0.66 0];
-
-RightGains = [0 0 1];
-
-createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
+createWindow3D(Gamma);
 
 preview = 0;
 
-boxPosition = [860 670]; % left and top coordinates
+boxPosition = [1075 280]; % left and top coordinates
 
-boxSize = [200 200]; % width and height
+boxSize = [200 150]; % width and height
 
 [sW, sH] = getResolution();
+
+sH = sH / 2;
 
 rect = [boxPosition boxPosition+boxSize];
 
@@ -35,9 +33,9 @@ As = [0 As 0]; % make last element by default black
 
 %% parameters
 
-tOn = 0.5;
+tOn = 0.5;%0.5
 
-tOff = 5;
+tOff = 5;%5
 
 T = tOn + tOff;
 
@@ -71,7 +69,7 @@ end
 
 flickSize = 50;
 
-flickerRect = [0 sH-flickSize flickSize sH];
+flickerRect = [0 sH-flickSize/2 flickSize sH];
 
 %% rendering loop:
 
@@ -149,7 +147,8 @@ while 1
     
     Screen(window, 'FillRect', [1 1 1] * 0, rect);
     
-    Screen('FillRect', window, [1 1 1] * 0, flickerRect);
+    %Screen('FillRect', window, [1 1 1] * 0, flickerRect);
+    Screen('FillRect', window, [1 1 1] * flicker * 0.05 * (1 + channel), flickerRect);
     
     Screen('SelectStereoDrawBuffer', window, channel);
     
@@ -157,7 +156,7 @@ while 1
     
     Screen(window, 'FillRect', [1 1 1] * b(t) * As(k), rect);
     
-    Screen('FillRect', window, [1 1 1] * flicker, flickerRect);
+    Screen('FillRect', window, [1 1 1] * flicker * 0.05 * (1 + channel), flickerRect);
     
     Screen(window, 'Flip');
     

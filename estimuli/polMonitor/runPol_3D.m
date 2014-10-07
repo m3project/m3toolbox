@@ -1,4 +1,4 @@
-function exitCode = runColors(As)
+function exitCode = runPol_3D(As)
 %% Initialization
 
 if nargin < 1
@@ -13,19 +13,15 @@ KbName('UnifyKeyNames');
 
 closeWindow();
 
-Gamma = 2.127; % for DELL U2413
+Gamma = 2; % for Ronny's 3D monitor (AOC D2367PH)
 
-LeftGains = [0 0.66 0];
-
-RightGains = [0 0 1];
-
-createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
+createWindow3D(Gamma);
 
 preview = 0;
 
-boxPosition = [860 670]; % left and top coordinates
+boxPosition = [100 100]; % left and top coordinates
 
-boxSize = [200 200]; % width and height
+boxSize = [150 150]; % width and height
 
 [sW, sH] = getResolution();
 
@@ -37,7 +33,7 @@ As = [0 As 0]; % make last element by default black
 
 tOn = 0.5;
 
-tOff = 5;
+tOff = 1;
 
 T = tOn + tOff;
 
@@ -155,7 +151,7 @@ while 1
     
     Screen(window, 'FillRect', [1 1 1] * 0, []);
     
-    Screen(window, 'FillRect', [1 1 1] * b(t) * As(k), rect);
+    Screen(window, 'FillRect', [1 1 1] * b(t) * As(k) * 255, rect);
     
     Screen('FillRect', window, [1 1 1] * flicker, flickerRect);
     

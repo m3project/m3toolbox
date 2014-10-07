@@ -49,7 +49,7 @@ end
 
 function runBeforeTrial(varargin)
 
-createWindow3D();
+createWindow3DAnaglyph();
 
 end
 
@@ -69,7 +69,7 @@ end
 
 function resultRow = runAfterTrial(varargin)
 
-pause(30);
+pause(60);
 
 r = [0];
 

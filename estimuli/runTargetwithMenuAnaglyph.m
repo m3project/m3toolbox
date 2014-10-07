@@ -1,21 +1,23 @@
-function exitCode = runTargetwithMenu
+function exitCode = runTargetwithMenuAnaglyph
 %% Initialization
 
 AssertOpenGL;
 
 KbName('UnifyKeyNames');
 
-consts = getConstants();
+Gamma = 2.127; % for DELL U2413
 
-consts.CRT_GAMMA = 2; % for Ronny's 3D monitor
+LeftGains = [0 0.66 0];
 
-createWindow3D(consts);
+RightGains = [0 0 1];
+
+createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
 
 w = getWindow();
 
 [sW, sH] = getResolution();
 
-sH = sH/2; % for 3D
+%sH = sH/2; % for 3D
 
 moving = 0;
 
@@ -24,6 +26,12 @@ moving = 0;
 disp_max = 10;
 
 disp_min = -10;
+
+%% load random motion sequence from file
+
+load('r1.mat'); % variable name is r1 (1e5 x 2 matrix)
+
+ind = 1; % r1 indexer
 
 %% Menu
 
@@ -34,23 +42,27 @@ menu.table = {
     'Ovality',          0.1:0.1:1.5, 1, '%1.1f units';
     'Step Size',        0:1:15,         5,         '%d pixels';   
     'Channels',         {'Left Only', 'Right Only', 'Both'}, 'Both', '%s';
-    'B-BOX X Shift',    -200:200,       0,          '%d pixels';
-    'B-BOX Y Shift',    -200:200,       -60,          '%d pixels';
-    'B-BOX Width',      5:5:sW,         400,        '%d pixels';
-    'B-BOX Height',     5:5:sH,         95,        '%d pixels';
+    'B-BOX X Shift',    -200:200,       -25,          '%d pixels';
+    'B-BOX Y Shift',    -200:200,       65,          '%d pixels';
+    'B-BOX Width',      5:5:sW,         100,        '%d pixels';
+    'B-BOX Height',     5:5:sH,         50,        '%d pixels';
     'B-BOX Visible',    {'No', 'Yes'},  'No',      '%s';
     'Flicker Color (!)',    0:0.1:1, 1, '%1.2f units';
     };
 
 menu = drawMenu(menu);
 
-menu.visible = 0;
+menu.visible = 1;
 
 %% Stimulus Settings
 
-x = 0.5 * sW; % bug x position
+x0 = 0.5 * sW; % bug x position
 
-y = 0.5 * sH; % bug y position
+y0 = 0.5 * sH; % bug y position
+
+x = x0;
+
+y = y0;
 
 bX = sW/2; % bounding box x position
 
@@ -60,7 +72,7 @@ bY = sH/2; % bounding box y position
 
 oldPressed = 0;
 
-flickSize = 50;
+flickSize = 100;
 
 flickerRect = [0 sH-flickSize/2 flickSize sH];
 
@@ -73,7 +85,13 @@ map1.put('Both', 0);
 
 old_fc = -1;
 
+frameTimes = nan(500, 1);
+
+frameCounter = 1;  
+
 while 1
+    
+    frameStart = GetSecs();
     
     r = menu.get('Radius');
     
@@ -101,25 +119,25 @@ while 1
     
     if strcmp(channels, 'Left Only')
         
-        fc = 0.9;
+        fc = 0.25;
         
     elseif strcmp(channels, 'Right Only')
         
-        fc = 0.7;
+        fc = 1;
         
     else
         
         if d == 0
             
-            fc = 0.5;
+            fc = 0.12;
             
         elseif d == disp_max
             
-            fc = 0.3;
+            fc = 0.05;
             
         elseif d == disp_min
             
-            fc = 0.1;
+            fc = 0.02;
             
         else
             
@@ -145,7 +163,7 @@ while 1
     
     boundBox = [bX bY bX bY] + [-bW -bH +bW +bH]/2 + [bXS bYS bXS bYS];
     
-    rect0 = [x y; x y] + [-1 -1/2; 1 1/2] .* [o 1; o 1] * r/2;
+    rect0 = [x y; x y] + [-1 -1; 1 1] .* [o 1; o 1] * r/2;
     
     rect1 = rect0 - [1 0; 1 0] * d/2;
     
@@ -154,6 +172,8 @@ while 1
     Screen('SelectStereoDrawBuffer', w, 1);
     
     Screen('FillRect', w, backColor);
+    
+    menu = drawMenu(menu);
     
     if bVisible
         
@@ -169,12 +189,11 @@ while 1
         
     end
     
-    
-    menu = drawMenu(menu);
-    
     Screen('SelectStereoDrawBuffer', w, 0);
     
     Screen('FillRect', w, backColor);
+    
+    menu = drawMenu(menu);
     
     if bVisible
         
@@ -190,7 +209,7 @@ while 1
         
     end
     
-    menu = drawMenu(menu);
+    %menu = drawMenu(menu);
     
     Screen('DrawingFinished', w);   
     
@@ -199,10 +218,12 @@ while 1
     flicker = 1 - flicker;
     
     if moving
+        
+        x = x + power(-1, r1(ind, 1)) * stepSize;
 
-        x = x + power(-1, randi(2)) * stepSize;
-
-        y = y + power(-1, randi(2)) * stepSize;
+        y = y + power(-1, r1(ind, 2)) * stepSize;
+        
+        ind = ind + 1;
 
         x = max(x, boundBox(1));
 
@@ -237,6 +258,12 @@ while 1
         if keycode(KbName('SPACE'))
             
             moving = 1 - moving;
+            
+            ind = 1;
+            
+            x = x0;
+
+            y = y0;
             
         end
         
@@ -284,4 +311,24 @@ while 1
     
     oldPressed = pressed;
     
+      frameEnd = GetSecs();
+
+    frameDuration = frameEnd - frameStart;
+
+    frameTimes(frameCounter) = frameDuration;
+
+    frameCounter = mod(frameCounter, 500)+1   ;
+    
+end
+
+hist(frameTimes);
+
+ft = frameTimes(~isnan(frameTimes));
+
+if any(ft-mean(ft)>1e-3)
+    
+    warning('Dropped frames detected!')
+    
+end
+
 end

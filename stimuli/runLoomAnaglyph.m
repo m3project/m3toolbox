@@ -15,17 +15,17 @@ makePlot = 0; % when set to 1, the script plots size and trajectory instead of r
 
 sizeScaleEnable = 1;
 
-disparityEnable = -1;
+disparityEnable = 1;
 
 disparitySizeCondition = 0; % when set to 1, the bug size in the case of (disparityEnable=1, sizeEnable=0) is initially small
 
 bugColor = 0; % [0, 1]
 
-iod = 0.4; % mantis inter-ocular distance (cm)
+iod = 0.7; % mantis inter-ocular distance (cm)
 
 sf = 40; % screen scaling factor (px/cm)
 
-viewD = 4;% viewing distance (cm)
+viewD = 5;% viewing distance (cm)
 
 virtDm1 = 2.5; % virtual distance 1 from mantis (cm)
 
@@ -39,7 +39,7 @@ virtBS1= virtBS2 * virtDm2 / viewD;
 
 duration = 2.25; % duration of motion from distance 1 to 2 (seconds)
 
-bugY = 0.58; % vertical location of bug (0 to 1)
+bugY = 0.62; % vertical location of bug (0 to 1)
 
 bugJitter = 5; % bug jitter in pixels (0 to disable)
 
@@ -222,7 +222,7 @@ while 1
         
         if keycode(KbName('s'))
             
-            startTime = GetSecs(); % restarts animation
+%             startTime = GetSecs(); % restarts animation
             
         end
         
