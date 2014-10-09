@@ -384,8 +384,6 @@ while 1
     
 end
 
-exitCode = 0;
-
 end
 
 function [X, Y] = getSwirl(centerX, centerY, motionDuration, motionR0, rotFreq)

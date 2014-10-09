@@ -23,9 +23,9 @@ moving = 0;
 
 %% constants
 
-disp_max = 10;
+disp_max = 20;
 
-disp_min = -10;
+disp_min = -20;
 
 %% load random motion sequence from file
 
@@ -42,8 +42,8 @@ menu.table = {
     'Ovality',          0.1:0.1:1.5, 1, '%1.1f units';
     'Step Size',        0:1:15,         5,         '%d pixels';   
     'Channels',         {'Left Only', 'Right Only', 'Both'}, 'Both', '%s';
-    'B-BOX X Shift',    -200:200,       -25,          '%d pixels';
-    'B-BOX Y Shift',    -200:200,       65,          '%d pixels';
+    'B-BOX X Shift',    -200:200,       37,          '%d pixels';
+    'B-BOX Y Shift',    -200:200,       0,          '%d pixels';
     'B-BOX Width',      5:5:sW,         100,        '%d pixels';
     'B-BOX Height',     5:5:sH,         50,        '%d pixels';
     'B-BOX Visible',    {'No', 'Yes'},  'No',      '%s';
@@ -52,7 +52,7 @@ menu.table = {
 
 menu = drawMenu(menu);
 
-menu.visible = 1;
+menu.visible = 0;
 
 %% Stimulus Settings
 
@@ -269,13 +269,13 @@ while 1
         
         if keycode(KbName('p'))
             
-            menu.table{1, 3} = 10;
+            menu.table{1, 3} = disp_max;
             
         end
         
         if keycode(KbName('n'))
             
-            menu.table{1, 3} = -10;
+            menu.table{1, 3} = -disp_min;
             
         end
         
@@ -321,7 +321,7 @@ while 1
     
 end
 
-hist(frameTimes);
+%hist(frameTimes);
 
 ft = frameTimes(~isnan(frameTimes));
 

@@ -23,7 +23,7 @@ motionR0 = 300; % initial motion radius (pixels) (800px in behavioral expt)
 
 motionDuration = 5; % duration of swirling (seconds) (5 secs in behavioral expt)
 
-totalTime = 30; % duration of bug visibility(seconds) (7 secs in behavioral expt)
+totalTime =7; % duration of bug visibility(seconds) (7 secs in behavioral expt)
 
 flickerCols = [0.01 0.03;0.05 0.12; 0.01 0.06]; % -, 0 and + disparity (avoid using 0 since black is the non-flickering color)
 
@@ -35,7 +35,7 @@ disparityEnable = 1; % disparity setting (-1, 0 or +1)
 
 previewMotionFunc = 0; % set to 1 to see a figure of the swirl function versus time
 
-cx = 950; % center in x coords (px) (screen center in behavioral expt)
+cx = 970; % center in x coords (px) (screen center in behavioral expt)
 
 cy = 650; % center in y coords (px) (screen center in behavioral expt)
 
