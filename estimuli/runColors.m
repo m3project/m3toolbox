@@ -43,6 +43,16 @@ T = tOn + tOff;
 
 channel = 0; % 0 or 1
 
+%% print keyboard shortcuts
+
+shortcuts = {
+    'Space',            'Start displaying flashes', ...
+    'b',                'Switch to blue channel'
+    'g',                'Switch to green channel'
+    'End or Escape',    'exit stimulus', ...    
+    };
+
+printKeyboardShortcuts(shortcuts);
 %% functions 0
 
 b = @(t) (t>0) & (t<tOn);

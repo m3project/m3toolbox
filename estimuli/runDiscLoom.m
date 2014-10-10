@@ -55,6 +55,20 @@ speed = 5;
 
 t2 = 5;
 
+%% print keyboard shortcuts
+
+shortcuts = {
+    'Up',               'Loom', ...
+    'Down',             'Receed', ...
+    'Right',            'Loom (with background motion)', ...
+    'Left',             'Receed (with background motion)', ...
+    'l',                'Switch direction to left', ...
+    'r',                'Switch direction to right', ...
+    'Escape or End',	'Exit stimulus'
+    };
+
+printKeyboardShortcuts(shortcuts);
+
 %% motion function
 
 dtr = (virtDist1 - virtDist2) / speed; % transition time
@@ -296,6 +310,8 @@ while 1
     end    
     
 end
+
+closeWindow();
 
 end
 

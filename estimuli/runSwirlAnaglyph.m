@@ -13,7 +13,7 @@ createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
 
 window = getWindow();
 
-[sW, sH] = getResolution()
+[sW, sH] = getResolution();
 
 %% Stimulus Settings
 
@@ -87,6 +87,20 @@ end
 
 dump = packWorkspace();
 
+%% print keyboard shortcuts
+
+shortcuts = {
+    'p',                        'Set disparity to positive', ... 
+    'n',                        'Set disparity to negative', ... 
+    '0',                        'Set disparity to zero', ... 
+    'b',                        'enable blue channel only', ... 
+    'g',                        'enable green channel only', ... 
+    'k',                        'enable both channels', ...     
+    'Space or s',               'Start bug motion', ...
+    'Escape or End',            'Exit stimulus'
+    };
+
+printKeyboardShortcuts(shortcuts);
 %% functions:
 
 ta = @(t) min(t, duration) / duration; % animation time [0, 1]
@@ -294,25 +308,15 @@ while 1
     
     [~, ~, keycode] = KbCheck;
     
-    if keycode(KbName('s'))
-        
-        startTime = GetSecs(); % restarts animation
-        
-    end
-    
     if keycode(KbName('p'))
         
         disparityEnable = +1;
-        
-        enableChannels = 0;
         
     end
     
     if keycode(KbName('n'))
         
         disparityEnable = -1;
-        
-        enableChannels = 0;
         
     end
     
@@ -322,9 +326,13 @@ while 1
         
     end
     
-    if keycode(KbName('b'))
+    if keycode(KbName('k'))
         
-        disparityEnable = 0;
+        enableChannels = 0;
+        
+    end    
+    
+    if keycode(KbName('b'))
         
         enableChannels = +1;
         
@@ -332,13 +340,11 @@ while 1
     
     if keycode(KbName('g'))
         
-        disparityEnable = 0;
-        
         enableChannels = -1;
         
     end    
     
-    if keycode(KbName('Space'));
+    if keycode(KbName('Space')) || keycode(KbName('s'))
         
         startTime = GetSecs();
         
@@ -379,6 +385,8 @@ if any(ft-mean(ft)>1e-3)
     warning('Dropped frames detected!')
     
 end
+
+closeWindow();
 
 end
 

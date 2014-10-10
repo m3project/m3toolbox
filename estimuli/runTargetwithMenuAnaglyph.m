@@ -41,7 +41,7 @@ menu.table = {
     'Background Color', 0:0.02:1,       1,          '%1.2f units';
     'Ovality',          0.1:0.1:1.5, 1, '%1.1f units';
     'Step Size',        0:1:15,         5,         '%d pixels';   
-    'Channels',         {'Left Only', 'Right Only', 'Both'}, 'Both', '%s';
+    'Channels',         {'Blue Only', 'Green Only', 'Both'}, 'Both', '%s';
     'B-BOX X Shift',    -200:200,       37,          '%d pixels';
     'B-BOX Y Shift',    -200:200,       0,          '%d pixels';
     'B-BOX Width',      5:5:sW,         100,        '%d pixels';
@@ -68,6 +68,22 @@ bX = sW/2; % bounding box x position
 
 bY = sH/2; % bounding box y position
 
+%% print keyboard shortcuts
+
+shortcuts = {
+    'p',                        'Set disparity to positive', ... 
+    'n',                        'Set disparity to negative', ... 
+    '0',                        'Set disparity to zero', ... 
+    'k',                        'enable both channels', ... 
+    'b',                        'enable blue channel only', ... 
+    'g',                        'enable green channel only', ... 
+    'Space',                    'Start/stop bug motion', ...
+    'm',                        'Display menu', ...
+    'Escape or End',            'Exit stimulus'
+    };
+
+printKeyboardShortcuts(shortcuts);
+
 %% Drawing loop
 
 oldPressed = 0;
@@ -79,8 +95,8 @@ flickerRect = [0 sH-flickSize/2 flickSize sH];
 flicker = 0;
 
 map1 = java.util.Hashtable;
-map1.put('Left Only', -1);
-map1.put('Right Only', 1);
+map1.put('Blue Only', 1);
+map1.put('Green Only', -1);
 map1.put('Both', 0);
 
 old_fc = -1;
@@ -117,11 +133,11 @@ while 1
     
     channels = menu.get('Channels');
     
-    if strcmp(channels, 'Left Only')
+    if strcmp(channels, 'Blue Only')
         
         fc = 0.25;
         
-    elseif strcmp(channels, 'Right Only')
+    elseif strcmp(channels, 'Green Only')
         
         fc = 1;
         
@@ -275,23 +291,23 @@ while 1
         
         if keycode(KbName('n'))
             
-            menu.table{1, 3} = -disp_min;
+            menu.table{1, 3} = disp_min;
             
         end
         
-        if keycode(KbName('l'))
+        if keycode(KbName('b'))
             
-            menu.table{6, 3} = 'Left Only';
+            menu.table{6, 3} = 'Blue Only';
             
         end
         
-        if keycode(KbName('r'))
+        if keycode(KbName('g'))
             
-            menu.table{6, 3} = 'Right Only';
+            menu.table{6, 3} = 'Green Only';
             
         end     
         
-        if keycode(KbName('b'))
+        if keycode(KbName('k'))
             
             menu.table{6, 3} = 'Both';
             
@@ -302,7 +318,7 @@ while 1
             menu.table{1, 3} = 0;
             
         end
-        
+
         menu.updateget = 1;
         
         menu = drawMenu(menu);
@@ -330,5 +346,7 @@ if any(ft-mean(ft)>1e-3)
     warning('Dropped frames detected!')
     
 end
+
+closeWindow();
 
 end

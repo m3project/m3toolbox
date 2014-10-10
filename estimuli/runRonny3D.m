@@ -1,6 +1,6 @@
-function runRonny()
+function runRonny3D()
 
-funcs = {@runDiscLoom, @runGratingwithMenu, @runTargetwithMenuAnaglyph, @runSwirlAnaglyph, @runDotsAnaglyph_ephys};
+funcs = {@runTargetwithMenuAnaglyph, @runSwirlAnaglyph, @runDotsAnaglyph_ephys};
 
 closeWindow();
 

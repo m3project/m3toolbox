@@ -128,9 +128,9 @@ for i=1:frameCount
     FINAL=ifft2(RESULT);
     NOISEFILTERED=real(FINAL);
     
-    I=NOISEFILTERED;
-    Lave=sum(sum(I.*gx*gy))./(degreesimagex*degreesimagey);
-    c=(I-Lave)./Lave;%Funcion de contraste
+    c=NOISEFILTERED;
+    %Lave=sum(sum(I.*gx*gy))./(degreesimagex*degreesimagey);
+    %c=(I-Lave)./Lave;%Funcion de contraste
     NORMNOISEFILTERED=127.5*(1+1*(c./max(max(abs(c)))));
     
     luminancias=reshape(NORMNOISEFILTERED,1,sW*SIZE_Y);

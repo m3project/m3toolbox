@@ -67,6 +67,20 @@ if exist('logFile', 'var')
 
 end
 
+%% print keyboard shortcuts
+
+shortcuts = {
+    'Numpad Up',                'Change direction to up', ...
+    'Numpad Down',              'Change direction to down', ...
+    'Numpad Right',             'Change direction to right', ...
+    'Numpad Left',              'Change direction to left', ...
+    'Space',                    'Start/stop motion', ...
+    'm',                        'Show/hide menu', ...    
+    'Escape or End',            'Exit stimulus'
+    };
+
+printKeyboardShortcuts(shortcuts);
+
 %% rendering stimulus
 
 % parameters:
@@ -316,6 +330,7 @@ if fid ~= -1
     fclose(fid);
     
 end
-%closeWindow();
+
+closeWindow();
 
 end
