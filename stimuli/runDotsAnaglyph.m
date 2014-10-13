@@ -10,15 +10,15 @@ RightGains = [0 0 1];
 
 createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
 
-%% Vivek parameters
+%% Vivek parameters 
 
 bugY = 0.6;
 
-viewD = 5; % viewing distance (cm)
+viewD = 7; % viewing distance (cm)
 
 bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm2 position
 
-disparityEnable = 1; % -1 ,0 or +1
+disparityEnable = -1; % -1 ,0 or +1
 
 enaJitter = 0;
 
@@ -316,7 +316,7 @@ while 1
         
         if enaJitter
             
-            jitter = d(0, t) / 2;
+            jitter = dispFunc(0, t, radFunc, edgeSmoothness, disparityMag, disparityEnable, backDisparity)/2;
             
             pos(:,1) = pos(:,1) + jitter .* (-1).^randV;
             

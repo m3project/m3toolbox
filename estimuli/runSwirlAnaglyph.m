@@ -101,6 +101,7 @@ shortcuts = {
     };
 
 printKeyboardShortcuts(shortcuts);
+
 %% functions:
 
 ta = @(t) min(t, duration) / duration; % animation time [0, 1]

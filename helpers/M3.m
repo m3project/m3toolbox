@@ -2,15 +2,17 @@
 %
 % Ghaith Tarawneh - 29/05/2014
 %
-function path = getM3Path()
+function path = M3()
 
-fullpath = mfilename('fullpath');
+path = mfilename('fullpath');
 
-[path, name, ~] = fileparts(fullpath);
+[path, name] = fileparts(path); % get parent of this script
+
+path = fileparts(path); % go up one dir
 
 % some sanity checks
 
-if ~strcmp(name, 'getM3Path')
+if ~strcmp(name, 'M3')
     
     error('sanity check: script name not returned correctly');
     
