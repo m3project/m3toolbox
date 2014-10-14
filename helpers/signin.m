@@ -1,6 +1,6 @@
 function signin()
 
-file = fullfile(getM3Path, 'in.use');
+file = fullfile(M3, 'in.use');
 
 [~, username] = system('whoami');
 

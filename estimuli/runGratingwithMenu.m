@@ -1,4 +1,13 @@
-function exitCode = runGratingwithMenu()
+function exitCode = runGratingwithMenu(logEvent)
+
+if nargin<1
+    
+    logEvent = @(str) str; % dummy function
+    
+end
+
+logEvent('runGratingwithMenu');
+
 %% options
 
 patchSize = 100; % pixels
@@ -15,7 +24,7 @@ motionDuration = 5; % seconds
 
 %% initialization
 
-KbName('UnifyKeyNames'); 
+KbName('UnifyKeyNames');
 
 Gamma = 2.127; % for DELL U2413
 
@@ -27,23 +36,23 @@ window = getWindow();
 
 %% menu
 
-menu.table = {  
+menu.table = {
     
-    'Spatial Period', 10:10:1000, 170, '%d px/cycle';
-    
-    'Motion', {'Off', 'On'}, 'Off', '%s';
-    
-    'Speed', 0:10:1500, 1200, '%d pixels/sec';
-    
-    'Direction', {'Left', 'Right'}, 'Right', '%s';
-    
-    'Orientation', {'Horitzontal', 'Vertical'}, 'Horitzontal', '%s';
-    
-    'Jitter', 0:1.8:36, 0, '%1.2f degrees';
+'Spatial Period', 10:10:1000, 170, '%d px/cycle';
 
-    'Type', {'Sine', 'Square'}, 'Sine', '%s'
-    
-    };
+'Motion', {'Off', 'On'}, 'Off', '%s';
+
+'Speed', 0:10:1500, 1200, '%d pixels/sec';
+
+'Direction', {'Left', 'Right'}, 'Right', '%s';
+
+'Orientation', {'Horitzontal', 'Vertical'}, 'Horitzontal', '%s';
+
+'Jitter', 0:1.8:36, 0, '%1.2f degrees';
+
+'Type', {'Sine', 'Square'}, 'Sine', '%s'
+
+};
 
 menu = drawMenu(menu);
 
@@ -54,18 +63,30 @@ oldMenu = menu;
 %% logging options
 
 fid = 1; % default: output to command window
- 
+
 if exist('logFile', 'var')
-
+    
     fid = fopen(logFile, 'A'); % open file in append mode
-
+    
     if fid == -1
-
+        
         error('Cannot open log file for writing');
-
+        
     end
-
+    
 end
+
+%% print notice about menu
+
+disp('')
+disp('*****************');
+disp('Important Notice:');
+disp('*****************');
+disp('')
+disp('Changes to the stimulus parameters using the menu feature are NOT saved to the experiment log file.');
+disp('You should use the menu feature to calibrate parameter values and then MANUALLY copy these to the script')
+disp('BEFORE doing any actual experiments.');
+disp('');
 
 %% print keyboard shortcuts
 
@@ -75,7 +96,7 @@ shortcuts = {
     'Numpad Right',             'Change direction to right', ...
     'Numpad Left',              'Change direction to left', ...
     'Space',                    'Start/stop motion', ...
-    'm',                        'Show/hide menu', ...    
+    'm',                        'Show/hide menu (MENU CHANGES ARE NOT LOGGED TO FILE)', ...
     'Escape or End',            'Exit stimulus'
     };
 
@@ -146,6 +167,8 @@ patchFreq = 1;
 
 fprintf(fid, 'Stimulus runGratingwithMenu started at %s : \n\n', datestr(now, 'dd-mmm-yyyy HH:MM:SS.FFF'));
 
+oldKeyIsDown = 1;
+
 while 1
     
     % print any changes in menu
@@ -165,7 +188,7 @@ while 1
     % flushing to file
     
     if (fid ~= 1) &&(t-lastFlushTime > logFlushPeriod)
-
+        
         fclose(fid);
         
         fid = fopen(logFile, 'A'); % open file in append mode
@@ -173,15 +196,15 @@ while 1
         lastFlushTime = t;
         
         disp('flushing')
-
-    end    
-   
+        
+    end
+    
     % updating t and i
     
     t = GetSecs() - startTime;
     
     i = i + 1;
-
+    
     % pulling params from menu
     
     spatialPeriod = menu.get('Spatial Period');
@@ -202,7 +225,7 @@ while 1
     
     gratingid = map3.get(menu.get('Type'));
     
-    motionEna = map4.get(menu.get('Motion'));    
+    motionEna = map4.get(menu.get('Motion'));
     
     % drawing patch
     
@@ -220,7 +243,7 @@ while 1
         
     end
     
-    Screen('FillRect', window, [1 1 1] * patchState * patchColor * patchEna, patchRect);        
+    Screen('FillRect', window, [1 1 1] * patchState * patchColor * patchEna, patchRect);
     
     % calculating phase
     
@@ -253,80 +276,105 @@ while 1
     
     Screen(window, 'Flip');
     
-    [~, ~, keyCode ] = KbCheck;
+    [keyIsDown, ~, keyCode ] = KbCheck;
     
-    if keyCode(KbName('SPACE')) && (t-spaceKeyCoolDown>0.25)
+    if keyIsDown && ~oldKeyIsDown
         
-        newMotionEna = map7.get(1 - motionEna);
+        if keyCode(KbName('SPACE')) %&& (t-spaceKeyCoolDown>0.25)
+            
+            newMotionEna = map7.get(1 - motionEna);
+            
+            menu = updateMenu(menu, 'Motion', newMotionEna);
+            
+%             spaceKeyCoolDown = t;
+            
+            if (1 - motionEna) % this is the new motion setting
+                
+                logEvent('motion started');
+                
+            else
+                
+                logEvent('motion stopped');
+                
+            end
+            
+        end
         
-        menu = updateMenu(menu, 'Motion', newMotionEna);
+%         if t-spaceKeyCoolDown>motionDuration
+%             
+%             newMotionEna = map7.get(0);
+%             
+%             menu = updateMenu(menu, 'Motion', newMotionEna);
+%             
+%             spaceKeyCoolDown = t;
+%             
+%         end
         
-        spaceKeyCoolDown = t;
+        if keyCode(KbName('8'))
+            
+            menu = updateMenu(menu, 'Orientation', 'Vertical');
+            
+            menu = updateMenu(menu, 'Direction', 'Left');
+            
+            logEvent('switched direction to up');
+            
+        end
+        
+        if keyCode(KbName('2'))
+            
+            menu = updateMenu(menu, 'Orientation', 'Vertical');
+            
+            menu = updateMenu(menu, 'Direction', 'Right');
+            
+            logEvent('switched direction to down');
+            
+        end
+        
+        if keyCode(KbName('4'))
+            
+            menu = updateMenu(menu, 'Orientation', 'Horitzontal');
+            
+            menu = updateMenu(menu, 'Direction', 'Left');
+            
+            logEvent('switched direction to left');
+            
+        end
+        
+        if keyCode(KbName('6'))
+            
+            menu = updateMenu(menu, 'Orientation', 'Horitzontal');
+            
+            menu = updateMenu(menu, 'Direction', 'Right');
+            
+            logEvent('switched direction to right');
+            
+        end
+        
+        if keyCode(KbName('Escape'))
+            
+            exitCode = 0;
+            
+            break;
+            
+        end
+        
+        if keyCode(KbName('END'))
+            
+            exitCode = 1;
+            
+            break;
+            
+        end
         
     end
     
-    if t-spaceKeyCoolDown>motionDuration
-        
-        newMotionEna = map7.get(0);
-        
-        menu = updateMenu(menu, 'Motion', newMotionEna);
-        
-        spaceKeyCoolDown = t;
-        
-    end
+    oldKeyIsDown = keyIsDown;
     
-    if keyCode(KbName('8'))
-        
-        menu = updateMenu(menu, 'Orientation', 'Vertical');
-        
-        menu = updateMenu(menu, 'Direction', 'Left');
-        
-    end  
-    
-    if keyCode(KbName('2'))
-        
-        menu = updateMenu(menu, 'Orientation', 'Vertical');
-        
-        menu = updateMenu(menu, 'Direction', 'Right');
-        
-    end  
-    
-    if keyCode(KbName('4'))
-        
-        menu = updateMenu(menu, 'Orientation', 'Horitzontal');
-        
-        menu = updateMenu(menu, 'Direction', 'Left');
-        
-    end  
-    
-    if keyCode(KbName('6'))
-        
-        menu = updateMenu(menu, 'Orientation', 'Horitzontal');
-        
-        menu = updateMenu(menu, 'Direction', 'Right');
-        
-    end    
-    
-    if keyCode(KbName('Escape'))
-        
-        exitCode = 0;
-        
-        break;
-        
-    end
-    
-    if keyCode(KbName('END'))
-
-        exitCode = 1;
-
-        break;
-
-    end
     
 end
 
 if fid ~= -1
-
+    
     fclose(fid);
     
 end

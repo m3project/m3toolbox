@@ -1,4 +1,13 @@
-function exitCode = runDiscLoom
+function exitCode = runDiscLoom(logEvent)
+
+if nargin<1
+    
+    logEvent = @(str) str; % dummy function
+    
+end
+
+logEvent('runDiscLoom');
+
 %% parameters
 
 spatialPeriod = 192; % pixels (use a divisor of the screen width)
@@ -153,6 +162,8 @@ mEna = @(t) 0;
 
 dir = 1;
 
+oldKeyIsDown = 1;
+
 while 1
     
     t = GetSecs() - startTime;
@@ -229,85 +240,103 @@ while 1
     
     Screen(window, 'Flip');
     
-    [~, ~, keyCode ] = KbCheck;
+    [keyIsDown, ~, keyCode ] = KbCheck;
     
-    if r(t)
+    if keyIsDown && ~oldKeyIsDown
         
-        y = [KbName('UpArrow') KbName('DownArrow') KbName('RightArrow') KbName('LeftArrow')];
-        
-        if any(keyCode(y))
+        if r(t)
             
-          %  warning('Current motion sequence still playing');
+            y = [KbName('UpArrow') KbName('DownArrow') KbName('RightArrow') KbName('LeftArrow')];
+            
+            if any(keyCode(y))
+                
+                %  warning('Current motion sequence still playing');
+                
+            end
+            
+        else
+            
+            if keyCode(KbName('UpArrow'))
+                
+                r = @(ct) rLoom1(ct - t);
+                
+                mEna = @(ct) backMotionEna1(ct - t);
+                
+                logEvent('start looming (static background)');
+                
+            end
+            
+            if keyCode(KbName('DownArrow'))
+                
+                r = @(ct) rReceed1(ct - t);
+                
+                mEna = @(ct) backMotionEna1(ct - t);
+                
+                logEvent('start receeding (static background)');
+                
+            end
+            
+            if keyCode(KbName('RightArrow'))
+                
+                r = @(ct) rLoom2(ct - t);
+                
+                mEna = @(ct) backMotionEna2(ct - t);
+                
+                logEvent('start looming (moving background)');
+                
+            end
+            
+            if keyCode(KbName('LeftArrow'))
+                
+                r = @(ct) rReceed2(ct - t);
+                
+                mEna = @(ct) backMotionEna2(ct - t);
+                
+                logEvent('start receeding (moving background)');
+                
+            end
             
         end
         
-    else        
-        
-        if keyCode(KbName('UpArrow'))
+        if keyCode(KbName('Escape'))
             
-            r = @(ct) rLoom1(ct - t);
+            exitCode = 0;
             
-            mEna = @(ct) backMotionEna1(ct - t);
+            break;
             
         end
         
-        if keyCode(KbName('DownArrow'))
+        if keyCode(KbName('END'))
             
-            r = @(ct) rReceed1(ct - t);
+            exitCode = 1;
             
-            mEna = @(ct) backMotionEna1(ct - t);
-            
-        end
-        
-        if keyCode(KbName('RightArrow'))
-            
-            r = @(ct) rLoom2(ct - t);
-            
-            mEna = @(ct) backMotionEna2(ct - t);
+            break;
             
         end
         
-        if keyCode(KbName('LeftArrow'))
+        if keyCode(KbName('l')) && dir == 1
             
-            r = @(ct) rReceed2(ct - t);
+            dir = -1;
             
-            mEna = @(ct) backMotionEna2(ct - t);
+            disp('direction switched to left');
+            
+            logEvent('direction switched to left');
+            
+        end
+        
+        if keyCode(KbName('r')) && dir == -1
+            
+            dir = 1;
+            
+            disp('direction switched to right');
+            
+            logEvent('direction switched to right');
             
         end
         
     end
     
-    if keyCode(KbName('Escape'))
-        
-        exitCode = 0;
-        
-        break;
-        
-    end
-    
-    if keyCode(KbName('END'))
-
-        exitCode = 1;
-
-        break;
-
-    end
-    
-    if keyCode(KbName('l')) && dir == 1
-        
-        dir = -1;
-        
-        disp('direction switched to left');
-        
-    end
-
-    if keyCode(KbName('r')) && dir == -1
-        
-        dir = 1;
-        
-        disp('direction switched to right');
-        
-    end    
+    oldKeyIsDown = keyIsDown;
     
 end
 

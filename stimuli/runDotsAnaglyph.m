@@ -20,15 +20,17 @@ bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm2 position
 
 disparityEnable = -1; % -1 ,0 or +1
 
+iod = 0.5 ; % mantis inter-ocular distance (cm)
+
 enaJitter = 0;
 
 preTrialDelay = 5; % seconds
 
 % dot params: 
 
-n = 1000; % number of dots  
+n = 10000; % number of dots  
 
-r = 60; % radius
+r = 20; % radius
 
 v = 2; % velocity
 
@@ -76,7 +78,7 @@ flickerCols = [0 0.25; 0 0.5; 0 1]; % -, 0 and + disparity (avoid using 0 since 
 
 
 
-iod = 0.7; % mantis inter-ocular distance (cm)
+
 
 sf = 37.0370; % screen scaling factor (px/cm) for Dell U2413
 

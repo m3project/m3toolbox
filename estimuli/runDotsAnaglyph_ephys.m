@@ -1,4 +1,14 @@
-function [exitCode, xs, ys, thetas] = runDotsAnaglyph_ephys(expt, xs, ys, thetas)
+function exitCode = runDotsAnaglyph_ephys(logEvent)
+
+if nargin<1
+    
+    logEvent = @(str) str; % dummy function
+    
+end
+
+logEvent('runDotsAnaglyph_ephys');
+
+%% Initialization
 
 KbName('UnifyKeyNames');
 
@@ -100,14 +110,6 @@ virtBS1= virtBS2 * virtDm2 / viewD;
 % overrides for testing:
 
 %rotFreq = 0.1; motionDuration = 50; % for testing
-
-%% parameter overrides
-
-if nargin>0
-    
-    unpackStruct(expt);
-    
-end
 
 %% print keyboard shortcuts
 
@@ -246,6 +248,8 @@ end
 
 %% rendering loop
 
+oldKeyIsDown = 1;
+
 startTime = GetSecs() + preTrialDelay - motionDuration - finalPresentationTime - 1;
 
 while 1
@@ -353,47 +357,61 @@ while 1
         
         % handle key presses
         
-        [~, ~, keyCode] = KbCheck;
+        [keyIsDown, ~, keyCode] = KbCheck;
         
-        if keyCode(KbName('p'))
+        if keyIsDown && ~oldKeyIsDown
             
-            disparityEnable = +1;            
+            if keyCode(KbName('p'))
+                
+                disparityEnable = +1;
+                
+                logEvent('set disparity to positive');
+                
+            end
+            
+            if keyCode(KbName('n'))
+                
+                disparityEnable = -1;
+                
+                logEvent('set disparity to negative');
+                
+            end
+            
+            if keyCode('0')
+                
+                disparityEnable = 0;
+                
+                logEvent('set disparity to 0');
+                
+            end
+            
+            if (keyCode(KbName('Space')))
+                
+                startTime = GetSecs();
+                
+                logEvent('started swirl');
+                
+            end
+            
+            if keyCode(KbName('Escape'))
+                
+                exitCode = 0;
+                
+                break;
+                
+            end
+            
+            if keyCode(KbName('END'))
+                
+                exitCode = 1;
+                
+                break;
+                
+            end
             
         end
         
-        if keyCode(KbName('n'))
-            
-            disparityEnable = -1;
-            
-        end
-        
-        if keyCode('0')
-            
-            disparityEnable = 0;
-            
-        end
-        
-        if (keyCode(KbName('Space')))
-            
-            startTime = GetSecs();
-            
-        end
-        
-        if keyCode(KbName('Escape'))
-            
-            exitCode = 0;
-            
-            break;
-            
-        end
-        
-        if keyCode(KbName('END'))
-            
-            exitCode = 1;
-            
-            break;
-            
-        end
+        oldKeyIsDown = keyIsDown;
         
     end
     

@@ -1,4 +1,13 @@
-function exitCode = runTargetwithMenuAnaglyph
+function exitCode = runTargetwithMenuAnaglyph(logEvent)
+
+if nargin<1
+    
+    logEvent = @(str) str; % dummy function
+    
+end
+
+logEvent('runTargetwithMenuAnaglyph');
+
 %% Initialization
 
 AssertOpenGL;
@@ -32,6 +41,18 @@ disp_min = -20;
 load('r1.mat'); % variable name is r1 (1e5 x 2 matrix)
 
 ind = 1; % r1 indexer
+
+%% print notice about menu
+
+disp('')
+disp('*****************');
+disp('Important Notice:');
+disp('*****************');
+disp('')
+disp('Changes to the stimulus parameters using the menu feature are NOT saved to the experiment log file.');
+disp('You should use the menu feature to calibrate parameter values and then MANUALLY copy these to the script')
+disp('BEFORE doing any actual experiments.');
+disp('');
 
 %% Menu
 
@@ -86,8 +107,6 @@ printKeyboardShortcuts(shortcuts);
 
 %% Drawing loop
 
-oldPressed = 0;
-
 flickSize = 100;
 
 flickerRect = [0 sH-flickSize/2 flickSize sH];
@@ -103,7 +122,9 @@ old_fc = -1;
 
 frameTimes = nan(500, 1);
 
-frameCounter = 1;  
+frameCounter = 1;
+
+oldKeyIsDown = 1;
 
 while 1
     
@@ -181,9 +202,9 @@ while 1
     
     rect0 = [x y; x y] + [-1 -1; 1 1] .* [o 1; o 1] * r/2;
     
-    rect1 = rect0 - [1 0; 1 0] * d/2;
+    rect1 = rect0 + [1 0; 1 0] * d/2;
     
-    rect2 = rect0 + [1 0; 1 0] * d/2;
+    rect2 = rect0 - [1 0; 1 0] * d/2;
     
     Screen('SelectStereoDrawBuffer', w, 1);
     
@@ -251,9 +272,9 @@ while 1
     
     end
     
-    [pressed, ~, keycode] = KbCheck;
+    [keyIsDown, ~, keycode] = KbCheck;
     
-    if pressed && ~oldPressed
+    if keyIsDown && ~oldKeyIsDown
         
         if keycode(KbName('ESCAPE'))
             
@@ -281,11 +302,23 @@ while 1
 
             y = y0;
             
+            if moving
+                
+                logEvent('started moving');
+                
+            else
+                
+                logEvent('stopped moving');
+                
+            end
+            
         end
         
         if keycode(KbName('p'))
             
             menu.table{1, 3} = disp_max;
+            
+            logEvent('set disparity to positive');
             
         end
         
@@ -293,11 +326,15 @@ while 1
             
             menu.table{1, 3} = disp_min;
             
+            logEvent('set disparity to negative');
+            
         end
         
         if keycode(KbName('b'))
             
             menu.table{6, 3} = 'Blue Only';
+            
+            logEvent('enabled blue channel only');
             
         end
         
@@ -305,17 +342,23 @@ while 1
             
             menu.table{6, 3} = 'Green Only';
             
+            logEvent('enabled green channel only');
+            
         end     
         
         if keycode(KbName('k'))
             
             menu.table{6, 3} = 'Both';
             
+            logEvent('enabled both channels');
+            
         end          
         
         if keycode('0')
             
             menu.table{1, 3} = 0;
+            
+            logEvent('set disparity to 0');
             
         end
 
@@ -325,12 +368,12 @@ while 1
         
     end
     
-    oldPressed = pressed;
+    oldKeyIsDown = keyIsDown;
     
-      frameEnd = GetSecs();
-
+    frameEnd = GetSecs();
+    
     frameDuration = frameEnd - frameStart;
-
+    
     frameTimes(frameCounter) = frameDuration;
 
     frameCounter = mod(frameCounter, 500)+1   ;

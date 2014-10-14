@@ -1,6 +1,6 @@
 function people()
 
-file = fullfile(getM3Path, 'in.use');
+file = fullfile(M3, 'in.use');
 
 
 if exist(file, 'file')

@@ -1,4 +1,13 @@
-function exitCode = runSwirlAnaglyph(expt)
+function exitCode = runSwirlAnaglyph(logEvent)
+
+if nargin<1
+    
+    logEvent = @(str) str; % dummy function
+    
+end
+
+logEvent('runSwirlAnaglyph');
+
 %% Initialization
 
 KbName('UnifyKeyNames');
@@ -78,14 +87,6 @@ finalPresentationTime = 2; % time stimulus remains on screen after looming (seco
 enableLoomDisparity = 1;
 
 enableChannels = 0; % 0 = both, -1=only left, +1=only right
-
-if nargin>0
-    
-    unpackStruct(expt)
-    
-end
-
-dump = packWorkspace();
 
 %% print keyboard shortcuts
 
@@ -195,6 +196,8 @@ startTime = GetSecs() - totalTime * 2;
 frameTimes = nan(500, 1);
 
 frameCounter = 1;  
+
+oldKeyIsDown = 1;
 
 while 1
     
@@ -307,65 +310,85 @@ while 1
     
     Screen('Flip', window);
     
-    [~, ~, keycode] = KbCheck;
+    [keyIsDown, ~, keycode] = KbCheck;
     
-    if keycode(KbName('p'))
+    if keyIsDown && ~oldKeyIsDown
         
-        disparityEnable = +1;
+        if keycode(KbName('p'))
+            
+            disparityEnable = +1;
+            
+            logEvent('set disparity to positive');
+            
+        end
+        
+        if keycode(KbName('n'))
+            
+            disparityEnable = -1;
+            
+            logEvent('set disparity to negative');
+            
+        end
+        
+        if keycode('0')
+            
+            disparityEnable = 0;
+            
+            logEvent('set disparity to 0');
+            
+        end
+        
+        if keycode(KbName('k'))
+            
+            enableChannels = 0;
+            
+            logEvent('enabled both channels');
+            
+        end
+        
+        if keycode(KbName('b'))
+            
+            enableChannels = +1;
+            
+            logEvent('enabled blue channel only');
+            
+        end
+        
+        if keycode(KbName('g'))
+            
+            enableChannels = -1;
+            
+            logEvent('enabled green channel only');
+            
+        end
+        
+        if keycode(KbName('Space')) || keycode(KbName('s'))
+            
+            startTime = GetSecs();
+            
+            logEvent('started swirl');
+            
+        end
+        
+        if keycode(KbName('Escape'))
+            
+            exitCode = 0;
+            
+            break;
+            
+        end
+        
+        if keycode(KbName('END'))
+            
+            exitCode = 1;
+            
+            break;
+            
+        end
         
     end
     
-    if keycode(KbName('n'))
-        
-        disparityEnable = -1;
-        
-    end
-    
-    if keycode('0')
-        
-        disparityEnable = 0;
-        
-    end
-    
-    if keycode(KbName('k'))
-        
-        enableChannels = 0;
-        
-    end    
-    
-    if keycode(KbName('b'))
-        
-        enableChannels = +1;
-        
-    end
-    
-    if keycode(KbName('g'))
-        
-        enableChannels = -1;
-        
-    end    
-    
-    if keycode(KbName('Space')) || keycode(KbName('s'))
-        
-        startTime = GetSecs();
-        
-    end
-    
-     if keycode(KbName('Escape'))
-        
-        exitCode = 0;
-        
-        break;
-        
-    end
-    
-    if keycode(KbName('END'))
-
-        exitCode = 1;
-
-        break;
-
-    end
+    oldKeyIsDown = keyIsDown;
     
     frameEnd = GetSecs();
 
