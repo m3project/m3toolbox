@@ -8,13 +8,25 @@ end
 
 logEvent('runTargetwithMenuAnaglyph');
 
+%% flicker brightness levels
+
+FlickerBrightness_BlueOnly = 0.25;
+
+FlickerBrightness_GreenOnly = 1;
+
+FlickerBrightness_ZeroDisp = 0.12;
+
+FlickerBrightness_MaxDisp = 0.05;
+
+FlickerBrightness_MinDisp = 0.02;
+
 %% Initialization
 
 AssertOpenGL;
 
 KbName('UnifyKeyNames');
 
-Gamma = 2.127; % for DELL U2413
+Gamma = 2.188; % for DELL U2413
 
 LeftGains = [0 0.66 0];
 
@@ -36,23 +48,13 @@ disp_max = 20;
 
 disp_min = -20;
 
+showMenu = 0;
+
 %% load random motion sequence from file
 
 load('r1.mat'); % variable name is r1 (1e5 x 2 matrix)
 
 ind = 1; % r1 indexer
-
-%% print notice about menu
-
-disp('')
-disp('*****************');
-disp('Important Notice:');
-disp('*****************');
-disp('')
-disp('Changes to the stimulus parameters using the menu feature are NOT saved to the experiment log file.');
-disp('You should use the menu feature to calibrate parameter values and then MANUALLY copy these to the script')
-disp('BEFORE doing any actual experiments.');
-disp('');
 
 %% Menu
 
@@ -73,7 +75,7 @@ menu.table = {
 
 menu = drawMenu(menu);
 
-menu.visible = 0;
+menu.visible = showMenu;
 
 %% Stimulus Settings
 
@@ -99,7 +101,6 @@ shortcuts = {
     'b',                        'enable blue channel only', ... 
     'g',                        'enable green channel only', ... 
     'Space',                    'Start/stop bug motion', ...
-    'm',                        'Display menu', ...
     'Escape or End',            'Exit stimulus'
     };
 
@@ -156,25 +157,25 @@ while 1
     
     if strcmp(channels, 'Blue Only')
         
-        fc = 0.25;
+        fc = FlickerBrightness_BlueOnly;
         
     elseif strcmp(channels, 'Green Only')
         
-        fc = 1;
+        fc = FlickerBrightness_GreenOnly;
         
     else
         
         if d == 0
             
-            fc = 0.12;
+            fc = FlickerBrightness_ZeroDisp;
             
         elseif d == disp_max
             
-            fc = 0.05;
+            fc = FlickerBrightness_MaxDisp;
             
         elseif d == disp_min
             
-            fc = 0.02;
+            fc = FlickerBrightness_MinDisp;
             
         else
             

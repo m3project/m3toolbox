@@ -2,6 +2,8 @@ function [exitCode, xs, ys, thetas] = runDotsAnaglyph(expt, xs, ys, thetas)
 
 KbName('UnifyKeyNames');
 
+exitCode = 0;
+
 Gamma = 2.127; % for DELL U2413
 
 LeftGains = [0 0.66 0];
@@ -12,15 +14,15 @@ createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
 
 %% Vivek parameters 
 
-bugY = 0.6;
+bugY = 0.62;
 
-viewD = 7; % viewing distance (cm)
+viewD = 10; % viewing distance (cm)
 
 bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm2 position
 
-disparityEnable = -1; % -1 ,0 or +1
+disparityEnable = 1; % -1 ,0 or +1
 
-iod = 0.5 ; % mantis inter-ocular distance (cm)
+iod = 0.7 ; % mantis inter-ocular distance (cm)
 
 enaJitter = 0;
 
@@ -28,11 +30,11 @@ preTrialDelay = 5; % seconds
 
 % dot params: 
 
-n = 10000; % number of dots  
+n = 1000; % number of dots  
 
-r = 20; % radius
+r = 60; % radius
 
-v = 2; % velocity
+v = 2  ; % velocity
 
 % control params:  
 

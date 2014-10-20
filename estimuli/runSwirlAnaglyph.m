@@ -8,11 +8,19 @@ end
 
 logEvent('runSwirlAnaglyph');
 
+%% flicker brightness levels
+
+flickerCols = [0.01 0.03;0.05 0.12; 0.01 0.06]; % -, 0 and + disparity (avoid using 0 since black is the non-flickering color)
+
+flickerColsB = [0.5 1];
+    
+flickerColsG = [0.25 0.35];
+
 %% Initialization
 
 KbName('UnifyKeyNames');
 
-Gamma = 2.127; % for DELL U2413
+Gamma = 2.188; % for DELL U2413
 
 LeftGains = [0 0.66 0];
 
@@ -32,13 +40,7 @@ motionR0 = 300; % initial motion radius (pixels) (800px in behavioral expt)
 
 motionDuration = 5; % duration of swirling (seconds) (5 secs in behavioral expt)
 
-totalTime =7; % duration of bug visibility(seconds) (7 secs in behavioral expt)
-
-flickerCols = [0.01 0.03;0.05 0.12; 0.01 0.06]; % -, 0 and + disparity (avoid using 0 since black is the non-flickering color)
-
-flickerColsB = [0.5 1];
-    
-flickerColsG = [0.25 0.35];
+totalTime = 7; % duration of bug visibility(seconds) (7 secs in behavioral expt)
 
 disparityEnable = 1; % disparity setting (-1, 0 or +1)
 
@@ -258,7 +260,7 @@ while 1
     
     rectR = [dotsR; dotsR(1)+r dotsR(2)+bugHeight];
     
-    flickerEna = t<motionDuration;
+    flickerEna = t<totalTime;
     
     if flickerEna
         

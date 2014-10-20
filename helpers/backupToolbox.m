@@ -14,7 +14,7 @@ end
 
 % export code
 
-toolboxDir = getM3Path();
+toolboxDir = M3();
 
 dStr = lower(datestr(now,'mmm-dd-yyyy-HHMM'));
 

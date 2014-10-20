@@ -3,7 +3,7 @@ function [dump] = runGrating(expt)
 
 KbName('UnifyKeyNames'); 
 
-createWindow();
+createWindow(1);
 
 window = getWindow();
 

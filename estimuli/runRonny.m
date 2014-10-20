@@ -18,17 +18,19 @@ mkdir(exptPath);
 
 logFilePath = fullfile(exptPath, logFileName);
 
-fid = fopen(logFilePath, 'w');
+%fid = fopen(logFilePath, 'w');
 
-if fid == -1
+%if fid == -1
     
-    error('Could not open log file for writing');
+ %   error('Could not open log file for writing');
     
-end
+%end
 
-logVersion(fid);
+%logVersion(fid);
 
-logEvent_w = @(varargin) logEvent(fid, varargin{:});
+%logEvent_w = @(varargin) logEvent(fid, varargin{:});
+
+logEvent_w = @(varargin) 1;
 
 %% backup
 
@@ -82,7 +84,7 @@ while 1
     
 end
 
-fclose(fid);
+%fclose(fid);
 
 end
 

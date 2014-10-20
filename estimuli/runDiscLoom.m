@@ -8,6 +8,14 @@ end
 
 logEvent('runDiscLoom');
 
+%% flicker brightness levels
+
+flickerLevels_motion = [0 40];
+
+flickerLevels_loom = [80 255];
+
+flickerLevels_receed = [80 120];
+
 %% parameters
 
 spatialPeriod = 192; % pixels (use a divisor of the screen width)
@@ -40,7 +48,7 @@ enaExtraSlide = 1; % when set to 1 the background will move in integer steps of 
 
 KbName('UnifyKeyNames');
 
-Gamma = 2.127; % for DELL U2413
+Gamma = 2.188; % for DELL U2413
 
 createWindow(Gamma);
 
@@ -164,6 +172,12 @@ dir = 1;
 
 oldKeyIsDown = 1;
 
+flip_t1 = 0;
+
+processTimes = zeros(1e3, 1);
+
+i = 1;
+
 while 1
     
     t = GetSecs() - startTime;
@@ -194,19 +208,19 @@ while 1
     
     if mEna(t)
         
-        levels = [0 40];
+        levels = flickerLevels_motion;
         
     end
     
     if s == 1
         
-        levels = [80 255];
+        levels = flickerLevels_loom;
         
     end
     
     if s == -1
         
-        levels = [80 120];
+        levels = flickerLevels_receed;
         
     end
     
@@ -238,7 +252,15 @@ while 1
         
     end
     
+    flip_t2 = GetSecs();
+    
+    processTimes(i) = flip_t1 - flip_t2;
+    
     Screen(window, 'Flip');
+    
+    flip_t1 = GetSecs();
+    
+    i = mod(i, 1e3) + 1;
     
     [keyIsDown, ~, keyCode ] = KbCheck;
     

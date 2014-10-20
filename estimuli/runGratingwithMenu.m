@@ -12,21 +12,17 @@ logEvent('runGratingwithMenu');
 
 patchSize = 100; % pixels
 
-dstr = datestr(now,'yy-mm-dd-hhMM');
+showMenu = 0;
 
-file = sprintf('runGratingwithMenu_log_%s.txt', dstr);
+%% flicker brightness levels
 
-logFile = fullfile('V:\readlab\Ronny\', file);
-
-logFlushPeriod = 60; % seconds
-
-motionDuration = 5; % seconds
+flickerLevels = [5, 10; 20, 100]; % brightness levels for directions
 
 %% initialization
 
 KbName('UnifyKeyNames');
 
-Gamma = 2.127; % for DELL U2413
+Gamma = 2.188; % for DELL U2413
 
 createWindow(Gamma);
 
@@ -56,37 +52,7 @@ menu.table = {
 
 menu = drawMenu(menu);
 
-menu.visible = 0;
-
-oldMenu = menu;
-
-%% logging options
-
-fid = 1; % default: output to command window
-
-if exist('logFile', 'var')
-    
-    fid = fopen(logFile, 'A'); % open file in append mode
-    
-    if fid == -1
-        
-        error('Cannot open log file for writing');
-        
-    end
-    
-end
-
-%% print notice about menu
-
-disp('')
-disp('*****************');
-disp('Important Notice:');
-disp('*****************');
-disp('')
-disp('Changes to the stimulus parameters using the menu feature are NOT saved to the experiment log file.');
-disp('You should use the menu feature to calibrate parameter values and then MANUALLY copy these to the script')
-disp('BEFORE doing any actual experiments.');
-disp('');
+menu.visible = showMenu;
 
 %% print keyboard shortcuts
 
@@ -96,7 +62,6 @@ shortcuts = {
     'Numpad Right',             'Change direction to right', ...
     'Numpad Left',              'Change direction to left', ...
     'Space',                    'Start/stop motion', ...
-    'm',                        'Show/hide menu (MENU CHANGES ARE NOT LOGGED TO FILE)', ...
     'Escape or End',            'Exit stimulus'
     };
 
@@ -137,8 +102,6 @@ map5 = createMap({'Left', 'Right'}, {1 2});
 
 map6 = createMap({'Horitzontal', 'Vertical'}, {1 2});
 
-directionAmplitudes = [5, 10; 20, 100]; % brightness levels for directions
-
 % flicker box
 
 patchRect = [0 H-patchSize patchSize H];
@@ -157,47 +120,11 @@ phase = 0;
 
 i = 0;
 
-t = 0;
-
-spaceKeyCoolDown = 0;
-
-lastFlushTime = 0;
-
 patchFreq = 1;
-
-fprintf(fid, 'Stimulus runGratingwithMenu started at %s : \n\n', datestr(now, 'dd-mmm-yyyy HH:MM:SS.FFF'));
 
 oldKeyIsDown = 1;
 
 while 1
-    
-    % print any changes in menu
-    
-    if ~isequal(menu.table, oldMenu.table)
-        
-        fprintf(fid, 'Change at %s : \n\n', datestr(now, 'dd-mmm-yyyy HH:MM:SS.FFF'));
-        
-        printMenu(menu, oldMenu, fid);
-        
-        fprintf(fid, '\n');
-        
-        oldMenu = menu;
-        
-    end
-    
-    % flushing to file
-    
-    if (fid ~= 1) &&(t-lastFlushTime > logFlushPeriod)
-        
-        fclose(fid);
-        
-        fid = fopen(logFile, 'A'); % open file in append mode
-        
-        lastFlushTime = t;
-        
-        disp('flushing')
-        
-    end
     
     % updating t and i
     
@@ -233,7 +160,7 @@ while 1
     
     ind2 = map6.get(menu.get('Orientation'));
     
-    patchColor = directionAmplitudes(ind1, ind2);
+    patchColor = flickerLevels(ind1, ind2);
     
     patchEna = motionEna;
     
@@ -300,16 +227,6 @@ while 1
             
         end
         
-%         if t-spaceKeyCoolDown>motionDuration
-%             
-%             newMotionEna = map7.get(0);
-%             
-%             menu = updateMenu(menu, 'Motion', newMotionEna);
-%             
-%             spaceKeyCoolDown = t;
-%             
-%         end
-        
         if keyCode(KbName('8'))
             
             menu = updateMenu(menu, 'Orientation', 'Vertical');
@@ -370,12 +287,6 @@ while 1
     
     oldKeyIsDown = keyIsDown;
     
-    
-end
-
-if fid ~= -1
-    
-    fclose(fid);
     
 end
 

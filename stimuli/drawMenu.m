@@ -56,7 +56,7 @@ isHold = ~isempty(menu.holdStartTime) && (GetSecs() - menu.holdStartTime > holdT
 
 if isJustPressed('m')
     
-    menu.visible = 1 - menu.visible;
+ %   menu.visible = 1 - menu.visible;
     
 end
 

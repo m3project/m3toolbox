@@ -5,7 +5,7 @@ KbName('UnifyKeyNames');
 
 closeWindow(); 
 
-Gamma = 2.127; % for DELL U2413
+Gamma = 2.188; % for DELL U2413
 
 createWindow(Gamma);
 

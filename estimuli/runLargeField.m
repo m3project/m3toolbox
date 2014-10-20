@@ -12,7 +12,7 @@ logEvent('runLargeField');
 
 KbName('UnifyKeyNames');
 
-Gamma = 2.127; % for DELL U2413
+Gamma = 2.188; % for DELL U2413
 
 LeftGains = [0 0.66 0];
 
@@ -162,6 +162,6 @@ while (1)
     
 end
 
-% closeWindow();
+closeWindow();
 
 end

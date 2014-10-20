@@ -8,11 +8,15 @@ end
 
 logEvent('runDotsAnaglyph_ephys');
 
+%% flicker brightness levels
+
+flickerCols = [0 0.25; 0 0.5; 0 1]; % -, 0 and + disparity (avoid using 0 since black is the non-flickering color)
+
 %% Initialization
 
 KbName('UnifyKeyNames');
 
-Gamma = 2.127; % for DELL U2413
+Gamma = 2.188; % for DELL U2413
 
 LeftGains = [0 0.66 0];
 
@@ -22,7 +26,7 @@ createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
 
 %% swirling motion parameters
 
-bugY = 0.6; % y-coord of swirling center (0 to 1)
+bugY = 0.5; % y-coord of swirling center (0 to 1)
 
 motionR0 = 800; % initial swirling radius (px) (800 in behavioral experiments)
 
@@ -83,8 +87,6 @@ edgeSmoothness = 0.8; % this determines how "hard/soft" the bug borders are
 % flicker params
 
 drawFlickerBox = 1;
-
-flickerCols = [0 0.25; 0 0.5; 0 1]; % -, 0 and + disparity (avoid using 0 since black is the non-flickering color)
 
 % loom params
 

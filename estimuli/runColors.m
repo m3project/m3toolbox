@@ -13,7 +13,7 @@ KbName('UnifyKeyNames');
 
 closeWindow();
 
-Gamma = 2.127; % for DELL U2413
+Gamma = 2.188; % for DELL U2413
 
 LeftGains = [0 0.66 0];
 
@@ -47,8 +47,8 @@ channel = 0; % 0 or 1
 
 shortcuts = {
     'Space',            'Start displaying flashes', ...
-    'b',                'Switch to blue channel'
-    'g',                'Switch to green channel'
+    'b',                'Switch to blue channel', ...
+    'g',                'Switch to green channel', ...
     'End or Escape',    'exit stimulus', ...    
     };
 
