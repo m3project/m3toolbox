@@ -10,7 +10,7 @@ consts.scrScaling = 1/40;      % screen resolution scaling factor (cm/px)
 
 % The code snippet below will lookup the appropriate SCREEN_ID per PC
 
-screenIDs = {{'READLAB14', 1}, {'VIVEKPC', 2'}, {'SLYTHERIN', 0}, {'IONHWB62', 0}, {'READLAB21', 2}, {'READLAB16', 1}};
+screenIDs = {{'READLAB14', 1}, {'VIVEKPC', 2'}, {'SLYTHERIN', 0}, {'IONHWB62', 0}, {'READLAB21', 2}, {'READLAB16', 1}, {'READLAB22', 2}};
 
 pc = getenv('computername');
 

@@ -1,8 +1,14 @@
-function exitCode = runDiscLoom(logEvent)
+function exitCode = runDiscLoom(logEvent, keyPress)
 
 if nargin<1
     
     logEvent = @(str) str; % dummy function
+    
+end
+
+if nargin<2
+    
+    keyPress = @(keyCode) 1; % dummy function
     
 end
 
@@ -265,6 +271,8 @@ while 1
     [keyIsDown, ~, keyCode ] = KbCheck;
     
     if keyIsDown && ~oldKeyIsDown
+        
+        keyPress(keyCode);
         
         if r(t)
             

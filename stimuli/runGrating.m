@@ -3,12 +3,6 @@ function [dump] = runGrating(expt)
 
 KbName('UnifyKeyNames'); 
 
-createWindow(1);
-
-window = getWindow();
-
-[W, H] = getResolution();
-
 %% rendering stimulus
 
 % parameters:
@@ -20,13 +14,29 @@ dir             = -1;       % direction
 enaAbort        = 1;        % 1 to enable user to abort by pressing Escape
 timeLimit       = 0;        % stimulus duration (seconds), 0 to disable
 contrast        = 1;        % [0, 1]
-
+Gamma           = [];       % must be overloaded by unpackStruct
 
 spatialFreq = 4/1600;
 
 if nargin>0
     unpackStruct(expt);         % load overridden parameter values
 end
+
+% create window
+
+if isempty(Gamma)
+
+    createWindow();
+    
+else
+    
+    createWindow(Gamma);
+    
+end
+
+window = getWindow();
+
+[W, H] = getResolution();
 
 % end of parameters
 

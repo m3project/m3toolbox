@@ -1,8 +1,14 @@
-function exitCode = runSwirlAnaglyph(logEvent)
+function exitCode = runSwirlAnaglyph(logEvent, keyPress)
 
 if nargin<1
     
     logEvent = @(str) str; % dummy function
+    
+end
+
+if nargin<2
+    
+    keyPress = @(keyCode) 1; % dummy function
     
 end
 
@@ -282,6 +288,8 @@ while 1
         
     end
     
+   [VBLTimestamp StimulusOnsetTime FlipTimestamp Missed Beampos] = Screen('Flip', window);
+    
     Screen('SelectStereoDrawBuffer', window, 0);
     
     if ismember(enableChannels, [0 +1])
@@ -310,11 +318,17 @@ while 1
     
     Screen('FillRect', window, [1 1 1] * flickerEna * flickerCol, flickerRect);
     
-    Screen('Flip', window);
+    if Missed>0
+        
+        disp('missed')
+        
+    end
     
     [keyIsDown, ~, keycode] = KbCheck;
     
     if keyIsDown && ~oldKeyIsDown
+        
+        keyPress(keyCode);
         
         if keycode(KbName('p'))
             
@@ -392,27 +406,22 @@ while 1
     
     oldKeyIsDown = keyIsDown;
     
-    frameEnd = GetSecs();
-
-    frameDuration = frameEnd - frameStart;
-
-    frameTimes(frameCounter) = frameDuration;
-
-    frameCounter = mod(frameCounter, 500)+1   ;
     
 end
-   
+
+% td = diff(frameTimes);
+% 
+% x=(td(10:end)*1e3);
+% 
+% std(x)
+% 
+% hist(x, 1e2);
+% 
+% axis([16 17 0 100]);
+
 %hist(frameTimes);
 
-ft = frameTimes(~isnan(frameTimes));
-
-if any(ft-mean(ft)>1e-3)
-    
-    warning('Dropped frames detected!')
-    
-end
-
-closeWindow();
+%closeWindow();
 
 end
 

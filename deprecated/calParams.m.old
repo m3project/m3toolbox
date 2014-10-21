@@ -1,0 +1,44 @@
+function actualMs = calParams(angles, D)
+
+% minAng = 0.5;
+% maxAng = 10;
+% 
+% stepAng = 0.5;
+
+if (nargin < 1)
+
+    angles = [0.1 0.57 1 1.5 2 5]; % degrees
+    
+    D = 6; % viewing distance in cm
+
+end
+
+const = getConstants();
+
+const.scrScaling
+
+Mphys = tand(angles) * D;
+
+Ms = Mphys / const.scrScaling;
+
+% corresponding angles
+
+actualMs = ceil(Ms')
+
+MphysActual = actualMs * const.scrScaling;
+
+MphysActual = [1 2 4 8 16 20 25 40] * const.scrScaling;
+
+clc;
+
+anglesActual = atand(MphysActual/D)'
+
+return
+
+for i=1:length(angles)
+
+    fprintf('%1.2f %1.2f\n', angles(i), anglesActual(i));
+
+end
+
+end

@@ -34,7 +34,7 @@ try
         
     end
     
-    exptDir =  chooseExperimentDir(name, workDir, defName, addTags);
+    exptDir = chooseExperimentDir(name, workDir, defName, addTags);
     
     if isempty(exptDir)
         
@@ -208,7 +208,7 @@ catch exception
     
     try
 
-        if recordVideos == 1
+        if recordVideos
             
             deallocCam(cam1);
         

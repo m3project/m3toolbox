@@ -1,0 +1,100 @@
+% This script plots the results obtained by runHumanExperimentDX.m
+%
+function analyzeHumanExperimentDX(paramSet, resultSet)
+
+figure(1);
+
+response = resultSet(:, 1);
+
+k1 = find(response ~= 1);
+k2 = find(response == 1);
+
+% first row
+
+subplot(3,2,[1 2]);
+
+cla; hold on;
+
+Ms = paramSet(:, 1);
+
+DXs = paramSet(:, 2);
+
+plot(DXs(k2), Ms(k2), 'r^');
+
+plot(DXs(k1), Ms(k1), 'o');
+
+xlabel('DX (pixels)');
+
+ylabel('Block Size (pixels)');
+
+grid on;
+
+axis([0 300 -10 80]);
+
+strPos = 'Motion Perceived + Correct direction';
+
+strNeg = 'Could not tell OR Wrong direction';
+
+legend(strPos, strNeg);
+
+% second row
+
+subplot(3,2,3);
+
+cla; hold on;
+
+plot(DXs(k2), resultSet(k2, 2), 'r^');
+
+xlabel('DX (pixels)');
+
+ylabel('Response Time (seconds)');
+
+grid on;
+
+title(strPos);
+
+subplot(3,2, 4);
+
+cla; hold on;
+
+plot(Ms(k2), resultSet(k2, 2), 'r^');
+
+xlabel('Block Size (pixels)');
+
+ylabel('Response Time (seconds)');
+
+grid on;
+
+title(strPos);
+
+% third row
+
+subplot(3,2,5);
+
+cla; hold on;
+
+plot(DXs(k1), resultSet(k1, 2), 'o');
+
+xlabel('DX (pixels)');
+
+ylabel('Response Time (seconds)');
+
+grid on;
+
+title(strNeg);
+
+subplot(3,2, 6);
+
+cla; hold on;
+
+plot(Ms(k1), resultSet(k1, 2), 'o');
+
+xlabel('Block Size (pixels)');
+
+ylabel('Response Time (seconds)');
+
+grid on;
+
+title(strNeg);
+
+end

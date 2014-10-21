@@ -1,8 +1,14 @@
-function exitCode = runLargeField(logEvent)
+function exitCode = runLargeField(logEvent, keyPress)
 
 if nargin<1
     
     logEvent = @(str) str; % dummy function
+    
+end
+
+if nargin<2
+    
+    keyPress = @(keyCode) 1; % dummy function
     
 end
 
@@ -105,6 +111,8 @@ while (1)
     [keyIsDown, ~, keycode] = KbCheck;
     
     if keyIsDown && ~oldKeyIsDown
+        
+        keyPress(keyCode);
         
         if keycode(KbName('n'))
             

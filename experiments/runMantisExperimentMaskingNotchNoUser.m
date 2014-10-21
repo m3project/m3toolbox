@@ -20,8 +20,7 @@ expt.recordVideos = 0;
 
 expt.makeBackup = 1;
 
-%runExperiment(expt);
-runExperimentNoVideo(expt);
+runExperiment(expt);
 
 end
 

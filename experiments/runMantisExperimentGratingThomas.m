@@ -16,7 +16,7 @@ expt.name = 'Mantis Grating Thomas';
 
 expt.recordVideos = 0;
 
-expt.makeBackup = 0;
+expt.makeBackup = 1;
 
 expt.defName = 'Diana';
 
@@ -42,7 +42,7 @@ end
 
 function runBeforeTrial(varargin)
 
-runAlignmentStimulus();
+runAlignmentStimulusNoBack();
 
 end
 
@@ -80,6 +80,8 @@ expt.timeLimit = 5; % seconds
 
 expt.enaAbort = 0; % disable exit by pressing Escape
 
+expt.Gamma = 2.1942; % Dell monitor in Thomas's setup
+
 [dump] = runGrating(expt);
 
 exitCode = 0;
@@ -90,6 +92,64 @@ function resultRow = runAfterTrial(varargin)
 
 resultRow = getDirectionJudgement();
 
-pause(1);
+%pause(1);
+
+end
+
+function runAlignmentStimulusNoBack()
+
+% coordinates of bug swirling center:
+
+x = 0;
+
+y = 350;
+
+% render alignment stimulus
+
+expt = struct;
+
+expt.interactiveMode = 1;
+
+expt.timeLimit = 0;
+
+expt.closeOnFinish = 0;
+
+expt.enable3D = 0;
+
+expt.disparity = 0;
+
+expt.M = 40;
+
+expt.R = 1;
+
+expt.textured = 0;
+
+expt.camouflage = 0;
+
+expt.dynamicBackground = 0;
+
+expt.funcMotionX = @(t) 0;
+
+expt.stepDX = 0;
+
+expt.bugFrames = getBugFrames('fly');
+
+expt.motionFuncs = getMotionFuncs('swirl', x, y);
+
+expt.nominalSize = 0.5;
+
+expt.bugVisible = 1;
+
+expt.txtCount = 50;
+
+expt.bugVisible = 1;
+
+expt.timeLimit = 0;
+
+expt.interactiveMode = 1;
+
+disp('alignment mode (interactive), press Escape when mantis is aligned ...');
+
+runAnimation2(expt);
 
 end

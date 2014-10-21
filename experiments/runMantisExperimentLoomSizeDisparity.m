@@ -18,8 +18,7 @@ expt.recordVideos = 0;
 
 expt.defName = 'Judith';
 
-%runExperiment(expt);
-runExperimentNoVideo(expt);
+runExperiment(expt);
 
 end
 

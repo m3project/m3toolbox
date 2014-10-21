@@ -159,11 +159,11 @@ end
 
 if enable3D
     
-    createWindow3D();
+    createWindow3D(1); % use Gamma=1 (NO calibration!)
     
 else
     
-    createWindow();
+    createWindow(1); % use Gamma=1 (NO calibration!)
     
 end
 
