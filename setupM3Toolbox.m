@@ -4,7 +4,7 @@
 
 function setupM3Toolbox()
 
-ignoreList = {'.', '..', '.git'};
+ignoreList = {'.', '..', '.git', 'deprecated'};
 
 myList = dir;
 

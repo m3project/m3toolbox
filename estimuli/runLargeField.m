@@ -108,13 +108,13 @@ while (1)
     
     %% processing keyboard shortcuts
     
-    [keyIsDown, ~, keycode] = KbCheck;
+    [keyIsDown, ~, keyCode] = KbCheck;
     
     if keyIsDown && ~oldKeyIsDown
         
         keyPress(keyCode);
         
-        if keycode(KbName('n'))
+        if keyCode(KbName('n'))
             
             disp = disp_neg;
             
@@ -122,7 +122,7 @@ while (1)
             
         end
         
-        if keycode(KbName('p'))
+        if keyCode(KbName('p'))
             
             disp = disp_pos;
             
@@ -130,7 +130,7 @@ while (1)
             
         end
         
-        if keycode(KbName('o'))
+        if keyCode(KbName('o'))
             
             disp = disp_oscillation;
             
@@ -138,7 +138,7 @@ while (1)
             
         end
         
-        if keycode('0')
+        if keyCode('0')
             
             disp = disp_zero;
             
@@ -146,7 +146,7 @@ while (1)
             
         end
         
-        if keycode(KbName('Escape'))
+        if keyCode(KbName('Escape'))
             
             exitCode = 0;
             
@@ -154,7 +154,7 @@ while (1)
             
         end
         
-        if keycode(KbName('END'))
+        if keyCode(KbName('END'))
             
             exitCode = 1;
             

@@ -279,13 +279,13 @@ while 1
     
     end
     
-    [keyIsDown, ~, keycode] = KbCheck;
+    [keyIsDown, ~, keyCode] = KbCheck;
     
     if keyIsDown && ~oldKeyIsDown
         
         keyPress(keyCode);
         
-        if keycode(KbName('ESCAPE'))
+        if keyCode(KbName('ESCAPE'))
             
           exitCode = 0;
             
@@ -293,7 +293,7 @@ while 1
           
         end
         
-        if keycode(KbName('END'))
+        if keyCode(KbName('END'))
             
             exitCode = 1;
             
@@ -301,7 +301,7 @@ while 1
             
         end
         
-        if keycode(KbName('SPACE'))
+        if keyCode(KbName('SPACE'))
             
             moving = 1 - moving;
             
@@ -323,7 +323,7 @@ while 1
             
         end
         
-        if keycode(KbName('p'))
+        if keyCode(KbName('p'))
             
             menu.table{1, 3} = disp_max;
             
@@ -331,7 +331,7 @@ while 1
             
         end
         
-        if keycode(KbName('n'))
+        if keyCode(KbName('n'))
             
             menu.table{1, 3} = disp_min;
             
@@ -339,7 +339,7 @@ while 1
             
         end
         
-        if keycode(KbName('b'))
+        if keyCode(KbName('b'))
             
             menu.table{6, 3} = 'Blue Only';
             
@@ -347,7 +347,7 @@ while 1
             
         end
         
-        if keycode(KbName('g'))
+        if keyCode(KbName('g'))
             
             menu.table{6, 3} = 'Green Only';
             
@@ -355,7 +355,7 @@ while 1
             
         end     
         
-        if keycode(KbName('k'))
+        if keyCode(KbName('k'))
             
             menu.table{6, 3} = 'Both';
             
@@ -363,7 +363,7 @@ while 1
             
         end          
         
-        if keycode('0')
+        if keyCode('0')
             
             menu.table{1, 3} = 0;
             

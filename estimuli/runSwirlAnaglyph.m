@@ -324,13 +324,13 @@ while 1
         
     end
     
-    [keyIsDown, ~, keycode] = KbCheck;
+    [keyIsDown, ~, keyCode] = KbCheck;
     
     if keyIsDown && ~oldKeyIsDown
         
         keyPress(keyCode);
         
-        if keycode(KbName('p'))
+        if keyCode(KbName('p'))
             
             disparityEnable = +1;
             
@@ -338,7 +338,7 @@ while 1
             
         end
         
-        if keycode(KbName('n'))
+        if keyCode(KbName('n'))
             
             disparityEnable = -1;
             
@@ -346,7 +346,7 @@ while 1
             
         end
         
-        if keycode('0')
+        if keyCode('0')
             
             disparityEnable = 0;
             
@@ -354,7 +354,7 @@ while 1
             
         end
         
-        if keycode(KbName('k'))
+        if keyCode(KbName('k'))
             
             enableChannels = 0;
             
@@ -362,7 +362,7 @@ while 1
             
         end
         
-        if keycode(KbName('b'))
+        if keyCode(KbName('b'))
             
             enableChannels = +1;
             
@@ -370,7 +370,7 @@ while 1
             
         end
         
-        if keycode(KbName('g'))
+        if keyCode(KbName('g'))
             
             enableChannels = -1;
             
@@ -378,7 +378,7 @@ while 1
             
         end
         
-        if keycode(KbName('Space')) || keycode(KbName('s'))
+        if keyCode(KbName('Space')) || keyCode(KbName('s'))
             
             startTime = GetSecs();
             
@@ -386,7 +386,7 @@ while 1
             
         end
         
-        if keycode(KbName('Escape'))
+        if keyCode(KbName('Escape'))
             
             exitCode = 0;
             
@@ -394,7 +394,7 @@ while 1
             
         end
         
-        if keycode(KbName('END'))
+        if keyCode(KbName('END'))
             
             exitCode = 1;
             

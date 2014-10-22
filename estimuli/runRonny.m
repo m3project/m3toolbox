@@ -66,7 +66,11 @@ i = 1;
 
 while 1
     
+    HideCursor
+    
     clc
+    
+    disp(funcs{i});
     
     exitCode = funcs{i}(logEvent_w); % call stimulus function
     
@@ -83,6 +87,8 @@ while 1
     i = mod(i, length(funcs)) + 1;
     
 end
+
+ShowCursor
 
 %fclose(fid);
 
