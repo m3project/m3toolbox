@@ -402,10 +402,30 @@ while 1
             
         end
         
+        numsPressed = intersect(find(keyCode), ('1':'9') + 0);
+        
+        if keyCode(KbName('Alt'))
+            
+            if isempty(numsPressed)
+                
+                % allows continuous holding down of Ctrl
+                % by resetting the isKeyDown flag
+                
+                keyIsDown = 0;
+                
+            else
+                
+                exitCode = 100 + min(numsPressed) - '0'; % special exit code to switch stimuli
+                
+                return;
+                
+            end
+            
+        end
+        
     end
     
     oldKeyIsDown = keyIsDown;
-    
     
 end
 

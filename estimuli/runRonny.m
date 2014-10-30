@@ -10,27 +10,35 @@ dStr = lower(datestr(now,'yyyy-mm-dd-HHMM.SS'));
 
 logFileName = 'params_log.txt';
 
+enableFileLogging = 0;
+
 %% creating experiment folder and log file
 
 exptPath = fullfile(rootExptsPath, dStr);
 
 mkdir(exptPath);
 
-logFilePath = fullfile(exptPath, logFileName);
-
-%fid = fopen(logFilePath, 'w');
-
-%if fid == -1
+if enableFileLogging
     
- %   error('Could not open log file for writing');
+    logFilePath = fullfile(exptPath, logFileName);
     
-%end
-
-%logVersion(fid);
-
-%logEvent_w = @(varargin) logEvent(fid, varargin{:});
-
-logEvent_w = @(varargin) 1;
+    fid = fopen(logFilePath, 'w');
+    
+    if fid == -1
+        
+        error('Could not open log file for writing');
+        
+    end
+    
+    logVersion(fid);
+    
+    logEvent_w = @(varargin) logEvent(fid, varargin{:});
+    
+else
+    
+    logEvent_w = @(varargin) 1;
+    
+end
 
 %% backup
 
@@ -80,17 +88,35 @@ while 1
         
         break
         
+    elseif exitCode >= 100
+        
+        % this is a special exit code to switch stimuli
+        
+        j = exitCode - 100;
+        
+        if j <= length(funcs)
+            
+            i = j;
+            
+        end
+        
+    else
+        
+        i = mod(i, length(funcs)) + 1;
+        
     end
     
     pause(0.2);
-    
-    i = mod(i, length(funcs)) + 1;
     
 end
 
 ShowCursor
 
-%fclose(fid);
+if enableFileLogging
+
+    fclose(fid);
+    
+end
 
 end
 

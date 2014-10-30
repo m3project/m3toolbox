@@ -1,8 +1,6 @@
 function dump = runLoomAnaglyph(expt)
 %% Initialization
 
-KbName('UnifyKeyNames');
-
 createWindow3DAnaglyph();
 
 window = getWindow();
@@ -21,11 +19,11 @@ disparitySizeCondition = 0; % when set to 1, the bug size in the case of (dispar
 
 bugColor = 0; % [0, 1]
 
-iod = 0.7; % mantis inter-ocular distance (cm)
+iod = 0.8; % mantis inter-ocular distance (cm)
 
 sf = 40; % screen scaling factor (px/cm)
 
-viewD = 10;% viewing distance (cm)
+viewD = 2.5;% viewing distance (cm)
 
 virtDm1 = 2.5; % virtual distance 1 from mantis (cm)
 
@@ -39,7 +37,7 @@ virtBS1= virtBS2 * virtDm2 / viewD;
 
 duration = 2.25; % duration of motion from distance 1 to 2 (seconds)
 
-bugY = 0.7; % vertical location of bug (0 to 1)
+bugY = 0.62; % vertical location of bug (0 to 1)
 
 bugJitter = 5; % bug jitter in pixels (0 to disable)
 
