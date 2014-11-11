@@ -25,7 +25,7 @@ if mod(groupRows, 1) ~= 0 % sanity check
     
 end
 
-G = reshape(paramSetS', c, groupRows, numel(ids));
+G = reshape(paramSetS.', c, groupRows, numel(ids));
 
 G = permute(G, [2 1 3]);
 

@@ -10,7 +10,7 @@ expt.runTrialFun = @runTrial;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
-expt.workDir = 'd:\mantisGratingThomas\';
+expt.workDir = 'c:\mantisGratingThomas\';
 
 expt.name = 'Mantis Grating Thomas';
 

@@ -19,11 +19,11 @@ disparitySizeCondition = 0; % when set to 1, the bug size in the case of (dispar
 
 bugColor = 0; % [0, 1]
 
-iod = 0.8; % mantis inter-ocular distance (cm)
+iod = 0.7; % mantis inter-ocular distance (cm)
 
 sf = 40; % screen scaling factor (px/cm)
 
-viewD = 2.5;% viewing distance (cm)
+viewD = 5;% viewing distance (cm)
 
 virtDm1 = 2.5; % virtual distance 1 from mantis (cm)
 

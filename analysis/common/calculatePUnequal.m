@@ -27,37 +27,57 @@
 %
 % Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk) - 18/11/2013
 %
-function [data, majorVar] = calculateP(combinedSet, key1, key2)
+function [data, majorVar] = calculatePUnequal(combinedSet, key1, key2)
 
 if nargin <3
     key1 = 4; % major dimension (grouping variable)
     key2 = 2; % minor dimension (x)
 end
 
-G = splitGroups(combinedSet, key1);
+G = splitGroupsUnequal(combinedSet, key1);
 
-groups = size(G, 3);
+groups = length(G);
 
 for i=1:groups
     
-    Gi = G(:, :, i);
+    Gi = G{i};
     
-    S = splitGroups(Gi, key2);
+    S = splitGroupsUnequal(Gi, key2);
     
-    r = size(S, 1);
+    sl = length(S);
     
-    m = squeeze(sum(S(:, end, :)));
+    m = zeros(sl, 1);
     
-    P = m / r;
+    r = zeros(sl, 1);
+    
+    x = zeros(sl, 1);
+    
+    for k=1:sl
+        
+        d = S{k}(:, end);
+        
+        m(k) = sum(d);
+        
+        r(k) = length(d);
+        
+        x(k) = S{k}(1, key2);
+        
+    end
+    
+    %m = squeeze(sum(S(:, end, :)));
+    
+    P = m ./ r;
     
     [L, H] = BinoConf_Score(m, r);    
     
-    x = squeeze(S(1, key2, :));
+    %x = squeeze(S(1, key2, :));
     
-    data(:, :, i) = [x P L H m r*ones(size(m))];
+    data{i} = [x P L H m r];
+    
+    majorVar(i) = Gi(1, key1);
     
 end
 
-majorVar = squeeze(G(1, key1, :));
+%majorVar = squeeze(G(1, key1, :));
 
 end

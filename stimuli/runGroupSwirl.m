@@ -2,19 +2,21 @@ function exitCode = runGroupSwirl()
 
 bugColor = 0;
 
-bugY = 0.62;
+bugY = 0.6;
 
-n = 20; % number of dots
+n = 10; % number of dots
 
 iod = 0.7 ; % mantis inter-ocular distance (cm)
 
-viewD = 10; % viewing distance (cm)
+viewD = 5; % viewing distance (cm)
 
 bugSize = 1; % bug size (cm) as perceived by the mantis
 
 bugD = 2.5; % distance between mantis and virtual bug
 
 sf = 37.0370; % screen scaling factor (px/cm) for Dell U2413
+
+disparityEnable = 1; % -1 ,0 or +1
 
 %% size calculations
 
@@ -42,15 +44,24 @@ window = getWindow();
 
 [sW, sH] = getResolution();
 
-%% motion profile
+%% motion profile   
 
 fps = 60;
 
-motionDuration = 2;
+motionDuration = 5;
 
-motionR0 = 500;
+finalPresentationTime = 2;
 
-[X, Y] = getSwirl(fps, motionDuration, motionR0);
+rotFreq = 4; % Hz
+
+motionR0 = 800;
+
+centerX = sW/2;
+
+centerY = sH * bugY;
+
+%[X, Y] = getSwirl(fps, motionDuration, motionR0);
+[X, Y] = getSwirl2(centerX, centerY, motionDuration, motionR0, rotFreq, fps, finalPresentationTime);
 
 % set last position as inf so that dots at X(end), Y(end)
 % are effectively hidden
@@ -58,7 +69,7 @@ motionR0 = 500;
 X(end) = inf;
 Y(end) = inf;
 
-totalFrames = motionDuration * fps;
+totalFrames = (motionDuration + finalPresentationTime) * fps;
 
 is = randi(totalFrames, [n 1]); % frame indexes
 
@@ -79,8 +90,6 @@ isTarget(1) = 1;
 centerX(1) = sW/2;
 
 centerY(1) = sH * bugY;
-
-disparity = disparity_mag;
 
 is(1) = totalFrames;
 
@@ -103,6 +112,8 @@ while (1)
     dotX = centerX + X(is);
     
     dotY = centerY + Y(is);
+    
+    disparity = disparityEnable * disparity_mag;
     
     %% channel 0
     
@@ -134,13 +145,13 @@ while (1)
         
         if keyCode(KbName('p'))
             
-            disparity = disparity_mag;
+            disparityEnable = 1;
             
         end
         
         if keyCode(KbName('n'))
             
-            disparity = -disparity_mag;
+            disparityEnable = -1;
             
         end
         
@@ -154,7 +165,7 @@ while (1)
         
         if keyCode('0')
             
-            disparity = 0;
+            disparityEnable = 0;
             
         end
         
@@ -192,3 +203,36 @@ X = cos(theta1(t) * v) .* motionR(t);
 Y = sin(theta1(t) * v) .* motionR(t);
 
 end
+
+function [X, Y] = getSwirl2(~, ~, motionDuration, motionR0, rotFreq, fps, finalPresentationTime)
+
+[xfunc, yfunc] = getSwirl_runDotsAnaglyph(0, 0, motionDuration, motionR0, rotFreq);
+
+td = 1/fps;
+
+totalTime = motionDuration + finalPresentationTime;
+
+t = transp(td : td : totalTime);
+
+X = xfunc(t);
+Y = yfunc(t);
+
+end
+
+function [X, Y] = getSwirl_runDotsAnaglyph(centerX, centerY, motionDuration, motionR0, rotFreq)
+
+% this function was copied from getSwirl() in the script runDotsAnaglyph
+
+theta1 = @(t) t * 2 * pi * rotFreq;
+
+theta2 = @(t) min(t * pi / motionDuration, pi);
+
+motionR = @(t) motionR0/2 * (1+cos(theta2(t)));
+
+v = .5 ;
+
+X = @(t) centerX + cos(theta1(t) * v) .* motionR(t);
+Y = @(t) centerY + sin(theta1(t) * v) .* motionR(t);
+
+end
+

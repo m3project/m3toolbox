@@ -1,7 +1,7 @@
 % This function returns a list of directories inside dir that is filtered
 % using include and exclude keywords
 %
-function list = getDirList(dir, include, exclude)
+function list = getDirList(dir, include, exclude, mustIncludeAll)
 
 if nargin < 2
     include = {};
@@ -9,6 +9,10 @@ end
 
 if nargin < 3
     exclude = {};
+end
+
+if nargin < 4
+    mustIncludeAll = 0;
 end
 
 dirs = ls(dir);
@@ -55,7 +59,17 @@ for i=1:n
             
             if ~isempty(ind)
                 
-                keep = 1; break;
+                keep = 1;
+                
+            else
+                
+                % directory not in include list
+                
+                if mustIncludeAll
+                    
+                    keep = 0; break;
+                    
+                end
                 
             end
             
@@ -98,5 +112,13 @@ for i=1:n
     list{m, :} = dirI;
     
     m = m + 1;
+
+end
+
+if m == 1
+    
+    list = {};
+    
+end
 
 end

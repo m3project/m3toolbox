@@ -3,7 +3,7 @@
 %
 % It returns the concatenated paramSet and resultSet.
 %
-function [paramSet, resultSet] = loadDirData(dir, include, exclude, allowIncomplete)
+function [paramSet, resultSet] = loadDirData(dir, include, exclude, allowIncomplete, mustIncludeAll)
 
 if nargin < 4
     
@@ -11,11 +11,17 @@ if nargin < 4
     
 end
 
+if nargin < 5
+    
+    mustIncludeAll = 0;
+    
+end
+
 paramFile = 'params.mat';
 
 resultsFile = 'results.mat';
 
-list = getDirList(dir, include, exclude);
+list = getDirList(dir, include, exclude, mustIncludeAll);
 
 n = size(list, 1); % number of sub-directories
 
