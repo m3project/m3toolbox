@@ -1,14 +1,14 @@
-function exitCode = runGroupSwirl()
+function [is, centerX, centerY]  = runGroupSwirl(expt, is, centerX, centerY)
 
 bugColor = 0;
 
-bugY = 0.6;
+bugY = 0.58;
 
 n = 10; % number of dots
 
 iod = 0.7 ; % mantis inter-ocular distance (cm)
 
-viewD = 5; % viewing distance (cm)
+viewD = 7; % viewing distance (cm)
 
 bugSize = 1; % bug size (cm) as perceived by the mantis
 
@@ -17,6 +17,20 @@ bugD = 2.5; % distance between mantis and virtual bug
 sf = 37.0370; % screen scaling factor (px/cm) for Dell U2413
 
 disparityEnable = 1; % -1 ,0 or +1
+
+duration = 7; % secs (-1 to disable)
+
+moveOnStart = 1; % start bug motion on stimulus onset
+
+bugJitter = 5; % px
+
+%% parameter overloads
+
+if nargin>0
+    
+    unpackStruct(expt);
+    
+end
 
 %% size calculations
 
@@ -56,12 +70,9 @@ rotFreq = 4; % Hz
 
 motionR0 = 800;
 
-centerX = sW/2;
-
-centerY = sH * bugY;
 
 %[X, Y] = getSwirl(fps, motionDuration, motionR0);
-[X, Y] = getSwirl2(centerX, centerY, motionDuration, motionR0, rotFreq, fps, finalPresentationTime);
+[X, Y] = getSwirl2([], [], motionDuration, motionR0, rotFreq, fps, finalPresentationTime);
 
 % set last position as inf so that dots at X(end), Y(end)
 % are effectively hidden
@@ -71,17 +82,19 @@ Y(end) = inf;
 
 totalFrames = (motionDuration + finalPresentationTime) * fps;
 
-is = randi(totalFrames, [n 1]); % frame indexes
+if nargin < 4
+
+    is = randi(totalFrames, [n 1]); % frame indexes
+    
+    centerX = rand(n, 1) * sW;
+
+    centerY = rand(n, 1) * sH;
+
+end
 
 %% rendering
 
-startTime = GetSecs();
-
 oldKeyIsDown = 1;
-
-centerX = rand(n, 1) * sW;
-
-centerY = rand(n, 1) * sH;
 
 isTarget = zeros(n, 1);
 
@@ -95,7 +108,24 @@ is(1) = totalFrames;
 
 includeTargetDot = 1;
 
+if moveOnStart == 1
+    
+    is(1) = 1;
+    
+end
+
+startTime = GetSecs();
+
 while (1)
+    
+    t = GetSecs() - startTime;
+    
+    if duration ~= -1 && t>duration
+        
+        Screen('Flip', window);
+        break;
+        
+    end        
     
     if includeTargetDot && is(1) == totalFrames
         
@@ -115,11 +145,15 @@ while (1)
     
     disparity = disparityEnable * disparity_mag;
     
+    %% calculate jitter
+    
+    jt = rand(n, 2) * bugJitter;
+    
     %% channel 0
     
     Screen('SelectStereoDrawBuffer', window, 0);
     
-    dotPos = [dotX-disparity/2.*isTarget dotY];
+    dotPos = [dotX-disparity/2.*isTarget dotY] + jt;
     
     dotRect = [dotPos-diameter/2 dotPos+diameter/2];
     
@@ -129,7 +163,7 @@ while (1)
     
     Screen('SelectStereoDrawBuffer', window, 1);
     
-    dotPos = [dotX+disparity/2.*isTarget dotY];
+    dotPos = [dotX+disparity/2.*isTarget dotY] + jt;
     
     dotRect = [dotPos-diameter/2 dotPos+diameter/2];
     

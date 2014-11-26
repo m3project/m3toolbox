@@ -16,7 +16,7 @@ createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
 
 bugY = 0.62;
 
-viewD = 10; % viewing distance (cm)
+viewD = 5; % viewing distance (cm)
 
 bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm2 position
 

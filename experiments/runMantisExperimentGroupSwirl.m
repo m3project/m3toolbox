@@ -1,4 +1,4 @@
-function runMantisExperimentCamoAnaglyph()
+function runMantisExperimentGroupSwirl()
 
 expt = struct;
 
@@ -34,34 +34,22 @@ paramSet = createRandTrialBlocks(blocks, [-1 0 +1], viewD);
 
 end
 
-function runBeforeTrial(varargin)
+function runBeforeTrial(paramSetRow)
 
 expt = struct;
 
-expt.enableKeyboard = 0;
+expt.duration = 120;
 
-expt.preTrialDelay = 0;
-expt.interTrialTime = 0;
-expt.motionDuration = 0;
-expt.finalPresentationTime = 60;
-expt.bugY = -0.5;
+expt.moveOnStart = 0;
 
-% the variables xs, ys and thetas are set to global to preserve the dot
-% positions and velocities between trials
+expt.viewD = paramSetRow(2);
 
-global xs;
-global ys;
-global thetas;
+global is;
+global centerX;
+global centerY;
 
-if isempty(xs)
-    
-    [~, xs, ys, thetas] = runGroupSwirl(expt);
-    
-else
-    
-    [~, xs, ys, thetas] = runGroupSwirl(expt, xs, ys, thetas);
-    
-end
+   
+% [is, centerX, centerY] = runGroupSwirl(expt);
 
 end
 
@@ -71,39 +59,38 @@ disp('rendering the stimulus ...');
 
 expt = struct;
 
-expt.enableKeyboard = 0;
+expt.duration = 7;
+
+expt.moveOnStart = 1;
 
 expt.disparityEnable = paramSetRow(1);
 
 expt.viewD = paramSetRow(2);
 
-expt.interTrialTime = 1;
+global is;
+global centerX;
+global centerY;
 
-expt.preTrialDelay = 0;
-
-% the variables xs, ys and thetas are set to global to preserve the dot
-% positions and velocities between trials
-
-global xs;
-global ys;
-global thetas;
-
-if isempty(xs)
+if isempty(is)
     
-    [dump, xs, ys, thetas] = runGroupSwirl(expt);
+    [is, centerX, centerY] = runGroupSwirl(expt);
     
 else
     
-    [dump, xs, ys, thetas] = runGroupSwirl(expt, xs, ys, thetas);
+    [is, centerX, centerY] = runGroupSwirl(expt, is, centerX, centerY);
     
 end
 
 exitCode = 0;
+
+dump = [];
 
 end
 
 function resultRow = runAfterTrial(varargin)
 
 resultRow = [0];
+
+pause (60)
 
 end

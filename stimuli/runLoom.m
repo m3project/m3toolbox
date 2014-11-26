@@ -15,7 +15,7 @@ makePlot = 0; % when set to 1, the script plots size and trajectory instead of r
 
 sizeScaleEnable = 1;
 
-disparityEnable = 0;
+disparityEnable = 1;
 
 disparitySizeCondition = 1; % when set to 1, the bug size in the case of (disparityEnable=1, sizeEnable=0) is initially small
 
@@ -25,9 +25,9 @@ iod = 0.4; % mantis inter-ocular distance (cm)
 
 sf = 40; % screen scaling factor (px/cm)
 
-viewD = 4;% viewing distance (cm)
+viewD = 5;% viewing distance (cm)
 
-virtDm1 = 5; % virtual distance 1 from mantis (cm)
+virtDm1 = 2.5; % virtual distance 1 from mantis (cm)
 
 virtDm2 = 2.5; % virtual distance 2 from mantis (cm)
 
