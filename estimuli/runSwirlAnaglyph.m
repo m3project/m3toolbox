@@ -18,9 +18,13 @@ logEvent('runSwirlAnaglyph');
 
 flickerCols = [0.01 0.03;0.05 0.12; 0.01 0.06]; % -, 0 and + disparity (avoid using 0 since black is the non-flickering color)
 
+flickerDutyCycles = [0.25 0.5 0.75];
+
 flickerColsB = [0.5 1];
     
 flickerColsG = [0.25 0.35];
+
+flickerPeriod = 10;
 
 %% Initialization
 
@@ -207,6 +211,8 @@ frameCounter = 1;
 
 oldKeyIsDown = 1;
 
+flickerCount= 0;
+
 while 1
     
     frameStart = GetSecs();
@@ -274,22 +280,26 @@ while 1
         
     end
     
-    if enableChannels == 0
+%     if enableChannels == 0
         
         flickerCol = flickerCols(disparityEnable+2, flicker+1);
         
-    elseif enableChannels == 1
-        
-        flickerCol = flickerColsB(flicker+1);
-        
-    elseif enableChannels == -1
-        
-        flickerCol = flickerColsG(flicker+1);
-        
-    end
+%     elseif enableChannels == 1
+%         
+%         flickerCol = flickerColsB(flicker+1);
+%         
+%     elseif enableChannels == -1
+%         
+%         flickerCol = flickerColsG(flicker+1);
+%         
+%     end
     
-   [VBLTimestamp StimulusOnsetTime FlipTimestamp Missed Beampos] = Screen('Flip', window);
+    flickerDutyCycle = flickerDutyCycles(enableChannels+2);
     
+    dutyOn = flickerCount < (flickerPeriod * flickerDutyCycle);
+    
+    Screen('Flip', window);
+
     Screen('SelectStereoDrawBuffer', window, 0);
     
     if ismember(enableChannels, [0 +1])
@@ -302,9 +312,13 @@ while 1
         
     end
     
-    Screen('FillRect', window, [1 1 1] * flickerEna * flickerCol, flickerRect);
+    Screen('FillRect', window, [1 1 1] * flickerEna * flickerCol * dutyOn, flickerRect);
     
     Screen('SelectStereoDrawBuffer', window, 1);
+    
+    if flickerEna
+     %   fprintf('%d', dutyOn);
+    end
     
     if ismember(enableChannels, [0 -1])        
         
@@ -316,13 +330,15 @@ while 1
         
     end
     
-    Screen('FillRect', window, [1 1 1] * flickerEna * flickerCol, flickerRect);
+    Screen('FillRect', window, [1 1 1] * flickerEna * flickerCol * dutyOn , flickerRect);
+%     fprintf('%d', flickerEna * flickerCol * dutyOn>0);
+%     if Missed>0
+%         
+%         disp('missed')
+%         
+%     end
     
-    if Missed>0
-        
-        disp('missed')
-        
-    end
+    flickerCount = mod(flickerCount + 1, flickerPeriod);
     
     [keyIsDown, ~, keyCode] = KbCheck;
     
@@ -381,6 +397,8 @@ while 1
         if keyCode(KbName('Space')) || keyCode(KbName('s'))
             
             startTime = GetSecs();
+            
+            flickerCount = 0;
             
             logEvent('started swirl');
             

@@ -16,7 +16,7 @@ exitCode = 0;
 %
 % -------------------------------------------------------------------------
 
-interactiveMode = 0;
+interactiveMode = 1;
 
 timeLimit = 0; % in seconds (0 to disable)
 
@@ -40,7 +40,7 @@ enable3D = 0;
 %
 % -------------------------------------------------------------------------
 
-M = 4;
+M = 40;
 
 txtCount = 50; % don't bother
 
@@ -589,13 +589,13 @@ while (1)
             
         end
         
-        %if (keyCode(KbName('k')))
+        if (keyCode(KbName('k')))
             
-            %motionFuncs = getMotionFuncs('keyboard');
+            motionFuncs = getMotionFuncs('keyboard');
             
-            %startTime = GetSecs();
+            startTime = GetSecs();
             
-        %end
+        end
         
         if (keyCode(KbName('h')))
             

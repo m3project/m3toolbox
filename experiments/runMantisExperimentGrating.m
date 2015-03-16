@@ -10,13 +10,17 @@ expt.runTrialFun = @runTrial;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisGrating\';
+%expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisGrating\';
 
-expt.name = 'Mantis Grating';
+expt.workDir = 'c:\mantisGratingThomasGrid2\';
+
+expt.name = 'Mantis Grating (Diana - Grid 2)';
+
+expt.defName = 'Diana';
 
 expt.addTags = {'GRID3'};
 
-expt.recordVideos = 0;
+expt.recordVideos = 1;
 
 runExperiment(expt);
 
@@ -24,9 +28,31 @@ end
 
 function paramSet = genParamSet()
 
-samplingMode    = 4;
+% Important: make sure Gamma value in runTrial is correct
 
-if samplingMode == 4
+samplingMode    = 5;
+
+if samplingMode == 5
+    
+    % Diana's experiment
+    
+    contrast = 0.25;
+    
+    gratingTypes = 1; % only square
+    
+    spatialFreqs = [1 32] / 1600; % cycle/px
+    
+    temporalFreqs = [0.25 30];
+    
+    spatialFreqs = 32 / 1600;
+    
+    temporalFreqs = 30;
+    
+    dirs = [+1 -1];
+    
+    paramSet = createRandTrial(gratingTypes, contrast, spatialFreqs, temporalFreqs, dirs);    
+
+elseif samplingMode == 4
     
     % Ghaith, Jenny and Vivek
     % 27/5/2014
@@ -91,7 +117,7 @@ end
 
 function runBeforeTrial(varargin)
 
-runAlignmentStimulus();
+runAlignmentStimulusNoBack();
 
 end
 
@@ -107,6 +133,7 @@ expt2.contrast = paramSetRow(2);
 expt2.spatialFreq = paramSetRow(3);
 expt2.temporalFreq = paramSetRow(4);
 expt2.dir = paramSetRow(5);
+expt2.Gamma = 2.1942; % Dell monitor in Thomas's setup
 
 [dump] = runGrating(expt2);
 

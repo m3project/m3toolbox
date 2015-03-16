@@ -10,9 +10,9 @@ jitter = 5; % pixels
 
 speed = 1000; % px/sec
 
-dir = -1;
+dir = 1;
 
-timeLimit = 0; % in seconds (0 to disable)
+timeLimit = 3; % in seconds (0 to disable)
 
 bugY = 0.5; % y-cord (0 to 1)
 

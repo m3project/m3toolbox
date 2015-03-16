@@ -8,15 +8,15 @@ KbName('UnifyKeyNames');
 % parameters:
 
 gratingType     = 0;        % 0 for sin, 1 for square
-spatialFreq     = 0.025;     % in cycles per pixel
-temporalFreq    = 0.25*10;       % in cycles per second
-dir             = -1;       % direction
+spatialFreq     = 0.0071;     % in cycles per pixel
+temporalFreq    = 0.25;       % in cycles per second
+dir             = 1;       % direction
 enaAbort        = 1;        % 1 to enable user to abort by pressing Escape
 timeLimit       = 0;        % stimulus duration (seconds), 0 to disable
 contrast        = 1;        % [0, 1]
 Gamma           = [];       % must be overloaded by unpackStruct
 
-spatialFreq = 4/1600;
+% spatialFreq = 4/1600;
 
 if nargin>0
     unpackStruct(expt);         % load overridden parameter values

@@ -11,11 +11,16 @@ window = getWindow();
 
 %% Stimulus Settings
 
+
+viewD = 10;% viewing distance (cm)
+
+bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm2 position
+
+disparityEnable = -1; % 1 for green lens on the left; -1 for green lens on the right)
+         
 makePlot = 0; % when set to 1, the script plots size and trajectory instead of rendering the stimulus
 
 sizeScaleEnable = 1;
-
-disparityEnable = 1;
 
 disparitySizeCondition = 0; % when set to 1, the bug size in the case of (disparityEnable=1, sizeEnable=0) is initially small
 
@@ -25,13 +30,9 @@ iod = 0.7; % mantis inter-ocular distance (cm)
 
 sf = 37.0370; % screen scaling factor (px/cm)
 
-viewD =5;% viewing distance (cm)
-
 virtDm1 = 2.5; % virtual distance 1 from mantis (cm)
 
 virtDm2 = 2.5; % virtual distance 2 from mantis (cm)
-
-bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm2 position
 
 virtBS2 = viewD / virtDm2 * bugSize;
 

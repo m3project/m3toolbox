@@ -14,13 +14,13 @@ createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
 
 %% Vivek parameters 
 
-bugY = 0.62;
+bugY = 0.65;
 
-viewD = 5; % viewing distance (cm)
+viewD = 10; % viewing distance (cm)
 
 bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm2 position
 
-disparityEnable = 1; % -1 ,0 or +1
+disparityEnable = -1; % -1 ,0 or +1
 
 iod = 0.7 ; % mantis inter-ocular distance (cm)
 

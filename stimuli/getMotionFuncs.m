@@ -5,7 +5,7 @@ switch (id)
     case 'swirl'
         
         centerX = 0;
-        centerY = 350;
+        centerY = 100;
         
         if nargin>1
             

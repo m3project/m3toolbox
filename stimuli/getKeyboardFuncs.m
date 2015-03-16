@@ -164,7 +164,7 @@ end
  [w h] = getResolution();
 
 xMin=600 - w/2;
-xMax=900 - w/2;
+xMax=150 - w/2;
 
 yMin=700 - h/2;
 yMax=900 - h/2;

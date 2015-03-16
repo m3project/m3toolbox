@@ -16,9 +16,9 @@ expt.name = 'Mantis Masking';
 
 expt.defName = 'Will';
 
-expt.recordVideos = 1;
+expt.recordVideos = 0;
 
-expt.makeBackup = 1;
+expt.makeBackup = 0;
 
 runExperiment(expt);
 

@@ -3,25 +3,15 @@
 %**********************************************************************************************
 function [dump] = runGratingNoise(expt)
 
-createWindow();
-
-window = getWindow();
-
-[sW, sH] = getResolution();
-
 %% params
+
+staticSetting = 0; % when 0 the noise is dynamic, otherwise noise is static
 
 temporalFreq = 8; % hz
 
 spatialFreq = 0.04; % cyc/deg
 
-sY = 2/sH;
-
 distance = 7; % viewing distance (cm)
-
-scrPhysicalWidth = 48; % cm
-
-scrPhysicalHeight = 48 / 1.1429 * sY; % cm
 
 SIZE_Y = 2; % texture height (2 pixels for efficient rendering)
 
@@ -47,8 +37,6 @@ addNoise = 1; % 0 or 1
 
 contrast = 0.7;
 
-
-
 %% unpack expt
 
 if nargin>0
@@ -56,6 +44,19 @@ if nargin>0
     unpackStruct(expt);
     
 end
+
+%% create window
+
+createWindow(Gamma); % Gamma must be loaded from expt
+
+window = getWindow();
+
+[sW, sH] = getResolution();
+
+sY = 2/sH;
+scrPhysicalWidth = 48; % cm
+
+scrPhysicalHeight = 48 / 1.1429 * sY; % cm
 
 %% body
 
@@ -98,36 +99,42 @@ textureIndex = nan(frameCount, 1);
 for i=1:frameCount
     
     t = i / fps;
-   
-    ruido=media+desv.*randn(SIZE_Y,sW);
-    I=ruido;
-    Lave=sum(sum(I.*gx*gy))./(degreesimagex*degreesimagey);
-    c=(I-Lave)./Lave;%Contrast function
-    FFTimagen=(fftshift(fft2(c)));
-    FASEimagen=angle(FFTimagen);
-    FFTmodulo=abs(FFTimagen);
-    REALPROD=fftshift(FILTRO1.*FFTmodulo.*cos(FASEimagen));
-    IMAGPROD=fftshift(FILTRO1.*FFTmodulo.*sin(FASEimagen));
-    RESULT=(REALPROD+IMAGPROD*sqrt(-1));
-    FINAL=ifft2(RESULT);
-    NOISEFILTERED=real(FINAL);
     
-    c=NOISEFILTERED;
-%     Lave=sum(sum(I.*gx*gy))./(degreesimagex*degreesimagey);
-%     c=(I-Lave)./Lave;%Funcion de contraste
-     NORMNOISEFILTERED=127.5*(1+1*(c./max(max(abs(c)))));
-    
-    luminancias=reshape(NORMNOISEFILTERED,1,sW*SIZE_Y);
-    CRMSoriginal=std(luminancias)/mean(luminancias);   %Calculo del Crms AVERAGE NOISE CONTRAST  Stromeyer III & Julesz 1972
-    
-    %frec=sum(FILTRO1((SIZE_Y/2)+1,:))*(1/degreesimagex)/2; %
-    %Crmsdesired=sqrt(NoiseLevel*2*frec);
-    
-    m=Crmsdesired/CRMSoriginal;
-    I=NORMNOISEFILTERED;
-    Lave=sum(sum(I.*gx*gy))./(degreesimagex*degreesimagey);
-    c=(I-Lave)./Lave;%
-    
+    if i==1 || staticSetting==0
+        
+        
+        ruido=media+desv.*randn(SIZE_Y,sW);
+        I=ruido;
+        Lave=sum(sum(I.*gx*gy))./(degreesimagex*degreesimagey);
+        c=(I-Lave)./Lave;%Contrast function
+        FFTimagen=(fftshift(fft2(c)));
+        FASEimagen=angle(FFTimagen);
+        FFTmodulo=abs(FFTimagen);
+        REALPROD=fftshift(FILTRO1.*FFTmodulo.*cos(FASEimagen));
+        IMAGPROD=fftshift(FILTRO1.*FFTmodulo.*sin(FASEimagen));
+        RESULT=(REALPROD+IMAGPROD*sqrt(-1));
+        FINAL=ifft2(RESULT);
+        NOISEFILTERED=real(FINAL);
+        
+        c=NOISEFILTERED;
+        %     Lave=sum(sum(I.*gx*gy))./(degreesimagex*degreesimagey);
+        %     c=(I-Lave)./Lave;%Funcion de contraste
+        NORMNOISEFILTERED=127.5*(1+1*(c./max(max(abs(c)))));
+        
+        luminancias=reshape(NORMNOISEFILTERED,1,sW*SIZE_Y);
+        CRMSoriginal=std(luminancias)/mean(luminancias);   %Calculo del Crms AVERAGE NOISE CONTRAST  Stromeyer III & Julesz 1972
+        
+        %frec=sum(FILTRO1((SIZE_Y/2)+1,:))*(1/degreesimagex)/2; %
+        %Crmsdesired=sqrt(NoiseLevel*2*frec);
+        
+        m=Crmsdesired/CRMSoriginal;
+        I=NORMNOISEFILTERED;
+        Lave=sum(sum(I.*gx*gy))./(degreesimagex*degreesimagey);
+        
+        
+        c=(I-Lave)./Lave;%
+        
+    end
     senal=contrast*cos(2*pi*spatialFreq*(xx-speed*t)+faseC1);
     
     imagen=127.5*(1+(senal+addNoise * m*c));
