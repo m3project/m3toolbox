@@ -99,7 +99,11 @@ mkdir(fullDir);
 
 hardwareInfoFile = fullfile(fullDir, 'hardware_info.mat');
 
-resultsFile = fullfile(fullDir, 'results.mat');  
+paramsFile = fullfile(fullDir, 'params.mat');
+
+resultsFile = fullfile(fullDir, 'results.mat');
+
+trialVideoFile      = fullfile(fullDir, 'trial%u.mp4');
 
 % pre-experiment preparation (dump hardware info & code backup)
 
@@ -218,7 +222,7 @@ try
                 
                 %outputFile = sprintf(trialVideoFile, i);
                 
-                outputFile = strrep(trialVideoFile, '%u', num2str(i));
+                outputFile = strrep(trialVideoFile, '%u', num2str(j));
                 
                 saveMP4(cam1, outputFile);
                 
@@ -266,9 +270,16 @@ try
         
         history(i, :, cond) = [x result bestEstimateTheta];
         
-        bestX = squeeze(history(steps, 3, :));
+        resultSet = transp(squeeze(history(steps, 3, :)));
         
-        save(resultsFile, 'bestX', 'history');
+        save(resultsFile, 'resultSet', 'history');
+        
+        % must also save a dummy paramSet for backward compatibility with
+        % loadDirData
+        
+        paramSet = 0;
+        
+        save(paramsFile, 'paramSet');
         
         if mod(i, 1) == 0 && makePlot
             

@@ -1,4 +1,4 @@
-function runMantisExperimentCrosstalkColors()
+function runMantisExperimentCrosstalkAnaglyph()
 
 expt = struct;
 
@@ -10,7 +10,7 @@ expt.runTrialFun = @runTrial;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisCrosstalkColor\';
+expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisCrosstalkAnaglyph\';
 
 expt.name = 'Mantis Crosstalk Color';
 
@@ -76,7 +76,7 @@ expt.bugColor = selColor;
 
 % expt.backColor = colors(1, :) * 0.5;
 
-[dump] = runLoomColors(expt);
+[dump] = runLoomAnaglyph(expt);
 
 exitCode = 0;
 

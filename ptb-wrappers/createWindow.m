@@ -75,6 +75,12 @@ window = PsychImaging('OpenWindow', consts.SCREEN_ID, consts.MEAN_LUM, [], [], [
 
 PsychColorCorrection('SetEncodingGamma', window, 1/Gamma);
 
+if Gamma == 1
+    
+    warning('running with the default Gamma=1, make sure you change this if you''re running a contrast-dependent experiment');
+    
+end
+
 end
 
 %%

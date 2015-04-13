@@ -58,17 +58,17 @@ glassSign=[1, -1];
 
 % experiment parameters
 
-simDistances = [2.5 3.75 5.625]; % cm - distances used for Sphodromantis
+ simDistances = [2.5 3.75 5.625]; % cm - distances used for Sphodromantis
 % simDistances = [2.5 3.75 5.625]; % cm - distances used for Rhombodera
 
 %Shpodro1
 % sizes = [0.2183 0.3277 0.4925 0.7417]; % cm as perceived at a distance of 2.5 cm away from mantis - sizes used for Sphodromantis
  
 %Sphodro2
-  sizes = [0.3277 0.4925 0.7417 1.1228]; % cm as perceived at a distance of 2.5 cm away from mantis - alternative sizes used for Sphodromantis
+ sizes = [0.3277 0.4925 0.7417 1.1228]; % cm as perceived at a distance of 2.5 cm away from mantis - alternative sizes used for Sphodromantis
 
 %Rhombo1
- % sizes = [.3935 .5918 .8929 1.3573]; % cm as perceived at a distance of 2.5 cm away from mantis - sizes used for Rhombodera
+ %   sizes = [.3935 .5918 .8929 1.3573]; % cm as perceived at a distance of 2.5 cm away from mantis - sizes used for Rhombodera
 
 
 

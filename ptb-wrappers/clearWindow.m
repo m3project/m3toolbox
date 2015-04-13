@@ -1,13 +1,39 @@
-function clearWindow()
+function clearWindow(color, stereo)
+
+if nargin < 1
+    
+    color = [0 0 0];
+    
+end
+
+if nargin < 2
+    
+    stereo = 0;
+    
+end
 
 w = getWindow();
 
 [sW, sH] = getResolution();
 
-Screen(w, 'FillRect' , [1 1 1] * 0, [0 0 sW sH] );
-
-%Screen(w, 'FillRect' , [0 0 0], [600 700 900 900] );
-
-Screen(w, 'Flip');
+if stereo
+    
+    for channel = [0 1]
+        
+        Screen('SelectStereoDrawBuffer', w, channel);
+        
+        Screen(w, 'FillRect' , color, [0 0 sW sH] );        
+        
+    end
+    
+    Screen(w, 'Flip');
+    
+else
+    
+    Screen(w, 'FillRect' , color, [0 0 sW sH] );
+    
+    Screen(w, 'Flip');
+    
+end
 
 end

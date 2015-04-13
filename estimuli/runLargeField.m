@@ -44,6 +44,8 @@ dynamic = 0; % 1 or 0 to enable/disable dynamic background
 
 frequency = 2; % disparity oscillation frequency (Hz)
 
+fbox = createFlickerBox(50,50);
+
 %% print keyboard shortcuts
 
 shortcuts = {
@@ -100,9 +102,15 @@ while (1)
     
     dotRect = [dotPos dotPos+radius];
     
+    fbox.pattern = 0.5 + 0.5*(disp(t)/disp_max);
+    
+    drawFlickerBox(window, fbox);
+    
     Screen('SelectStereoDrawBuffer', window, 1);
     
     Screen('FillOval', window, bugColor, dotRect');
+    
+    fbox = drawFlickerBox(window, fbox);
     
     Screen('Flip', window);
     

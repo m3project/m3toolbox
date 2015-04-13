@@ -28,4 +28,16 @@ for i=1:length(screenIDs)
     
 end
 
+% check if SCREEN_ID maps to an existing screen
+
+% if not then set it to the secondary display
+
+ids = Screen('Screens');
+
+if ~ismember(consts.SCREEN_ID, ids)
+    
+    consts.SCREEN_ID = max(ids);
+    
+end
+
 end

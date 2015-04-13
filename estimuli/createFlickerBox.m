@@ -16,8 +16,8 @@ function fbox = createFlickerBox(W, H)
 
 rect = [0 sH-H W sH];
 
-internal = struct('rect', rect, 'i', 0, 'frames', 0);
+internal = struct('rect', rect, 'i', 0, 'frames', 0, 'simtrace', zeros(60*5, 1));
 
-fbox = struct('period', 1, 'pattern', [0 1], 'visible', 1, 'internal', internal);
+fbox = struct('period', 1, 'pattern', [0 1], 'visible', 1, 'simulate', 0, 'internal', internal);
 
 end
