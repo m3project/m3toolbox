@@ -30,9 +30,11 @@ blocks = 3;
 
 bugBrightness = 0:0.25:1;
 
-enableChannels = [1 2 3];
+scaledChannel = [1 2 3];
 
-paramSet = createRandTrialBlocks(blocks, bugBrightness, enableChannels);
+paramSet = createRandTrialBlocks(blocks, bugBrightness, scaledChannel);
+
+% paramSet = createTrial(bugBrightness, scaledChannel);
 
 end
 
@@ -50,7 +52,7 @@ expt = struct;
 
 brightness = paramSetRow(1);
 
-selColor = [0 0.66 1];
+selColor = [0 0.5 0.5];
 
 switch(paramSetRow(2))
     

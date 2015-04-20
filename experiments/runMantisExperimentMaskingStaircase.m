@@ -20,6 +20,8 @@ getNoiseSetting = @(cond) conditions(cond, 2);
 
 getStaticNoise = @(cond) conditions(cond, 3);
 
+expt.runBeforeStepFun = @runAnimation2;
+
 expt.fun = @(cond, x) runTrial(x, getChannel(cond), ...
     getNoiseSetting(cond), getStaticNoise(cond));
 
@@ -39,7 +41,7 @@ expt.nconds = size(conditions, 1);
 
 %expt.addTags = {'FREQS_8HZ'};
 
-expt.addTags = {'DEBUG_2'};
+expt.addTags = {'DEBUG_3'};
 
 runStaircaseExperiment(expt);
 
@@ -99,8 +101,6 @@ end
 
 
 function c = runTrial(x, channel, noiseSetting, staticSetting)
-
-runAnimation2();
 
 contrast = power(10, x);
 

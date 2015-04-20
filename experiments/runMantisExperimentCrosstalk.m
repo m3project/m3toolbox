@@ -10,11 +10,13 @@ expt.runTrialFun = @runTrial;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisCrosstalk\';
+expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisCrosstalkGreen\';
 
-expt.name = 'Mantis Crosstalk';
+expt.name = 'Mantis Crosstalk Green';
 
 expt.defName = 'Vivek';
+
+expt.addTags = {'GREENPOL'};
 
 expt.recordVideos = 1;
 
@@ -50,7 +52,17 @@ expt.bugColor = paramSetRow(1);
 
 expt.enableChannels = paramSetRow(2);
 
-[dump] = runLoom(expt);
+% note: the results in 
+% V:\readlab\Ghaith\m3\data\mantisCrosstalk\
+% are based on the stimulus:
+
+%[dump] = runLoom(expt);
+
+% the results in:
+% V:\readlab\Ghaith\m3\data\mantisCrosstalkGreen\
+% are based on the stimulus:
+
+[dump] = runLoomGreen(expt);
 
 %[dump] = runTarget(expt);
 

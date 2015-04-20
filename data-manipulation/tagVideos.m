@@ -11,11 +11,12 @@ function tagVideos(outputFile)
 
 if nargin<1
     
-    outputFile = 'results2.mat';
+    outputFile = 'results3.mat';
     
 end
 
-colNames = {'Tracks', 'Strikes', 'Tension'};
+%colNames = {'Tracks', 'Strikes', 'Tension'};
+colNames = {'Attack', 'Antennae Motion'};
 % colNames = {'Response (up=no-follow, down=follow-straight, and left/right): '};
 
 dir = pwd;

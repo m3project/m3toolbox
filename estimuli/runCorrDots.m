@@ -20,6 +20,9 @@ shortcuts = {
     '3',                'Switch to fully correlated', ...
     't',                'Enable toggling between correlation modes', ...
     's',                'Stop toggling between correlation modes', ...
+    'b',                'enable blue channel only', ... 
+    'g',                'enable green channel only', ... 
+    'k',                'enable both channels', ...         
     'Space',            'start/stop flashing', ...
     'Escape',           'Exit stimulus'
     };
@@ -52,11 +55,11 @@ window = getWindow();
 
 apreture = [300 300 1000 800]; % [x1 y1 x2 y2]
 
-%apreture = [0 0 W H];
+apreture = [0 0 W H];
 
-npoints = 1000;
+npoints = 500;
 
-radius = 1000;
+radius = 750;
 
 boundaryAlpha = 0.0;
 
@@ -126,6 +129,8 @@ brects = [...
     0 apreture(4) W H; ...
 ];
 
+enableChannels = 0;
+
 resetRandSequence();
 
 while 1
@@ -167,6 +172,23 @@ while 1
     if stimOn || (dispArrIndexer < length(dispArr))
         
         for channel = [0 1]
+            
+            if enableChannels
+                
+                if channel == 0 && enableChannels ~= +1
+                    
+                    continue;
+                    
+                end
+                
+                if channel == 1 && enableChannels ~= -1
+                    
+                    continue;
+                    
+                end
+                
+                
+            end
             
             s = power(-1, 1-channel); % disparity sign
             
@@ -335,6 +357,24 @@ while 1
             dispArrNorm = 0.1;
             
         end
+        
+        if keyCode(KbName('k'))
+            
+            enableChannels = 0;
+            
+        end
+        
+        if keyCode(KbName('b'))
+            
+            enableChannels = +1;
+            
+        end
+        
+        if keyCode(KbName('g'))
+            
+            enableChannels = -1;
+            
+        end        
         
         if (keyCode(KbName('s')))
             

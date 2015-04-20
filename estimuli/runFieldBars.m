@@ -22,15 +22,23 @@ aperture = [0 0 sW sH]; % x1, y1, x2, y2
 
 %aperture = [200 200 sW-200 sH-200]; % use this for testing
 
-nbars = 25; % number of bars
+nbars = 12; % number of bars
 
 barCols = [0 1]; % bar colors (0 is black, 0.5 is gray [background] and 1 is white)
 
-tOn = 0.1; % seconds
+tOn = 0.01; % seconds
 
-tOff = 1; % seconds
+tOff = 0.5; % seconds
 
 drawGrid = 0; % set to 1 to render the bar grid instead of the pattern
+
+%% estimating rendering time
+
+paramSet = genParamSet(nbars, barCols, 0);
+
+totalTime = size(paramSet, 1) * (tOn + tOff);
+
+fprintf('estimated total time = %g minutes\n', totalTime/60);
 
 %% rendering
 
@@ -105,10 +113,6 @@ while 1
     fprintf('Selected pattern %i ...\n', numPressed);
     
     paramSet = genParamSet(nbars, barCols, numPressed);
-    
-    totalTime = size(paramSet, 1) * (tOn + tOff);
-
-    fprintf('estimated total time = %g seconds\n', totalTime);
     
     % start presenting
     
