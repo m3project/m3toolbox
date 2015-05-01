@@ -110,7 +110,7 @@ map6 = createMap({'Horitzontal', 'Vertical'}, {1 2});
 
 % flicker box
 
-patchRect = [0 H-patchSize patchSize H];
+patchRect = [0 H-55 150 H];
 
 patchState = 0;
 
@@ -209,7 +209,15 @@ while 1
     
     Screen(window, 'Flip');
     
-    [keyIsDown, ~, keyCode ] = KbCheck;
+    [keyIsDown, ~, keyCode] = KbCheck;
+    
+    exitCode = checkEscapeKeys(keyCode);
+    
+    if exitCode
+        
+        return
+        
+    end
     
     if keyIsDown && ~oldKeyIsDown
         
@@ -274,43 +282,6 @@ while 1
             logEvent('switched direction to right');
             
         end
-        
-        if keyCode(KbName('Escape'))
-            
-            exitCode = 0;
-            
-            break;
-            
-        end
-        
-        if keyCode(KbName('END'))
-            
-            exitCode = 1;
-            
-            break;
-            
-        end
-        
-        numsPressed = intersect(find(keyCode), ('1':'9') + 0);
-        
-        if keyCode(KbName('Alt'))
-            
-            if isempty(numsPressed)
-                
-                 % allows continuous holding down of Ctrl
-                 % by resetting the isKeyDown flag
-                
-                keyIsDown = 0;
-                
-            else
-            
-                exitCode = 100 + min(numsPressed) - '0'; % special exit code to switch stimuli
-                
-                return;
-                
-            end
-           
-        end        
         
     end
     

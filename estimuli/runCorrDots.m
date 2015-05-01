@@ -53,13 +53,21 @@ window = getWindow();
 
 %% variables
 
-apreture = [300 300 1000 800]; % [x1 y1 x2 y2]
+% old settings:
 
-apreture = [0 0 W H];
+aperture = [720 1 1200 1200]; % [x1 y1 x2 y2]
 
-npoints = 500;
+npoints = 250;
 
-radius = 750;
+radius = 300;
+
+% new settings:
+
+% aperture = [0 0 W H];
+% 
+% npoints = 750;
+% 
+% radius = 600;
 
 boundaryAlpha = 0.0;
 
@@ -69,9 +77,9 @@ contrast = 1; % 0 to 1
 
 %% delay settings
 
-delay0 = 3; % stimulus presentation (seconds)
+delay0 = 2; % stimulus presentation (seconds)
 
-delay1 = 0.5; % pause (grey screen) after each condition presentation (seconds)
+delay1 = 1; % pause (grey screen) after each condition presentation (seconds)
 
 % NOTE: the durations of transitions during looming and receeding are
 % specied on line 305 of this file
@@ -82,13 +90,13 @@ viewD = 10; % viewing distance - between mantis and screen (cm)
 
 IOD = 0.7; % inter-ocular distance (cm)
 
-screenReso = 40; % px/cm
+screenReso = 39; % px/cm
 
 %% looming and receeding params
 
 nearSimD = 2.5; % simulated distance (min) - between mantis and target (cm)
 
-farSimD = 7.5; % simulated distance (max) - between mantis and target (cm)
+farSimD = 10; % simulated distance (max) - between mantis and target (cm)
 
 % viewD = 100; nearSimD = 30; farSimD = 100;
 
@@ -98,7 +106,7 @@ farDisp = calDisp(farSimD, viewD, IOD) * screenReso;
 
 %% plots
 
-fbox = createFlickerBox(100, 65);
+fbox = createFlickerBox(150, 55);
 
 % fbox.simulate = 1;
 
@@ -123,10 +131,10 @@ stimOn = 0;
 oldKeyCode = [];
 
 brects = [...
-    0 0 apreture(1) H; ...
-    0 0 W apreture(2); ...
-    apreture(3) 0 W H; ...
-    0 apreture(4) W H; ...
+    0 0 aperture(1) H; ...
+    0 0 W aperture(2); ...
+    aperture(3) 0 W H; ...
+    0 aperture(4) W H; ...
 ];
 
 enableChannels = 0;
@@ -253,46 +261,17 @@ while 1
     
     % checking for key presses
     
-    [~, ~, keyCode ] = KbCheck;
+    [~, ~, keyCode] = KbCheck;
+    
+    exitCode = checkEscapeKeys(keyCode);
+    
+    if exitCode
+        
+        return
+        
+    end    
     
     if ~isequal(keyCode, oldKeyCode) && (dispArrIndexer == length(dispArr))
-        
-        if keyCode(KbName('Escape'))
-            
-            exitCode = 0;
-            
-            break;
-            
-        end
-        
-        if keyCode(KbName('END'))
-            
-            exitCode = 1;
-            
-            break;
-            
-        end
-        
-        numsPressed = intersect(find(keyCode), ('1':'9') + 0);
-        
-        if keyCode(KbName('Alt'))
-            
-            if isempty(numsPressed)
-                
-                % allows continuous holding down of Ctrl
-                % by resetting the isKeyDown flag
-                
-                keyIsDown = 0;
-                
-            else
-                
-                exitCode = 100 + min(numsPressed) - '0'; % special exit code to switch stimuli
-                
-                return;
-                
-            end
-            
-        end
         
         if (keyCode(KbName('1!')))
             
@@ -452,7 +431,7 @@ function y = calculateDispArr(disp1, disp2)
 
 fps = 60;
 
-t = [1 0.5 1 0.5 1]; % segment durations (seconds)
+t = [1 1.5 2 1.5 1]; % segment durations (seconds)
 
 frames = t * fps;
 

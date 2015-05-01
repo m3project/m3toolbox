@@ -20,8 +20,8 @@ window = getWindow();
 %% print keyboard shortcuts
 
 shortcuts = {
-    'Left Arrow',               'Scan from left', ...
-    'Right Arrow',             'Scan from right', ...
+    'Left Arrow',       'Scan from left', ...
+    'Right Arrow',      'Scan from right', ...
     'g',                'Switch to green channel', ...
     'b',                'Switch to blue channel', ...
     'Escape',           'Exit stimulus'
@@ -41,7 +41,7 @@ speed = 5; % px/sec
 
 channel = 0;
 
-fbox = createFlickerBox(100,70);
+fbox = createFlickerBox(150, 55);
 
 fbox.pattern = [0 1] * 255;
 
@@ -75,42 +75,13 @@ channel = 0;
 
 while 1
     
-    [~, ~, keyCode ] = KbCheck;
+    [~, ~, keyCode] = KbCheck;
     
-    if keyCode(KbName('Escape'))
-        
-        exitCode = 0;
-        
-        break;
-        
-    end
+    exitCode = checkEscapeKeys(keyCode);
     
-    if keyCode(KbName('END'))
+    if exitCode
         
-        exitCode = 1;
-        
-        break;
-        
-    end
-    
-    numsPressed = intersect(find(keyCode), ('1':'9') + 0);
-    
-    if keyCode(KbName('Alt'))
-        
-        if isempty(numsPressed)
-            
-            % allows continuous holding down of Ctrl
-            % by resetting the isKeyDown flag
-            
-            keyIsDown = 0;
-            
-        else
-            
-            exitCode = 100 + min(numsPressed) - '0'; % special exit code to switch stimuli
-            
-            return;
-            
-        end
+        return
         
     end
     
@@ -186,6 +157,16 @@ while 1
             
             Screen(window, 'flip');
             
+            [~, ~, keyCode] = KbCheck;
+            
+            exitCode = checkEscapeKeys(keyCode);
+            
+            if exitCode
+                
+                return
+                
+            end
+            
         end
         
     end
@@ -195,8 +176,6 @@ while 1
     xs = [];
     
 end
-
-closeWindow();
 
 end
 

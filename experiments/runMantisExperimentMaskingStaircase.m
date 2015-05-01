@@ -1,5 +1,9 @@
 function runMantisExperimentMaskingStaircase
 
+obj1 = onCleanup((@() commandwindow));
+
+obj2 = onCleanup((@() closeWindow));
+
 expt = struct;
 
 expt.recordVideos = 1;
@@ -29,8 +33,6 @@ expt.xrange = [-3 0];
 
 expt.steps = 20;
 
-expt.makePlot = 0;
-
 expt.sigma = 5e-2;
 
 expt.pfp = 0.01; % probability of false positive
@@ -39,9 +41,13 @@ expt.pfn = 0.01; % probability of false negative
 
 expt.nconds = size(conditions, 1);
 
+expt.makePlot = 0;
+
 %expt.addTags = {'FREQS_8HZ'};
 
-expt.addTags = {'DEBUG_3'};
+%expt.addTags = {'GRID1', 'TAKE2'};
+
+expt.addTags = {'DEBUG_5', 'FROM_TOP', '4SECS'};
 
 runStaircaseExperiment(expt);
 
@@ -58,6 +64,8 @@ function conditions = getConditions()
 % noiseSetting = [0 1 2];
 % 
 % staticNoise = [0 1];
+% 
+% channel = 1; noiseSetting = 0; staticNoise = 0;
 
 % Grid 2 (16th March 2015):
 
@@ -79,7 +87,15 @@ function conditions = getConditions()
 
 % Grid 4 - DEBUG2 (19th March 2015):
 
-channel = [1 3 5];
+% channel = [1 3 5];
+% 
+% noiseSetting = 0;
+% 
+% staticNoise = 0;
+
+% DEBUG_5 (21st April 2015):
+
+channel = 5;
 
 noiseSetting = 0;
 
@@ -188,7 +204,7 @@ expt.contrast = contrast;
 
 expt.direction = direction;
 
-expt.duration = 2;
+expt.duration = 4;
 
 expt.Gamma = 1.3476;
 

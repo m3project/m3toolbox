@@ -7,16 +7,21 @@
 %
 % 5/12/2013
 
-function tagVideos(outputFile)
+function tagVideos(outputFile, colNames)
 
-if nargin<1
+if nargin < 1
     
-    outputFile = 'results3.mat';
+    outputFile = 'results2.mat';
     
 end
 
-%colNames = {'Tracks', 'Strikes', 'Tension'};
-colNames = {'Attack', 'Antennae Motion'};
+if nargin<2    
+    
+    colNames = {'Tracks', 'Strikes', 'Tension'};
+    
+end
+
+% colNames = {'Attack', 'Antennae Motion'};
 % colNames = {'Response (up=no-follow, down=follow-straight, and left/right): '};
 
 dir = pwd;

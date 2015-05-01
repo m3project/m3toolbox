@@ -33,9 +33,11 @@ while 1
         
     end
     
-    if intfunc()
+    k = intfunc();
+    
+    if k
         
-        result = 1;
+        result = k;
         
     end
     

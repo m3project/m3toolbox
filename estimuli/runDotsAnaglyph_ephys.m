@@ -40,7 +40,7 @@ swirlSpeed = 0.5 ; % swirling speed (0.5 in behavioral experiments)
 
 %% parameters
 
-viewD = 5; % viewing distance (cm)
+viewD = 10; % viewing distance (cm)
 
 bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm2 position
 
@@ -230,9 +230,7 @@ end
 
 %% flicker box
 
-flickSize = 200;
-
-flickerRect = [0 sH-flickSize flickSize sH];
+flickerRect = [0 sH-55 150 sH];
 
 flicker = 0;
 
@@ -367,6 +365,14 @@ while 1
         
         [keyIsDown, ~, keyCode] = KbCheck;
         
+        exitCode = checkEscapeKeys(keyCode);
+        
+        if exitCode
+            
+            return
+            
+        end
+        
         if keyIsDown && ~oldKeyIsDown
             
             keyPress(keyCode);
@@ -400,43 +406,6 @@ while 1
                 startTime = GetSecs();
                 
                 logEvent('started swirl');
-                
-            end
-            
-            if keyCode(KbName('Escape'))
-                
-                exitCode = 0;
-                
-                break;
-                
-            end
-            
-            if keyCode(KbName('END'))
-                
-                exitCode = 1;
-                
-                break;
-                
-            end
-            
-            numsPressed = intersect(find(keyCode), ('1':'9') + 0);
-            
-            if keyCode(KbName('Alt'))
-                
-                if isempty(numsPressed)
-                    
-                    % allows continuous holding down of Ctrl
-                    % by resetting the isKeyDown flag
-                    
-                    keyIsDown = 0;
-                    
-                else
-                    
-                    exitCode = 100 + min(numsPressed) - '0'; % special exit code to switch stimuli
-                    
-                    return;
-                    
-                end
                 
             end
             

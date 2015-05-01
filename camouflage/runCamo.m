@@ -12,9 +12,11 @@ duration = inf;
 
 bugTexture = 1 * (rand(100, 20) > 0.15);
 
-bugSpeed = 10;
+bugSpeed = 500;
 
-bugJitter = 5;
+bugJitter = 0;
+
+bugDirection = 1;
 
 if nargin>1
     
@@ -72,7 +74,7 @@ while exitCode == 0
                 
                 rect = [1 1 W+1 H+1] + [x y x y] .* [W H W H];
                 
-                %rect = [1 1 W*2 H*2];
+%                 rect = [1 1 W H];
                 
                 Screen('DrawTexture', window, tex, [], rect);
                 
@@ -84,7 +86,13 @@ while exitCode == 0
         
         bugX = sW / 2 - bugSize(1)/2 + t * bugSpeed * bugDirection;
         
+        bugX = mod(t * bugSpeed * bugDirection, sW);
+        
         jitXY = (rand(1, 2)-0.5) * bugJitter;
+        
+        bugY = round(bugY);
+        
+        bugX = round(bugX);
         
         bugRect = [1 0 1 0] * bugX + [0 1 0 1] * bugY ...
             + [0 0 bugSize] + [jitXY jitXY];

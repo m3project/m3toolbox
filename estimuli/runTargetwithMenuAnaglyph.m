@@ -116,7 +116,7 @@ printKeyboardShortcuts(shortcuts);
 
 flickSize = 100;
 
-flickerRect = [0 sH-flickSize/2 flickSize sH];
+flickerRect = [0 sH-55 150 sH];
 
 flicker = 0;
 
@@ -281,25 +281,17 @@ while 1
     
     [keyIsDown, ~, keyCode] = KbCheck;
     
+    exitCode = checkEscapeKeys(keyCode);
+    
+    if exitCode
+        
+        return
+        
+    end    
+    
     if keyIsDown && ~oldKeyIsDown
         
         keyPress(keyCode);
-        
-        if keyCode(KbName('ESCAPE'))
-            
-          exitCode = 0;
-            
-          break;
-          
-        end
-        
-        if keyCode(KbName('END'))
-            
-            exitCode = 1;
-            
-            break;
-            
-        end
         
         if keyCode(KbName('SPACE'))
             
@@ -371,27 +363,6 @@ while 1
             
         end
         
-        numsPressed = intersect(find(keyCode), ('1':'9') + 0);
-        
-        if keyCode(KbName('Alt'))
-            
-            if isempty(numsPressed)
-                
-                % allows continuous holding down of Ctrl
-                % by resetting the isKeyDown flag
-                
-                keyIsDown = 0;
-                
-            else
-            
-                exitCode = 100 + min(numsPressed) - '0'; % special exit code to switch stimuli
-                
-                return;
-                
-            end
-           
-        end
-
         menu.updateget = 1;
         
         menu = drawMenu(menu);

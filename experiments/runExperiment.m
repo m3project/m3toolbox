@@ -1,6 +1,6 @@
 function runExperiment(expt)
 
-cleanupObj1 = onCleanup(@signout);
+obj1 = onCleanup(@cleanup);
 
 signin();
 
@@ -36,7 +36,10 @@ if nargin>0
     
 end
 
-exptDir = chooseExperimentDir(name, workDir, defName, addTags);
+% if the 'continue experiment' option is selected in the
+% chooseExperimentDir dialog then the function will return the 
+
+[exptDir, contExpt] = chooseExperimentDir(name, workDir, defName, addTags);
 
 if isempty(exptDir)
     
@@ -44,19 +47,29 @@ if isempty(exptDir)
     
 end
 
-fullDir = fullfile(workDir, exptDir);
-
-if exist(fullDir, 'dir')
+if contExpt
     
-    error('Directory %s already exists', fullDir);
+    fullDir = exptDir;
+    
+else
+    
+    % check if directory exists
+    
+    fullDir = fullfile(workDir, exptDir);
+    
+    if exist(fullDir, 'dir')
+        
+        error('Directory %s already exists', fullDir);
+        
+    end
+    
+    mkdir(fullDir);
+
+    paramSet = genParamSetFun();
+    
+    hardwareInfo = getHardwareInfo();
     
 end
-
-mkdir(fullDir);
-
-paramSet = genParamSetFun();
-
-hardwareInfo = getHardwareInfo();
 
 % pre-experiment preparation:
 
@@ -70,15 +83,29 @@ dumpsFile           = fullfile(fullDir, 'dumps.mat');
 
 hardwareInfoFile    = fullfile(fullDir, 'hardware_info.mat');
 
-trialCount          = size(paramSet, 1);
-
-save(paramFile, 'paramSet');
-
-save(hardwareInfoFile, 'hardwareInfo');
-
-if makeBackup
+if contExpt
     
-    backupToolbox(fullDir);
+    if ~exist(paramFile, 'file')
+        
+        error('The selected folder does not contain experiment data');
+        
+    end
+   
+    load(paramFile);
+    
+    load(resultsFile);
+    
+else
+    
+    save(paramFile, 'paramSet');
+    
+    save(hardwareInfoFile, 'hardwareInfo');
+    
+    if makeBackup
+        
+        backupToolbox(fullDir);
+        
+    end
     
 end
 
@@ -86,31 +113,43 @@ if recordVideos
     
     cam1 = initCam(); % initialize camera
     
-    cleanupObj2 = onCleanup(deallocCam(cam1));
+    deallocCam1 = @() deallocCam(cam1);
+    
+    cleanupObj2 = onCleanup(deallocCam1);
     
 end
 
 % start trials
 
+trialCount = size(paramSet, 1);
+
+firstTrial = size(resultSet, 1) + 1;
+
+remTrials = trialCount - firstTrial + 1; % number of remaining trials
+
+exitCode = 0;
+
 ticID = tic;
 
-for i=1:trialCount
+for i=firstTrial:trialCount
     
     clc;
+    
+    j = i - firstTrial + 1;
     
     fprintf('Experiment Folder:\n\n%s\n\n', fullDir);
     
     fprintf('Trial %3i of %3i (%3.1f%%) ... \n\n', i, trialCount, i/trialCount*100);
     
-    if (i>2)
+    if (j>2)
         
         elaspedTime = toc(ticID);
         
-        totalTime = elaspedTime / (i-1) * trialCount;
+        totalTime = elaspedTime / (j-1) * remTrials;
         
         remainingTime = totalTime - elaspedTime;
         
-        avgTime = elaspedTime/i;
+        avgTime = elaspedTime/j;
         
         fprintf('Time Spent       : %s\n', datestr(elaspedTime/3600/24, 'HH:MM:SS'));
         
@@ -248,4 +287,12 @@ resultRow = [1];
 
 end
 
+function cleanup()
 
+signout();
+
+closeWindow();
+
+commandwindow();
+
+end

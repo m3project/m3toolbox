@@ -62,7 +62,7 @@ end
 
 if nargin < 1
 
-    funcs = {@runDiscLoom, @runGratingwithMenu, @runTargetwithMenuAnaglyph, @runSwirlAnaglyph, @runDotsAnaglyph_ephys, @runLargeField, @runCorrDots, @runBarScan};
+    funcs = {@runDiscLoom, @runGratingwithMenu, @runTargetwithMenuAnaglyph, @runSwirlAnaglyph, @runDotsAnaglyph_ephys, @runLargeField, @runCorrDots, @runBarScan, @runFieldBars};
 
 end
 
@@ -84,7 +84,7 @@ while 1
     
     closeWindow(); % close window afterwards
     
-    if exitCode == 0
+    if exitCode == 1
         
         break
         

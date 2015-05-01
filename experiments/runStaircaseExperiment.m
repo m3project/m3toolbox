@@ -35,6 +35,10 @@
 
 function [bestX, history] = runStaircaseExperiment(expt)
 
+cleanupObj1 = onCleanup(@signout);
+
+signin();
+
 % default parameters:
 
 fun = @(cond, x) blackBoxPsychometric(cond, x);
@@ -123,7 +127,9 @@ if recordVideos
     
     cam1 = initCam(); % initialize camera
     
-    cleanupObj2 = onCleanup(deallocCam(cam1));
+    deallocCam1 = @() deallocCam(cam1);
+    
+    cleanupObj2 = onCleanup(deallocCam1);
     
 end
 
@@ -143,8 +149,11 @@ xvals = (xmin:xstep:xmax)';
 
 priors = ones(priorsLength, nconds);
 
-%sequence = createRandTrialBlocks(steps, 1:nconds);
-sequence = reshape(ones(steps, 1) * (1:nconds), [steps*nconds 1]);
+sequence = createRandTrialBlocks(steps, 1:nconds);
+
+% uncomment below to change to non-interleaved staircases
+
+% sequence = reshape(ones(steps, 1) * (1:nconds), [steps*nconds 1]);
 
 progress = zeros(nconds, 1);
 
@@ -277,7 +286,7 @@ for j=1:n
     % must also save a dummy paramSet for backward compatibility with
     % loadDirData
     
-    paramSet = 0;
+    paramSet = sequence;
     
     save(paramsFile, 'paramSet');
     
@@ -365,11 +374,29 @@ end
 
 function x = getMeanIndex(priors)
 
+% edited by Jenny on 23rd April 2015:
+
+% (Jenny found out that my previous implementation was choosing the
+% *median* as opposed to the mean, she didn't think this would make much of
+% a difference).
+
+% FInds median
 c = cumsum(priors);
 
 m = c(end);
 
 x = find(c > m/2, 1, 'first');
+
+% Finds mean?
+xx = [1:length(priors)]';
+%mean
+m = sum(xx.*priors)./sum(priors);
+m = trapz(xx,xx.*priors)./trapz(xx,priors);
+% difference between xx and mean is
+df = abs(xx-m);
+% find the one that is closest to the mean:
+[mn,x] = min(df);
+
 
 end
 

@@ -10,11 +10,11 @@ expt.runTrialFun = @runTrial;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
-expt.workDir = 'c:\mantisGratingThomas\';
+expt.workDir = 'd:\mantisGratingThomas\';
 
 expt.name = 'Mantis Grating Thomas';
 
-expt.recordVideos = 0;
+expt.recordVideos = 1;
 
 expt.makeBackup = 1;
 
@@ -28,7 +28,7 @@ end
 
 function paramSet = genParamSet()
 
-columnWidths = [0.5 1 2 4 8]; % cm
+columnWidths = [0.5 1 2 4 8 16]; % cm
 
 speeds_cm_sec = [1 2 4 8 16]; % cm/sec
 
@@ -102,7 +102,7 @@ function runAlignmentStimulusNoBack()
 
 x = 0;
 
-y = 350;
+y = 0;
 
 % render alignment stimulus
 

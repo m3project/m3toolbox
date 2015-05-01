@@ -1,6 +1,10 @@
 % this is a modified version of runExperiment (not backward compatible)
 function runExperimentB(expt)
 
+obj1 = onCleanup((@() commandwindow));
+
+obj2 = onCleanup((@() closeWindow));
+
 cleanupObj1 = onCleanup(@signout);
 
 signin();

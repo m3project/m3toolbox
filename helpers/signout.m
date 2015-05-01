@@ -40,7 +40,6 @@ if exist(file, 'file')
     
 end
 
-error('You are not signed in')
-
+warning('signout ignored, you are not signed in')
 
 end

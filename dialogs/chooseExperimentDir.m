@@ -1,4 +1,4 @@
-function dir = chooseExperimentDir(exptName, exptFolder, defName, addTags)
+function [dir, contExpt] = chooseExperimentDir(exptName, exptFolder, defName, addTags)
 
 if nargin<2
     
@@ -82,11 +82,19 @@ formats(n, 1).enable ='off';
 
 n = n+1;
 
-
 prompt(n,:) = {'Date and Time :','datetime',''};
 formats(n, 1).size = w;
 formats(n, 1).margin = [m1 0];
 formats(n, 1).enable ='off';
+
+n = n + 1;
+
+prompt(n, :) = {'Continue previous experiment', 'continue', ''};
+formats(n, 1).size = w;
+formats(n, 1).margin = [m1 0];
+formats(n, 1).enable ='on';
+formats(n, 1).type = 'check';
+formats(n, 1).style = 'checkbox';
 
 dateStr = datestr(now, 'dd-mm-yyyy HH.MM');
 
@@ -103,6 +111,16 @@ options.Sep = 16;
 [answer, cancelled] = inputsdlg(prompt, title, formats, defs, options);
 
 drawnow
+
+contExpt = answer.continue;
+
+if contExpt == 1
+    
+    dir = uigetdir(exptFolder, 'Select experiment folder');
+    
+    return
+    
+end
 
 if cancelled
     

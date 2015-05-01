@@ -20,7 +20,9 @@ if exist(file, 'file')
         
         % user already checked out toolbox
         
-        error('You are already signed in');
+        warning('signin ignored, you are already signed in');
+        
+        return;
         
     else
         

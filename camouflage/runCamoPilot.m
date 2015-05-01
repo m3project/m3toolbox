@@ -4,11 +4,11 @@ function runCamoPilot
 
 % background parameters
 
-spatialScale = 0.1; % 0.01 (large) or 0.1 (small)
+spatialScale = 0.01; % 0.01 (large) or 0.1 (small)
 
-temporalScale = 0.01; % 0.05 (fast), 0.01 (slow), 0.0001 (static)
+temporalScale = 0.0001; % 0.05 (fast), 0.01 (slow), 0.0001 (static)
 
-backContrast = 0.5; % 0 to 1
+backContrast = 1; % 0 to 1
 
 % bug parameters
 

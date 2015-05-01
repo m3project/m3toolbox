@@ -128,7 +128,7 @@ cos2 = @(x) (1+cos(x)*b)/2;
 
 %% flicker box
 
-flickerRect = [0 sH-flickSize flickSize sH];
+flickerRect = [0 sH-55 150 sH];
 
 flicker = 0;
 
@@ -268,7 +268,15 @@ while 1
     
     i = mod(i, 1e3) + 1;
     
-    [keyIsDown, ~, keyCode ] = KbCheck;
+    [keyIsDown, ~, keyCode] = KbCheck;
+    
+    exitCode = checkEscapeKeys(keyCode);
+    
+    if exitCode
+        
+        return
+        
+    end
     
     if keyIsDown && ~oldKeyIsDown
         
@@ -328,22 +336,6 @@ while 1
             
         end
         
-        if keyCode(KbName('Escape'))
-            
-            exitCode = 0;
-            
-            break;
-            
-        end
-        
-        if keyCode(KbName('END'))
-            
-            exitCode = 1;
-            
-            break;
-            
-        end
-        
         if keyCode(KbName('l')) && dir == 1
             
             dir = -1;
@@ -362,29 +354,8 @@ while 1
             
             logEvent('direction switched to right');
             
-        end
-        
-        numsPressed = intersect(find(keyCode), ('1':'9') + 0);
-        
-        if keyCode(KbName('Alt'))
-            
-            if isempty(numsPressed)
-                
-                 % allows continuous holding down of Ctrl
-                 % by resetting the isKeyDown flag
-                
-                keyIsDown = 0;
-                
-            else
-            
-                exitCode = 100 + min(numsPressed) - '0'; % special exit code to switch stimuli
-                
-                return;
-                
-            end
-           
-        end
-        
+        end        
+       
     end
     
     oldKeyIsDown = keyIsDown;

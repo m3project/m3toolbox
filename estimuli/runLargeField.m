@@ -44,7 +44,7 @@ dynamic = 0; % 1 or 0 to enable/disable dynamic background
 
 frequency = 2; % disparity oscillation frequency (Hz)
 
-fbox = createFlickerBox(50,50);
+fbox = createFlickerBox(150,55);
 
 %% print keyboard shortcuts
 
@@ -118,6 +118,14 @@ while (1)
     
     [keyIsDown, ~, keyCode] = KbCheck;
     
+    exitCode = checkEscapeKeys(keyCode);
+    
+    if exitCode
+        
+        return
+        
+    end    
+    
     if keyIsDown && ~oldKeyIsDown
         
         keyPress(keyCode);
@@ -151,43 +159,6 @@ while (1)
             disp = disp_zero;
             
             logEvent('set disparity to 0');
-            
-        end
-        
-        if keyCode(KbName('Escape'))
-            
-            exitCode = 0;
-            
-            break;
-            
-        end
-        
-        if keyCode(KbName('END'))
-            
-            exitCode = 1;
-            
-            break;
-            
-        end
-        
-        numsPressed = intersect(find(keyCode), ('1':'9') + 0);
-        
-        if keyCode(KbName('Alt'))
-            
-            if isempty(numsPressed)
-                
-                % allows continuous holding down of Ctrl
-                % by resetting the isKeyDown flag
-                
-                keyIsDown = 0;
-                
-            else
-                
-                exitCode = 100 + min(numsPressed) - '0'; % special exit code to switch stimuli
-                
-                return;
-                
-            end
             
         end
         

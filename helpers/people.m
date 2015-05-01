@@ -2,7 +2,6 @@ function people()
 
 file = fullfile(M3, 'in.use');
 
-
 if exist(file, 'file')
     
     load(file, '-mat');

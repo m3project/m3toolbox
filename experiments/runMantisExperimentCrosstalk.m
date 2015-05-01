@@ -72,7 +72,7 @@ end
 
 function resultRow = runAfterTrial(varargin)
 
-pause(30);
+pause(60);
 
 resultRow = 0;
 

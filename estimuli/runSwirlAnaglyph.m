@@ -56,9 +56,9 @@ disparityEnable = 1; % disparity setting (-1, 0 or +1)
 
 previewMotionFunc = 0; % set to 1 to see a figure of the swirl function versus time
 
-cx = 970; % center in x coords (px) (screen center in behavioral expt)
+cx = 955; % center in x coords (px) (screen center in behavioral expt)
 
-cy = 650; % center in y coords (px) (screen center in behavioral expt)
+cy = 710; % center in y coords (px) (screen center in behavioral expt)
 
 iod = 0.8; % 0.5 mantis inter-ocular distance (cm)
 
@@ -82,7 +82,7 @@ bugColor = 0; % [0, 1]
 
 sf = 37; % screen scaling factor (px/cm)
 
-bugSize = 0.5; % bug size (cm) as perceived by the mantis at virtDm2 position
+bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm2 position
 
 virtBS2 = viewD / virtDm2 * bugSize;
 
@@ -176,9 +176,7 @@ swirlActive = 1;
 
 %% flicker box
 
-flickSize = 50;
-
-flickerRect = [0 sH-flickSize flickSize sH];
+flickerRect = [0 sH-55 150 sH];
 
 flicker = 0;
 
@@ -331,7 +329,7 @@ while 1
     end
     
     Screen('FillRect', window, [1 1 1] * flickerEna * flickerCol * dutyOn , flickerRect);
-%     fprintf('%d', flickerEna * flickerCol * dutyOn>0);
+    
 %     if Missed>0
 %         
 %         disp('missed')
@@ -341,6 +339,14 @@ while 1
     flickerCount = mod(flickerCount + 1, flickerPeriod);
     
     [keyIsDown, ~, keyCode] = KbCheck;
+    
+    exitCode = checkEscapeKeys(keyCode);
+    
+    if exitCode
+        
+        return
+        
+    end    
     
     if keyIsDown && ~oldKeyIsDown
         
@@ -401,43 +407,6 @@ while 1
             flickerCount = 0;
             
             logEvent('started swirl');
-            
-        end
-        
-        if keyCode(KbName('Escape'))
-            
-            exitCode = 0;
-            
-            break;
-            
-        end
-        
-        if keyCode(KbName('END'))
-            
-            exitCode = 1;
-            
-            break;
-            
-        end
-        
-        numsPressed = intersect(find(keyCode), ('1':'9') + 0);
-        
-        if keyCode(KbName('Alt'))
-            
-            if isempty(numsPressed)
-                
-                % allows continuous holding down of Ctrl
-                % by resetting the isKeyDown flag
-                
-                keyIsDown = 0;
-                
-            else
-                
-                exitCode = 100 + min(numsPressed) - '0'; % special exit code to switch stimuli
-                
-                return;
-                
-            end
             
         end
         
