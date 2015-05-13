@@ -42,11 +42,19 @@ enable3D = 0;
 
 M = 40;
 
-txtCount = 50; % don't bother
+txtCount = 50;
 
-R = 0.5; % don't bother
+R = 0.5;
 
-textured = 0; % don't bother
+textured = 0;
+
+whiteLum = 150;
+
+blackLum = 0;
+
+baseLum = 255/2; % background luminance
+
+enableChequers = 1;
 
 camouflage = 0;
 
@@ -120,7 +128,8 @@ if (interactiveMode == 2)
         '---------'     , '--------', ...
         'a'             , 'motion mode: auto', ...
         's'             , 'motion mode: swirl', ...
-        'k'             , 'motion mode: keyboard', ...
+        'k'             , 'show chequers', ...
+        'l'             , 'hide chequers', ...
         'h'             , 'motion mode: horizontal', ...
         'r'             , 'motion mode: restart motion', ...
         ''              , '', ...
@@ -228,8 +237,8 @@ if (textured)
     
 else
     
-    tile(:,:,1) = ones(tileSide, tileSide) * 0;
-    tile(:,:,2) = ones(tileSide, tileSide) * 150;
+    tile(:,:,1) = ones(tileSide, tileSide) * blackLum;
+    tile(:,:,2) = ones(tileSide, tileSide) * whiteLum;
     
 end
 
@@ -379,6 +388,8 @@ while (1)
     
     Screen('SelectStereoDrawBuffer', window, channel);
     
+    Screen('FillRect', window, [1 1 1] * baseLum);
+    
     if timeLimit>0 && t >= timeLimit
         
         break;
@@ -425,11 +436,15 @@ while (1)
         
     end
     
-    for x=1:w
+    if enableChequers
         
-        s = [1 0 1 0] * disparity/2 * channel;
-        
-        drawRow(window, x, txtID, h, board, blockSide, [marginRight marginTop marginRight marginTop] + s, dx, dy, sW, sH)
+        for x=1:w
+            
+            s = [1 0 1 0] * disparity/2 * channel;
+            
+            drawRow(window, x, txtID, h, board, blockSide, [marginRight marginTop marginRight marginTop] + s, dx, dy, sW, sH)
+            
+        end
         
     end
         
@@ -598,11 +613,15 @@ while (1)
         
         if (keyCode(KbName('k')))
             
-            motionFuncs = getMotionFuncs('keyboard');
-            
-            startTime = GetSecs();
+            enableChequers = 1;
             
         end
+        
+        if (keyCode(KbName('l')))
+            
+            enableChequers = 0;
+            
+        end        
         
         if (keyCode(KbName('h')))
             

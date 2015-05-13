@@ -2,7 +2,7 @@ function [is, centerX, centerY]  = runGroupSwirl(expt, is, centerX, centerY)
 
 bugColor = 0;
 
-bugY = 0.62;
+bugY = 0.49;
 
 n = 10; % number of dots
 
@@ -16,7 +16,7 @@ bugD = 2.5; % distance between mantis and virtual bug
 
 sf = 37.0370; % screen scaling factor (px/cm) for Dell U2413
 
-disparityEnable = -1; % -1 ,0 or +1
+disparityEnable = 1; % -1 ,0 or +1
 
 duration = 7; % secs (-1 to disable)
 

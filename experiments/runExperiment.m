@@ -36,6 +36,16 @@ if nargin>0
     
 end
 
+if strcmp(getenv('computername'), 'READLAB14')
+    
+    recordVideos = 0;
+    
+    makeBackup = 0;
+    
+    warning('running on Ghaith''s desktop machine, backup and video recording disabled');
+    
+end
+
 % if the 'continue experiment' option is selected in the
 % chooseExperimentDir dialog then the function will return the 
 

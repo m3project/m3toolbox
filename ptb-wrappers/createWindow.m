@@ -77,7 +77,7 @@ PsychColorCorrection('SetEncodingGamma', window, 1/Gamma);
 
 if Gamma == 1
     
-    warning('running with the default Gamma=1, make sure you change this if you''re running a contrast-dependent experiment');
+    warning('running with the default Gamma=1, make sure you change this if you''re running a contrast-dependent experiment or rendering grating/other patterns');
     
 end
 

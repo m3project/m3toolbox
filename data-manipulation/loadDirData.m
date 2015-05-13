@@ -82,6 +82,8 @@ for i=1:n
     k1 = size(fileData1.paramSet, 1);
     k2 = size(fileData2.resultSet, 1);
     
+    hash = DataHash(sort(fileData1.paramSet));
+    
     if k1 ~= k2
         
         fileData1.paramSet = fileData1.paramSet(1:k2, :);
@@ -96,7 +98,7 @@ for i=1:n
     
     
     
-    hash = DataHash(sort(fileData1.paramSet));
+    
     
     if ~ismember(hash, hashes)
         

@@ -1,8 +1,6 @@
 function runMantisExperimentMaskingStaircase
 
-obj1 = onCleanup((@() commandwindow));
-
-obj2 = onCleanup((@() closeWindow));
+obj1 = onCleanup(@cleanup);
 
 expt = struct;
 
@@ -16,7 +14,7 @@ expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisMaskingStaircase\';
 
 expt.name = 'Mantis Masking Staircase';
 
-conditions = getConditions();
+conditions = getConditionsRun2();
 
 getChannel = @(cond) conditions(cond, 1);
 
@@ -31,7 +29,7 @@ expt.fun = @(cond, x) runTrial(x, getChannel(cond), ...
 
 expt.xrange = [-3 0];
 
-expt.steps = 20;
+expt.steps = 10;
 
 expt.sigma = 5e-2;
 
@@ -43,11 +41,11 @@ expt.nconds = size(conditions, 1);
 
 expt.makePlot = 0;
 
-%expt.addTags = {'FREQS_8HZ'};
+expt.addTags = {'RUN2'};
 
-%expt.addTags = {'GRID1', 'TAKE2'};
+Gamma = 1.3476;
 
-expt.addTags = {'DEBUG_5', 'FROM_TOP', '4SECS'};
+createWindow(Gamma);
 
 runStaircaseExperiment(expt);
 
@@ -115,6 +113,42 @@ conditions = conditions(k, :);
 
 end
 
+function conditions = getConditionsRun2()
+
+% RUN2 (11th May 2015):
+
+channel = [1 2];
+
+noiseSetting = [0 1 2];
+
+staticNoise = [0 1];
+
+conditions = createTrial(channel, noiseSetting, staticNoise);
+
+% remove conditions with noiseSetting=0 and staticNoise=1
+
+% i.e. keep conditions with either noiseSetting~=0 or staticNoise=0
+
+k = conditions(:, 2) | ~conditions(:, 3); conditions = conditions(k, :);
+
+% prompt user to select condition
+
+selected_cond = nan;
+
+n = size(conditions, 1);
+
+while ~ismember(selected_cond, 1:n)
+    
+    strPrompt = sprintf('select a condition (1 to %i): ', n);
+    
+    selected_cond = input(strPrompt);
+    
+end
+
+conditions = conditions(selected_cond, :);
+
+end
+
 
 function c = runTrial(x, channel, noiseSetting, staticSetting)
 
@@ -176,19 +210,19 @@ end
 
 % grid 1:
 
-% spatialFreqs = [0.04 0.2];
-% 
-% noiseLevels{1} = [0.141 0.282 0;   0.028 0.056 0.14;   0.141 0.282 0.14;]; %%%ISP 26-06-2014
-% 
-% noiseLevels{2} = [0.141 0.282 0;   0.141 0.282 0.14;   0.028 0.056 0.14;]; %%%ISP 26-06-2014
-% 
-% noiseParams = noiseLevels{channel}(noiseSetting+1, :);
+spatialFreqs = [0.04 0.2];
+
+noiseLevels{1} = [0.141 0.282 0;   0.028 0.056 0.14;   0.141 0.282 0.14;]; %%%ISP 26-06-2014
+
+noiseLevels{2} = [0.141 0.282 0;   0.141 0.282 0.14;   0.028 0.056 0.14;]; %%%ISP 26-06-2014
+
+noiseParams = noiseLevels{channel}(noiseSetting+1, :);
 
 % grid 2:
 
-spatialFreqs = 0.04 * (1:5);
-
-noiseParams = [0.141 0.282 0]; % params for zero noise
+% spatialFreqs = 0.04 * (1:5);
+% 
+% noiseParams = [0.141 0.282 0]; % params for zero noise
 
 % other params
 
@@ -211,5 +245,13 @@ expt.Gamma = 1.3476;
 expt.staticSetting = staticSetting;
 
 runGratingNoise(expt);
+
+end
+
+function cleanup()
+
+% closeWindow();
+
+commandwindow;
 
 end

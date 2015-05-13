@@ -14,9 +14,9 @@ expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisTrack\';
 
 expt.name = 'Mantis Track';
 
-expt.recordVideos = 0;
+expt.recordVideos = 1;
 
-expt.makeBackup = 0;
+expt.makeBackup = 1;
 
 expt.defName = 'Lisa';
 

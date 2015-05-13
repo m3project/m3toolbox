@@ -1,4 +1,4 @@
-% this function calculates the min and max luminance levels
+% this function calculates the min (B) and max (A) luminance levels
 % given a luminance average and a contrast
 %
 % contrast is defined as (A-B)/(A+B) where A, B are the max and min

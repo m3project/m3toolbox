@@ -20,7 +20,7 @@ window = getWindow();
 %% Stimulus Settings
 
 
-viewD = 10;% viewing distance (cm)
+viewD = 5;% viewing distance (cm)
 
 bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm2 position
 
@@ -50,7 +50,7 @@ virtBS1= virtBS2 * virtDm2 / viewD;
 
 duration = 2.25; % duration of motion from distance 1 to 2 (seconds)
 
-bugY = 0.72; % vertical location of bug (0 to 1)
+bugY = 0.52; % vertical location of bug (0 to 1)
 
 bugJitter = 5; % bug jitter in pixels (0 to disable)
 

@@ -1,36 +1,26 @@
-function runCamo(s, expt)
-
-if isempty(s)
-    
-    return
-    
-end
-
-contrast = 1;
+function runCamoPattern(args)
 
 duration = inf;
 
-bugTexture = 1 * (rand(100, 20) > 0.15);
+backPattern = 0.5 * ones(500, 500);
 
-bugSpeed = 500;
+bugPattern = 0.5;
 
-bugJitter = 0;
+getBugPosition = @(t) getBugPosition_internal(t);
 
-bugDirection = 1;
+escapeEnabled = 1;
 
-if nargin>1
+if nargin>0
     
-    unpackStruct(expt);
+    unpackStruct(args);
     
 end
-
-bugSize = size(bugTexture);
 
 S = 1; % scaling factor
 
 KbName('UnifyKeyNames');
 
-[H, W, ~] = size(s);
+[H, W, ~] = size(backPattern);
 
 W = W * S;
 
@@ -45,16 +35,18 @@ createWindow(1); window = getWindow();
 blocksX = ceil(sW / W);
 
 blocksY = ceil(sH / H);
-    
-mx = mean(abs(s(:))) * 4;
 
-frames = size(s, 3);
+frames = size(backPattern, 3);
 
 exitCode = 0;
 
 startTime = GetSecs();
 
-bugTex = Screen('MakeTexture', window, bugTexture' * 255);
+bugTex = Screen('MakeTexture', window, bugPattern' * 255);
+
+bugSize = size(bugPattern(:, :, 1));
+
+% render loop
 
 while exitCode == 0
     
@@ -62,19 +54,17 @@ while exitCode == 0
         
         t = GetSecs() - startTime;
         
-        k = abs(s(:, :, i));
+        k = backPattern(:, :, i);
         
-        k2 = (0.5 + (k / mx - 0.5) * contrast) * 255;
+        tex = Screen('MakeTexture', window, k * 255);
         
-        tex = Screen('MakeTexture', window, k2);
+        Screen(window, 'FillRect', [1 1 1] * 255/2);
         
         for x=0:blocksX
             
             for y=0:blocksY
                 
-                rect = [1 1 W+1 H+1] + [x y x y] .* [W H W H];
-                
-%                 rect = [1 1 W H];
+                rect = [0 0 W H] + [x y x y] .* [W H W H];
                 
                 Screen('DrawTexture', window, tex, [], rect);
                 
@@ -82,24 +72,15 @@ while exitCode == 0
             
         end
         
-        bugY = sH / 2 - bugSize(2)/2;
+        bugPos = getBugPosition(t);
         
-        bugX = sW / 2 - bugSize(1)/2 + t * bugSpeed * bugDirection;
+        bugY = round(bugPos(2) - bugSize(2)/2);
         
-        bugX = mod(t * bugSpeed * bugDirection, sW);
+        bugX = round(bugPos(1) - bugSize(1)/2);
         
-        jitXY = (rand(1, 2)-0.5) * bugJitter;
-        
-        bugY = round(bugY);
-        
-        bugX = round(bugX);
-        
-        bugRect = [1 0 1 0] * bugX + [0 1 0 1] * bugY ...
-            + [0 0 bugSize] + [jitXY jitXY];
+        bugRect = [1 0 1 0] * bugX + [0 1 0 1] * bugY + [0 0 bugSize];
         
         Screen('DrawTexture', window, bugTex, [], bugRect);
-        
-        %Screen(window, 'FillRect', [1 1 1]*0, bugRect);
         
         Screen(window, 'Flip');
         
@@ -109,7 +90,7 @@ while exitCode == 0
         
         [~, ~, keyCode ] = KbCheck;
         
-        if (keyCode(KbName('Escape')))
+        if (keyCode(KbName('Escape'))) && escapeEnabled
             
             exitCode = 1;
             
@@ -128,5 +109,23 @@ while exitCode == 0
     end
     
 end
+
+end
+
+function pos = getBugPosition_internal(t)
+
+bugSpeed = 500;
+
+sW = 1920;
+
+sH = 1200;
+
+bugDirection = 1;
+
+t = max(0, t-2);
+
+pos(1) = mod(sW / 2 + t * bugSpeed * bugDirection, sW);
+
+pos(2) = sH * 0.5;
 
 end

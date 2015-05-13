@@ -2,15 +2,21 @@ function plotStaircaseMaskingPsychometric
 
 dir1 = 'V:\readlab\Ghaith\m3\data\mantisMaskingStaircase';
 
+dir1 = 'D:\collar';
+
 resultsFile = 'results.mat';
 
 binStep = 0.1;
 
-maxThreshold = 0.8;
+maxThreshold = 1;
 
 %%
 
-list = getDirList(dir1, {'4SECS'}, {'SET_A', '5SECS'}, 1);
+list = getDirList(dir1, {'COLLAR'}, { ...
+%     'NS90 07-05-2015 13.57' ...
+%     'NS90 07-05-2015 13.53' ...
+         'xN' ...
+    }, 1);
 
 n = size(list, 1);
 
@@ -21,6 +27,8 @@ if n == 0
 end
 
 set = [];
+
+clf
 
 subplot(2, 1, 2); cla; hold on; grid on;
 
@@ -34,11 +42,13 @@ for i=1:n
     
     item = list{i};
     
+    fprintf('%s\n', item);
+    
     f = fullfile(dir1, item, resultsFile);
     
     load(f);
     
-    if power(10, resultSet) < maxThreshold
+    if power(10, resultSet) <= maxThreshold
     
         set = [set; history(:, 1:2)];
         
@@ -75,7 +85,7 @@ for j=1:length(z)
     
 end
 
-strTitle = sprintf('Mean = %1.2f, \sigma = %1.2f', mean(thresholds), std(thresholds));
+strTitle = sprintf('Mean = %1.2f, \\sigma = %1.2f', mean(thresholds), std(thresholds));
 
 title(strTitle);
 
