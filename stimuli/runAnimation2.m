@@ -169,7 +169,7 @@ end
 
 if enable3D
     
-    createWindow3D(1); % use Gamma=1 (NO calibration!)
+    createWindow3D(1); %#ok % use Gamma=1 (NO calibration!) 
     
 else
     
@@ -232,7 +232,7 @@ txtID = zeros(2, 1);
 
 if (textured)
     
-    tile(:,:,1) = 0   + 50 * rand(tileSide, tileSide);
+    tile(:,:,1) = 0   + 50 * rand(tileSide, tileSide); %#ok
     tile(:,:,2) = 200 + 50 * rand(tileSide, tileSide);
     
 else
@@ -402,9 +402,9 @@ while (1)
         
         dx = ceil(funcMotionX(t)/stepDX) * stepDX;
         
-        DXs = [DXs dx];
+        DXs = [DXs dx]; %#ok
         
-        Ts = [Ts t];
+        Ts = [Ts t]; %#ok
         
     end
     
@@ -551,7 +551,7 @@ while (1)
         
         % scale window vertically by a factor of 2 (undo previous scaling)
         
-        scaleWindow([sW/2 0], 1, 2);
+        scaleWindow([sW/2 0], 1, 2); %#ok
         
     end
     
@@ -725,7 +725,7 @@ end
 
 if closeOnFinish
     
-    closeWindow();
+    closeWindow(); %#ok
     
 end
 

@@ -41,13 +41,13 @@ expt.nconds = size(conditions, 1);
 
 expt.makePlot = 0;
 
-expt.addTags = {'RUN2'};
+expt.addTags = {'RUN2', 'VAR1'};
 
 Gamma = 1.3476;
 
 createWindow(Gamma);
 
-runStaircaseExperiment(expt);
+runStaircaseExperiment(expt, conditions);
 
 end
 

@@ -2,7 +2,9 @@ function plotStaircaseMaskingPsychometric
 
 dir1 = 'V:\readlab\Ghaith\m3\data\mantisMaskingStaircase';
 
-dir1 = 'D:\collar';
+% dir1 = 'D:\staircase VAR1';
+
+% dir1 = 'D:\collar';
 
 resultsFile = 'results.mat';
 
@@ -12,10 +14,12 @@ maxThreshold = 1;
 
 %%
 
-list = getDirList(dir1, {'COLLAR'}, { ...
+list = getDirList(dir1, {'VAR1'}, { ...
 %     'NS90 07-05-2015 13.57' ...
 %     'NS90 07-05-2015 13.53' ...
          'xN' ...
+         'delme' ...
+         'BAD' ...
     }, 1);
 
 n = size(list, 1);
@@ -59,6 +63,8 @@ for i=1:n
     end
     
 end
+
+
 
 x = set(:, 1);
 y = set(:, 2);

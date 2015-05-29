@@ -2,9 +2,9 @@
 %
 % Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk) - 13/10/2014
 
-function setupM3Toolbox()
+function setupM3()
 
-ignoreList = {'.', '..', '.git', 'deprecated'};
+ignoreList = {'.', '..', '.git', 'deprecated', 'camo_new'};
 
 myList = dir;
 

@@ -20,7 +20,7 @@ expt.makeBackup = 1;
 
 expt.defName = 'Lisa';
 
-expt.addTags = {'SWIRL'};
+expt.addTags = {'HORZ'};
 
 runExperiment(expt);
 
@@ -30,7 +30,7 @@ function paramSet = genParamSet()
 
 blocks = 10;
 
-dirs = [-1 1];
+dirs = 1;
 
 spatialFreqsCPPX = 1 ./ power(2, 1:6);
 
@@ -47,7 +47,7 @@ end
 
 function runBeforeTrial(~)
 
-Gamma = 1.3476;
+Gamma = 2.783; % this is for Lisa's Phillips 107b3
 
 createWindow(Gamma);
 
@@ -95,6 +95,8 @@ if args.Fx == 1
     
 end
 
+args.duration = 10;
+
 runBugPattern(args);
 
 exitCode = 0;
@@ -107,7 +109,7 @@ function resultRow = runAfterTrial(varargin)
 
 checkPositive = @(str) str2double(str) >= 0;
 
-numSaccades = getNumber('Number of saccades: ', checkPositive);
+numSaccades = getNumber('Number of saccades/sways: ', checkPositive);
 
 response = getTrackResponseJudgement();
 
@@ -123,11 +125,11 @@ function response = getTrackResponseJudgement()
 
 c = 'x';
 
-letters = ['n' 't' 's' 'p' 'w'];
+letters = ['n' 't' 's' 'p' 'a' 'o'];
 
 while (length(c) ~= 1 || ismember(c, letters) ~= 1)
     
-    c = input('None(n), Track(t), Strike (s), Peer (p) or Twitch (w)? ', 's');
+    c = input('None(n), Track(t), Strike (s), Peer (p), Attention (a) or Other (o)? ', 's');
     
 end
 
@@ -161,7 +163,7 @@ expt.enable3D = enable3D;
 
 expt.disparity = 0;
 
-expt.M = 40;
+expt.M = 32;
 
 expt.R = 0.5;
 % 

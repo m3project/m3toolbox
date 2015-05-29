@@ -33,7 +33,7 @@
 %
 % Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk) - 6/3/2015
 
-function [bestX, history] = runStaircaseExperiment(expt)
+function [history] = runStaircaseExperiment(expt, condition)
 
 cleanupObj1 = onCleanup(@signout);
 
@@ -81,6 +81,16 @@ if nargin > 0
     
 end
 
+if strcmp(getenv('computername'), 'READLAB14')
+    
+    recordVideos = 0;
+    
+    makeBackup = 0;
+    
+    warning('running on Ghaith''s desktop machine, backup and video recording disabled');
+    
+end
+
 % choose experiment directory
 
 exptDir = chooseExperimentDir(name, workDir, defName, addTags);
@@ -111,7 +121,7 @@ trialVideoFile      = fullfile(fullDir, 'trial%u.mp4');
 
 % pre-experiment preparation (dump hardware info & code backup)
 
-hardwareInfo = getHardwareInfo();
+hardwareInfo = getHardwareInfo(); %#ok
 
 save(hardwareInfoFile, 'hardwareInfo');
 
@@ -237,7 +247,7 @@ for j=1:n
             
         end
         
-    catch except1
+    catch except1 %#ok
         
         warning('Could not save video');
         
@@ -279,14 +289,14 @@ for j=1:n
     
     history(i, :, cond) = [x result bestEstimateTheta];
     
-    resultSet = transp(squeeze(history(steps, 3, :)));
+    resultSet = transp(squeeze(history(steps, 3, :))); %#ok
     
     save(resultsFile, 'resultSet', 'history');
     
     % must also save a dummy paramSet for backward compatibility with
     % loadDirData
     
-    paramSet = sequence;
+    paramSet = condition; %#ok
     
     save(paramsFile, 'paramSet');
     
@@ -381,21 +391,21 @@ function x = getMeanIndex(priors)
 % a difference).
 
 % FInds median
-c = cumsum(priors);
+% c = cumsum(priors);
 
-m = c(end);
+% m = c(end);
 
-x = find(c > m/2, 1, 'first');
+% x = find(c > m/2, 1, 'first');
 
 % Finds mean?
-xx = [1:length(priors)]';
+xx = (1:length(priors))';
 %mean
-m = sum(xx.*priors)./sum(priors);
+% m = sum(xx.*priors)./sum(priors);
 m = trapz(xx,xx.*priors)./trapz(xx,priors);
 % difference between xx and mean is
 df = abs(xx-m);
 % find the one that is closest to the mean:
-[mn,x] = min(df);
+[~,x] = min(df);
 
 
 end

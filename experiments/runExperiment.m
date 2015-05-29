@@ -77,7 +77,7 @@ else
 
     paramSet = genParamSetFun();
     
-    hardwareInfo = getHardwareInfo();
+    hardwareInfo = getHardwareInfo(); %#ok
     
 end
 
@@ -215,7 +215,7 @@ for i=firstTrial:trialCount
             
         end
         
-    catch except1
+    catch except1 %#ok
         
         warning('Could not save video');
         
@@ -225,7 +225,7 @@ for i=firstTrial:trialCount
     
     resultRow = runAfterTrialFun(paramSetRow);
     
-    resultSet(i, :) = resultRow;
+    resultSet(i, :) = resultRow; %#ok
     
     % save results
     
@@ -275,7 +275,7 @@ warning('Please overload runBeforeTrial()');
 
 end
 
-function [exitCode, dump] = runTrial(paramSetRow)
+function [exitCode, dump] = runTrial(paramSetRow) %#ok
 
 % template function
 
@@ -293,7 +293,7 @@ warning('Please overload runAfterTrial()');
 
 disp('Press any key to continue'); pause;
 
-resultRow = [1];
+resultRow = 1;
 
 end
 

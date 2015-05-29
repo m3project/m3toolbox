@@ -6,9 +6,9 @@ Fx = 1/64; % cycle/px
 
 Sigx = 0.001; % cycle/px
 
-bugSpeed = 1500; % px/sec
+bugSpeed = 500; % px/sec
 
-duration = 5;
+duration = 10;
 
 dir = power(-1, rand>0.5);
 
@@ -42,7 +42,7 @@ i = 0;
 
 while (baseLumErr > baseLumErrTolerance) && (i < MAX_RETRIES)
     
-    bugPattern = gen2DPattern(struct('Fx', Fx, 'Sigx', Sigx, 'W', 50, 'H', 50));
+    bugPattern = gen2DPattern(struct('Fx', Fx, 'Sigx', Sigx, 'W', 75, 'H', 75));
     
     [minLum, maxLum] = calLumLevels(baseLum, contrast);
     
@@ -82,12 +82,14 @@ end
 
 function pos = getBugPosSwirl(t, sW, sH, bugDirection, bugSpeed)
 
-radius = 200; % px
+radius = 600; % px
 
 angVel = bugDirection * bugSpeed / radius; % angular velocity (rad/sec)
 
+angVel = bugSpeed / 300;
+
 angPos = angVel * t;
 
-pos = [sW sH]/2 + [cos(angPos) sin(angPos)] * radius;
+pos = [sW sH]/2 + [cos(angPos) 0*sin(angPos)] * radius;
 
 end
