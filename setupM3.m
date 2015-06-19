@@ -2,9 +2,15 @@
 %
 % Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk) - 13/10/2014
 
-function setupM3()
+function setupM3(unsetup)
 
-ignoreList = {'.', '..', '.git', 'deprecated', 'camo_new'};
+if nargin < 1
+    
+    unsetup = 0;
+    
+end
+
+ignoreList = {'.', '..', '.git', 'deprecated'};
 
 myList = dir;
 
@@ -20,17 +26,23 @@ end
 
 rootDir = pwd;
 
+setup_funcs = {@addpath, @rmpath};
+
+setupFunc = setup_funcs{unsetup+1};
+
 for i=1:length(myList)
     
     fullsubdir = fullfile(rootDir, myList(i).name);
     
     paths = genpath(fullsubdir);
-    
-    addpath(paths);
+        
+    setupFunc(paths);
     
 end
 
 disp('M3 toolbox has been setup successfully.');
+
+rehash
 
 end
 

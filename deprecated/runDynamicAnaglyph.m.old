@@ -1,4 +1,6 @@
-function [exitCode, xs, ys, thetas] = runDotsAnaglyph(expt, xs, ys, thetas)
+% this script is an adaptation of runDotsAnglyph
+
+function exitCode = runDynamicAnaglyph(expt)
 
 KbName('UnifyKeyNames');
 
@@ -14,12 +16,16 @@ createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
 
 %% Vivek parameters 
 
-bugY = 0.69    ;
+refreshCycle = 2; % background refresh rate (in frames)
 
-viewD = 10; % viewing distance (cm)
+syncStimBackground = 1; % synchronize bug position updates with background refresh cycles
+
+bugY = 0.69;
+
+viewD = 5  ; % viewing distance (cm)
 
 bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm2 position
- 
+
 disparityEnable = -1; % -1 ,0 or +1
 
 iod = 0.7 ; % mantis inter-ocular distance (cm)
@@ -30,11 +36,9 @@ preTrialDelay = 5; % seconds
 
 % dot params: 
 
-n = 1000; % number of dots  
+n =50000; % number of dots  
 
-r = 60; % radius
-
-v = 2  ; % velocity
+r =10; % radius
 
 % control params:  
 
@@ -44,10 +48,12 @@ previewMotionFuncs = 0;
 
 enableKeyboard = 1;
 
-backDisparity =  0; % background disparity (px)
+enaDynamicBackground = 0;
+
+enaBackDisparity = 1   ;
 
 interTrialTime = 600;
-
+% n = 5000; r =  10;  
 %% parameters
 
 % background params:
@@ -69,12 +75,6 @@ finalPresentationTime = 2;
 rotFreq = 4; % Hz
 
 edgeSmoothness = 0.8; % this determines how "hard/soft" the bug borders are
-
-% flicker params
-
-drawFlickerBox = 0;
-
-flickerCols = [0 0.25; 0 0.5; 0 1]; % -, 0 and + disparity (avoid using 0 since black is the non-flickering color)
 
 % loom params
 
@@ -135,7 +135,7 @@ if sizeScaleEnable
     
 else
     
-    if disparitySizeCondition
+    if disparitySizeCondition %#ok
         
         virtBugSize = @(t) virtBS1 * ones(size(t)); % .* viewD./ virtDm2 ;
         
@@ -166,9 +166,9 @@ radFunc = @(t) virtBugSize(t) * sf;
 
 if previewDisparityFunc
 
-    dist = 0:200;
+    dist = 0:200; %#ok
     
-    d = dispFunc(dist, 0, radFunc, edgeSmoothness, disparityMag, disparityEnable, backDisparity);
+    d = dispFunc(dist, 0, radFunc, edgeSmoothness, disparityMag, disparityEnable, enaBackDisparity);
     
     plot(dist, d);
     
@@ -187,33 +187,21 @@ centerX = sW/2;
 
 centerY = sH * bugY;
 
-if nargin < 4
-    
-    xs = rand(n, 1) * sW;
-    
-    ys = rand(n, 1) * sH;
-    
-    thetas = rand(n, 1) * 360;
-    
-end
+xs = rand(n, 1) * sW;
+
+ys = rand(n, 1) * sH;
+
+thetas = rand(n, 1) * 360;
 
 testRedBlue = 0;
 
 if testRedBlue
     
-    SetAnaglyphStereoParameters('RightGains', window, [1 0 0]);
+    SetAnaglyphStereoParameters('RightGains', window, [1 0 0]); %#ok
     
     SetAnaglyphStereoParameters('LeftGains', window, [0 0 1]);
     
 end
-
-%% flicker box
-
-flickSize = 50;
-
-flickerRect = [0 sH-flickSize flickSize sH];
-
-flicker = 0;
 
 %% motion function
 
@@ -221,7 +209,7 @@ flicker = 0;
 
 if previewMotionFuncs
     
-    t = 0:1e-2:5;
+    t = 0:1e-2:5; %#ok
     
     plot(t, [X(t); Y(t)]);
     
@@ -237,7 +225,13 @@ end
 
 startTime = GetSecs() + preTrialDelay;
 
+i = 0;
+
+t2 = 0;
+
 while 1
+    
+    i = i + 1;
     
     t = GetSecs() - startTime;
     
@@ -249,9 +243,15 @@ while 1
     
     if t>0
         
-        bugX = X(t);
+        if (mod(i, refreshCycle)==0 || ~syncStimBackground)
+            
+            t2 = t;
+            
+        end
         
-        bugY = Y(t);
+        bugX = X(t2);
+            
+        bugY = Y(t2);
         
     else
         
@@ -260,42 +260,24 @@ while 1
         bugY = inf;
         
     end
+    
+    bugX = 500; bugY = 500;
 
-    % update positions
+    % update dot positions
     
-    xs = xs + v * cosd(thetas);
-    
-    ys = ys + v * sind(thetas);
-    
-    k1 = xs>sW+r; xs(k1) = -r;
-    
-    k1 = xs<0-r; xs(k1) = sW+r;
-    
-    k1 = ys>sH+r; ys(k1) = -r;
-    
-    k1 = ys<0-r; ys(k1) = sH+r;
+    if enaDynamicBackground && mod(i, refreshCycle)==0
+        
+        xs = (1.2 * rand(n, 1) - 0.1) * sW;
+        
+        ys = (1.2 * rand(n, 1) - 0.1) * sH;
+        
+        thetas = rand(n, 1) * 360;
+        
+    end
     
     % calculate bug dot indexes
     
     dist = sqrt((xs - bugX).^2 + (ys - bugY).^2);
-    
-    % update flicker
-    
-    flickerEna = t<motionDuration;
-    
-    if flickerEna
-        
-        flicker = 1 - flicker;
-        
-    end
-    
-    k2 = disparityEnable * disparityMag(t);
-    
-    flickerCol = flickerCols(sign(k2)+2, flicker+1);    
-    
-    % draw
-    
-    randV = (rand(n, 1)>0.5);
     
     for channel = [0 1]
         
@@ -314,25 +296,19 @@ while 1
             
         end
         
-        d = dispFunc(dist, t, radFunc, edgeSmoothness, disparityMag, disparityEnable, backDisparity);
+        d = dispFunc(dist, t, radFunc, edgeSmoothness, disparityMag, disparityEnable, enaBackDisparity);
         
         pos = [xs-d*(-1)^channel ys];
         
         if enaJitter
             
-            jitter = dispFunc(0, t, radFunc, edgeSmoothness, disparityMag, disparityEnable, backDisparity)/2;
+            jitter = dispFunc(0, t, radFunc, edgeSmoothness, disparityMag, disparityEnable, enaBackDisparity)/2; %#ok
             
             pos(:,1) = pos(:,1) + jitter .* (-1).^randV;
             
         end
         
         Screen(window, 'DrawDots', pos', r, [1 1 1] * dotBrightness, [], 2);
-        
-        if drawFlickerBox
-            
-            Screen('FillRect', window, [1 1 1] * flickerEna * flickerCol, flickerRect);
-            
-        end
         
     end
     
@@ -405,12 +381,22 @@ Y = @(t) centerY + sin(theta1(t) * v) .* motionR(t);
 
 end
 
-function d = dispFunc(dist, t, radFunc, edgeSmoothness, disparityMag, disparityEnable, backDisparity)
+function d = dispFunc(dist, t, radFunc, edgeSmoothness, disparityMag, disparityEnable, enaBackDisparity)
 
-    tansig01 = @(x) (tansig(x)+1)/2;
+tansig01 = @(x) (tansig(x)+1)/2;
 
-    tansigAB = @(x, a, b) tansig01(x) * (b-a) + a';
+tansigAB = @(x, a, b) tansig01(x) * (b-a) + a';
 
-    d = tansigAB((dist - radFunc(t)) * edgeSmoothness,  disparityMag(t) * disparityEnable, backDisparity);
+if enaBackDisparity
     
+    backDisparity = -disparityMag(t) * disparityEnable;
+    
+else
+    
+    backDisparity = 0;
+    
+end    
+
+d = tansigAB((dist - radFunc(t)) * edgeSmoothness,  disparityMag(t) * disparityEnable, backDisparity);
+
 end

@@ -4,7 +4,7 @@ paramSet = [];
 
 for i=1:n
     
-    paramSet = [paramSet; createRandTrial(varargin{:})];
+    paramSet = [paramSet; createRandTrial(varargin{:})]; %#ok
     
 end
 

@@ -1,4 +1,4 @@
-function StereoDemo3
+function StereoDemo3.backup
 
 AssertOpenGL;
 

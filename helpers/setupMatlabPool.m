@@ -2,7 +2,7 @@ function setupMatlabPool(workers)
 
 if nargin == 0
     
-    workers = 8;
+    workers = getProcessorCount - 2;
     
 end
 

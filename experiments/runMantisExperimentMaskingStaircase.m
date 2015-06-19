@@ -234,6 +234,8 @@ expt.rho_max = noiseParams(2);
 
 expt.Crmsdesired = noiseParams(3);
 
+expt.Crmsdesired = expt.Crmsdesired * 1.2;
+
 expt.contrast = contrast;
 
 expt.direction = direction;

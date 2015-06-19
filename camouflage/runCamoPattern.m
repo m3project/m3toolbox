@@ -46,17 +46,29 @@ bugTex = Screen('MakeTexture', window, bugPattern' * 255);
 
 bugSize = size(bugPattern(:, :, 1));
 
+% prepare background textures
+
+texIDs = nan(frames, 1);
+
+for i=1:frames
+    
+    k = backPattern(:, :, i);
+    
+    texIDs(i) = Screen('MakeTexture', window, k * 255);    
+    
+end
+
+cleanFunc1 = @() Screen('Close', texIDs);
+
+obj1 = onCleanup(cleanFunc1);
+
 % render loop
 
 while exitCode == 0
     
     for i=1:frames
         
-        t = GetSecs() - startTime;
-        
-        k = backPattern(:, :, i);
-        
-        tex = Screen('MakeTexture', window, k * 255);
+        t = GetSecs() - startTime;        
         
         Screen(window, 'FillRect', [1 1 1] * 255/2);
         
@@ -66,7 +78,7 @@ while exitCode == 0
                 
                 rect = [0 0 W H] + [x y x y] .* [W H W H];
                 
-                Screen('DrawTexture', window, tex, [], rect);
+                Screen('DrawTexture', window, texIDs(i), [], rect);
                 
             end
             
@@ -82,9 +94,7 @@ while exitCode == 0
         
         Screen('DrawTexture', window, bugTex, [], bugRect);
         
-        Screen(window, 'Flip');
-        
-        Screen('Close', tex);
+        Screen(window, 'Flip');        
         
         % checking for key presses
         

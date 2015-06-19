@@ -2,11 +2,11 @@ function runMantisExperimentTrackingPattern()
 
 expt = struct;
 
-expt.genParamSetFun = @genParamSet;
+expt.genParamSetFun = @genParamSet2;
 
 expt.runBeforeTrialFun = @runBeforeTrial;
 
-expt.runTrialFun = @runTrial;
+expt.runTrialFun = @runTrial2;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
@@ -20,9 +20,21 @@ expt.makeBackup = 1;
 
 expt.defName = 'Lisa';
 
-expt.addTags = {'HORZ'};
+expt.addTags = {'CAMO'};
 
 runExperiment(expt);
+
+end
+
+function paramSet = genParamSet2()
+
+blocks = 5;
+
+bugBlockSizes = [0 5 10 20]; % note: 0 is special code for black bug
+
+backBlockSizes = [0 5 10 20]; % note: 0 is special code for gray background
+
+paramSet = createRandTrialBlocks(blocks, bugBlockSizes, backBlockSizes);
 
 end
 
@@ -44,7 +56,6 @@ paramSet = createRandTrialBlocks(blocks, dirs, spatialFreqsCPPX);
 
 end
 
-
 function runBeforeTrial(~)
 
 Gamma = 2.783; % this is for Lisa's Phillips 107b3
@@ -52,6 +63,54 @@ Gamma = 2.783; % this is for Lisa's Phillips 107b3
 createWindow(Gamma);
 
 runAlignmentStimulus_internal(0, 0, 0);
+
+end
+
+function [exitCode, dump] = runTrial2(paramSetRow)
+
+disp('rendering the stimulus ...');
+
+args = struct;
+
+bugBlockSize = paramSetRow(1);
+
+backBlockSize = paramSetRow(2);
+
+if bugBlockSize == 0
+    
+    args.bugType = 5;
+    
+else
+    
+    args.bugType = 4;
+    
+    args.bugBlockSize = bugBlockSize;
+    
+end
+
+if backBlockSize == 0
+    
+    args.backBlockSize = 100;
+    
+    args.backBlockContrast = 0;
+    
+else
+    
+    args.backBlockSize = backBlockSize;
+    
+end
+
+args.escapeEnabled = 0;
+
+args.duration = 25;
+
+runBugPattern(args);
+
+% clearWindow([1 1 1]*128);
+
+exitCode = 0;
+
+dump = [];
 
 end
 
@@ -99,6 +158,8 @@ args.duration = 10;
 
 runBugPattern(args);
 
+clearWindow([1 1 1]*128);
+
 exitCode = 0;
 
 dump = [];
@@ -106,6 +167,8 @@ dump = [];
 end
 
 function resultRow = runAfterTrial(varargin)
+
+delay = 0; % inter-trial delay (seconds)
 
 checkPositive = @(str) str2double(str) >= 0;
 
@@ -115,9 +178,9 @@ response = getTrackResponseJudgement();
 
 resultRow = [numSaccades response];
 
-disp('pausing for 15 seconds ...');
+sprintf('pausing for %i seconds ...\n', delay);
 
-pause(15);
+pause(delay);
 
 end
 
@@ -136,7 +199,6 @@ end
 response = strfind(letters, c);
 
 end
-
 
 function runAlignmentStimulus_internal(enable3D, x, y)
 

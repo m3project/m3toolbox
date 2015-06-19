@@ -22,21 +22,33 @@ frameRate = Screen(window, 'FrameRate');
 
 %% parameters
 
-aperture = [0 0 sW sH]; % x1, y1, x2, y2
+m = 200; % horizontal margin
+
+aperture = [m 0 sW-m sH]; % x1, y1, x2, y2
 
 % aperture = [200 200 300 400]; % use this for testing
 
-nbars = 12; % number of bars
+nbars = 10; % number of bars
 
-barCols = [0 1]; % bar colors (0 is black, 0.5 is gray [background] and 1 is white)
+barCols = [0]; % bar colors (0 is black, 0.5 is gray [background] and 1 is white)
 
-tOn = 0.0166; % seconds
+tOn = 10*0.166666666; % seconds
 
-tOff = 0.25; % seconds
+tOff = 0.5; % seconds
 
 drawGrid = 0; % set to 1 to render the bar grid instead of the pattern
 
 generateParams = 0; % set to 1 to export bar positions and patterns (to file)
+
+if nargin == 1
+    
+    if ischar(varargin{1})
+        
+        generateParams = 1;
+        
+    end
+    
+end
 
 %% estimating rendering time
 
@@ -44,13 +56,13 @@ paramSet = genParamSet(nbars, barCols, 0, 0);
 
 totalTime = size(paramSet, 1) * (tOn + tOff);
 
-fprintf('estimated total time (binocular) = %g minutes\n', totalTime/60);
+fprintf('estimated total time (monocular) = %g minutes\n', totalTime/60);
 
 paramSet = genParamSet(nbars, barCols, 0, 1);
 
 totalTime = size(paramSet, 1) * (tOn + tOff);
 
-fprintf('estimated total time (monocular) = %g minutes\n', totalTime/60);
+fprintf('estimated total time (binocular) = %g minutes\n', totalTime/60);
 
 %% rendering
 
@@ -95,7 +107,9 @@ if generateParams
         
     end
     
-    save('d:\runFieldBars_data.mat', 'data');
+    exitCode = data;
+    
+%     save('c:\runFieldBars_data.mat', 'data');
     
     return
     

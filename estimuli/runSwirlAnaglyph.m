@@ -56,7 +56,7 @@ disparityEnable = 1; % disparity setting (-1, 0 or +1)
 
 previewMotionFunc = 0; % set to 1 to see a figure of the swirl function versus time
 
-cx = 955; % center in x coords (px) (screen center in behavioral expt)
+cx = 970; % center in x coords (px) (screen center in behavioral expt)
 
 cy = 710; % center in y coords (px) (screen center in behavioral expt)
 

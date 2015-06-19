@@ -32,6 +32,10 @@ viewD = input('Enter distance between mantis and screen (cm): ');
 
 paramSet = createRandTrialBlocks(blocks, [-1 0 +1], viewD);
 
+rSeeds = randi(1e5, size(paramSet, 1));
+
+paramSet = [paramSet rSeeds];
+
 end
 
 function runBeforeTrial(paramSetRow)
@@ -48,13 +52,15 @@ expt.bugY = -100; % hide bug
 
 expt.interTrialTime = 0;
 
-expt.preTrialDelay = 59;
+expt.preTrialDelay = 58;
 
 expt.motionDuration = 1;
 
 expt.finalPresentationTime = 0;
 
 expt.viewD = paramSetRow(2);
+
+expt.randomSeed = paramSetRow(3);
 
 runDynamicAnaglyph(expt);
 
@@ -72,9 +78,11 @@ expt.disparityEnable = paramSetRow(1);
 
 expt.viewD = paramSetRow(2);
 
-expt.interTrialTime = 0;
+expt.interTrialTime = 2;
 
 expt.preTrialDelay = 0;
+
+expt.randomSeed = paramSetRow(3);
 
 runDynamicAnaglyph(expt);
     
