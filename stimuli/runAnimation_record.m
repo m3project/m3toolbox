@@ -137,7 +137,7 @@ if (interactiveMode == 2)
         'w'     , 'change background', ...
         };
     
-    clc;
+    home;
     
     
     for i=1:2:length(arr)

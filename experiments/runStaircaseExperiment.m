@@ -177,7 +177,7 @@ ticID = tic;
 
 for j=1:n
     
-    clc;
+    home;
     
     fprintf('Experiment Folder:\n\n%s\n\n', fullDir);
     

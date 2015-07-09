@@ -10,6 +10,8 @@ getBugPosition = @(t) getBugPosition_internal(t);
 
 escapeEnabled = 1;
 
+tileMode = 1; % 0 = stretch, 1 = tile
+
 if nargin>0
     
     unpackStruct(args);
@@ -28,7 +30,7 @@ H = H * S;
 
 disp('rendering ...')
 
-createWindow(1); window = getWindow();
+createWindow(); window = getWindow();
 
 [sW, sH] = getResolution();
 
@@ -42,6 +44,8 @@ exitCode = 0;
 
 startTime = GetSecs();
 
+bugPattern = bugPattern';
+
 bugTex = Screen('MakeTexture', window, bugPattern' * 255);
 
 bugSize = size(bugPattern(:, :, 1));
@@ -54,7 +58,7 @@ for i=1:frames
     
     k = backPattern(:, :, i);
     
-    texIDs(i) = Screen('MakeTexture', window, k * 255);    
+    texIDs(i) = Screen('MakeTexture', window, k, [], [], 2);
     
 end
 
@@ -72,15 +76,29 @@ while exitCode == 0
         
         Screen(window, 'FillRect', [1 1 1] * 255/2);
         
-        for x=0:blocksX
+        if tileMode
             
-            for y=0:blocksY
+            % tile
+            
+            for x=0:blocksX
                 
-                rect = [0 0 W H] + [x y x y] .* [W H W H];
-                
-                Screen('DrawTexture', window, texIDs(i), [], rect);
+                for y=0:blocksY
+                    
+                    rect = [0 0 W H] + [x y x y] .* [W H W H];
+                    
+                    Screen('DrawTexture', window, texIDs(i), [], rect);
+                    
+                end
                 
             end
+            
+        else
+            
+            % stretch
+            
+            rect = [0 0 sW sH]; %#ok
+            
+            Screen('DrawTexture', window, texIDs(i), [], rect);
             
         end
         

@@ -1,6 +1,6 @@
 function runRonny(funcs)
 
-clc;
+home;
 
 %% settings
 
@@ -76,7 +76,7 @@ while 1
     
     HideCursor
     
-    clc
+    home;
     
     disp(funcs{i});
     

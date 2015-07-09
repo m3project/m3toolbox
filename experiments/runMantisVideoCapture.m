@@ -6,7 +6,7 @@ expt.genParamSetFun = @genParamSet;
 
 expt.runBeforeTrialFun = @runBeforeTrial;
 
-expt.runTrialFun = @runTrial;
+expt.runTrialFun = @runTrial2;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
@@ -82,7 +82,15 @@ expt.timeLimit = 6;
 
 %disp('alignment mode (interactive), press Escape when mantis is aligned ...');
 
-runAnimation2(expt);
+% runAnimation2(expt);
+
+end
+
+function [exitCode, dump] = runTrial2(~)
+
+runAnimation2(struct('interactiveMode', 0, 'timeLimit', 5, 'Gamma', 1, 'R', 1));
+
+exitCode = 0; dump = [];
 
 end
 

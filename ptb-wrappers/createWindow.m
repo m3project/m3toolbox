@@ -1,53 +1,50 @@
 % creates a PTB window
+%
+% The function requires that you specify the Gamma value for the used
+% monitor. If no Gamma value is provided the function will not apply Gamma
+% correction. If an existing window is open and a Gamma value is provided
+% the function will throw an error to help programmers catch elusive cases
+% when a top function initializes a window without a Gamma value and child
+% function calls which attempt to apply Gamma get ignored (because a window
+% is already open)
+%
+% Usage:
+%
+% createWindow(); % when the stimulus does not require Gamma correction
+% createWindow(G); % when the stimulus requires Gamma = G
 
 function createWindow(Gamma)
 
-if (nargin == 0) || (nargin == 1 && isstruct(Gamma))
-    
-    % this is most probably a call using the deprecated function signature
-    % createWindow(consts)
-    
-    msg = 'Part of the experiment/stimulus you just attempted to executed includes calls to deprecated functions. If you''re not sure what this means, please email Ghaith.';
+applyGamma = nargin > 0;
 
-    msgbox(msg, 'Important')
+if nargin < 1
     
-    if nargin == 0
-        
-        createWindow_dep();
-        
-    else
+    % this is just to stop Matlab complaining when the function is called
+    % with no parameters   
     
-        createWindow_dep(Gamma); % note: Gamma in this case is consts
-        
-    end
-    
-    return;    
-    
-elseif nargin ~= 1
-    
-    error('This function requires that you specify Gamma');
+    Gamma = 0; % dummy value which is not used since applyGamma = 0
     
 end
+
+if Gamma == 1
     
+    error('this call is now deprecated, update to createWindow()');
+    
+end
+
 consts = getConstants();
 
 % set PTB message verbosity depending on constant SILENT_PTB
 
-if (consts.SILENT_PTB == 1)
-    verb_level = 1;
-else
-    verb_level = 3;
-end
+verb_level = ifelse(consts.SILENT_PTB, 1, 3);
+
+debug_level = ifelse(consts.NO_TESTS, 0, 5);
 
 Screen('Preference', 'Verbosity', verb_level);
 
 Screen('Preference','SkipSyncTests', consts.NO_TESTS);
 
-if (consts.NO_TESTS == 1)
-    Screen('Preference','VisualDebugLevel', 0);
-else
-    Screen('Preference','VisualDebugLevel', 5);
-end
+Screen('Preference','VisualDebugLevel', debug_level);
 
 % checking for any existing windows
 
@@ -55,7 +52,15 @@ m = Screen('Windows');
 
 if (~isempty(m))
     
-    return;
+    if applyGamma
+        
+        error('attempted to create Window with Gamma while one is open');
+        
+    else
+    
+        return;
+    
+    end
     
 end
 
@@ -67,75 +72,25 @@ PsychImaging('PrepareConfiguration');
 
 PsychImaging('AddTask', 'FinalFormatting', 'DisplayColorCorrection', 'SimpleGamma');
 
-window = PsychImaging('OpenWindow', consts.SCREEN_ID, consts.MEAN_LUM, [], [], [], consts.STEREO_MODE, 0);
+enable10Bit();
 
-%Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+window = PsychImaging('OpenWindow', consts.SCREEN_ID, consts.MEAN_LUM, ...
+    [], [], [], consts.STEREO_MODE, 0);
 
-% Specify the window's inverse gamma value to be applied in the imaging pipeline
+Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-PsychColorCorrection('SetEncodingGamma', window, 1/Gamma);
+if applyGamma
 
-if Gamma == 1
-    
-    warning('running with the default Gamma=1, make sure you change this if you''re running a contrast-dependent experiment or rendering grating/other patterns');
-    
-end
-
-end
-
-%%
-
-
-function createWindow_dep(consts)
-
-if nargin<1
-    
-    consts = getConstants();
-
-end
-
-% set PTB message verbosity depending on constant SILENT_PTB
-
-if (consts.SILENT_PTB == 1)
-    verb_level = 1;
-else
-    verb_level = 3;
-end
-
-Screen('Preference', 'Verbosity', verb_level);
-
-Screen('Preference','SkipSyncTests', consts.NO_TESTS);
-
-if (consts.NO_TESTS == 1)
-    Screen('Preference','VisualDebugLevel', 0);
-else
-    Screen('Preference','VisualDebugLevel', 5);
-end
-
-% checking for any existing windows
-
-m = Screen('Windows');
-
-if (~isempty(m))
-    
-    return;
+    PsychColorCorrection('SetEncodingGamma', window, 1/Gamma);
     
 end
 
-% Open a PTB window on the TV
+end
 
-PsychImaging('PrepareConfiguration');
+function enable10Bit()
 
-%PsychImaging('AddTask', 'General', 'NormalizedHighresColorRange');
+PsychImaging('AddTask', 'General', 'FloatingPoint32BitIfPossible');
 
-PsychImaging('AddTask', 'FinalFormatting', 'DisplayColorCorrection', 'SimpleGamma');
-
-window = PsychImaging('OpenWindow', consts.SCREEN_ID, consts.MEAN_LUM, [], [], [], consts.STEREO_MODE, 0);
-
-%Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-% Specify the window's inverse gamma value to be applied in the imaging pipeline
-
-PsychColorCorrection('SetEncodingGamma', window, 1/consts.CRT_GAMMA);
+PsychImaging('AddTask', 'General', 'EnableNative10BitFramebuffer');
 
 end

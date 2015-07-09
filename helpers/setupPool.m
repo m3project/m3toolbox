@@ -1,4 +1,4 @@
-function setupMatlabPool(workers)
+function setupPool(workers)
 
 if nargin == 0
     

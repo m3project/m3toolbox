@@ -40,6 +40,10 @@ drawGrid = 0; % set to 1 to render the bar grid instead of the pattern
 
 generateParams = 0; % set to 1 to export bar positions and patterns (to file)
 
+barFlickerFramePeriod = 1; % how often the bars flicker (in frames) when flickering is enabled
+
+barFlickerEnabled = 0;
+
 if nargin == 1
     
     if ischar(varargin{1})
@@ -101,7 +105,7 @@ if generateParams
     end
     
     for j=1:9
-       
+        
         data.monocularPattern{j} = genParamSet(nbars, barCols, j, 0);
         data.binocularPattern{j} = genParamSet(nbars, barCols, j, 1);
         
@@ -109,7 +113,7 @@ if generateParams
     
     exitCode = data;
     
-%     save('c:\runFieldBars_data.mat', 'data');
+    %     save('c:\runFieldBars_data.mat', 'data');
     
     return
     
@@ -118,7 +122,7 @@ end
 fbox = createFlickerBox(150, 55);
 
 numPressed = 1;
-    
+
 pmode = 1; % presentation mode: 0 = monocular, 1 = binocular
 
 while 1
@@ -128,6 +132,8 @@ while 1
     disp('Press (1-9) to select presentation pattern');
     
     disp('Press (m) for monocular mode or (b) for binocular');
+    
+    disp('Press (f) for flickering bars or (s) for static bars');
     
     disp('Press Space to start ...');
     
@@ -159,6 +165,22 @@ while 1
             
         end
         
+        if keyCode(KbName('f')) && barFlickerEnabled == 0
+            
+            barFlickerEnabled = 1;
+            
+            disp('switched to flickering bars');
+            
+        end
+        
+        if keyCode(KbName('s')) && barFlickerEnabled == 1
+            
+            barFlickerEnabled = 0;
+            
+            disp('switched to static bars');
+            
+        end
+        
         numsPressed = intersect(find(keyCode), ('1':'9') + 0);
         
         if ~isempty(numsPressed)
@@ -168,7 +190,7 @@ while 1
             numPressed = min(numsPressed) - '0';
             
             if numPressed ~= oldNumPressed
-            
+                
                 fprintf('selected pattern %d\n', numPressed);
                 
             end
@@ -183,11 +205,11 @@ while 1
         
     end
     
-    clc
+    home
     
     temp_arr = {'monocular', 'binocular'};
     
-    fprintf('Selected mode : %s\n\n', temp_arr{pmode+1});    
+    fprintf('Selected mode : %s\n\n', temp_arr{pmode+1});
     
     fprintf('Selected pattern : %i\n\n', numPressed);
     
@@ -205,49 +227,88 @@ while 1
         
         fprintf('\n');
         
-        Screen('SelectStereoDrawBuffer', window, 0);
+        % draw ON
         
-        Screen(window, 'FillRect', [1 1 1] * p(3), getBar(p(1)));
-       
-        drawFlickerBox(window, fbox);
+        w = 0;
         
-        Screen('SelectStereoDrawBuffer', window, 1);
+        fbox.pattern = [0 1];
         
-        Screen(window, 'FillRect', [1 1 1] * p(4), getBar(p(2)));
+        j = 1;
         
-        fbox = drawFlickerBox(window, fbox);
+        startTime = GetSecs();
         
-        Screen(window, 'Flip');
-        
-        k = pause2(tOn - 1/frameRate, @checkEscapeKeys);
-        
-        if k
+        while GetSecs - startTime < (tOn - 1/frameRate)
             
-            exitCode = k;
+            w = mod(w+1, barFlickerFramePeriod);
             
-            return;
+            if w == 0 && barFlickerEnabled
+            
+                j = 1 - j;
+            
+            end
+            
+            c1 = j * p(3) + (1-j) * 0.5;
+            c2 = j * p(4) + (1-j) * 0.5;
+            
+            Screen('SelectStereoDrawBuffer', window, 0);
+            
+            Screen(window, 'FillRect', [1 1 1] * c1, getBar(p(1)));
+            
+            drawFlickerBox(window, fbox);
+            
+            Screen('SelectStereoDrawBuffer', window, 1);
+            
+            Screen(window, 'FillRect', [1 1 1] * c2, getBar(p(2)));
+            
+            fbox = drawFlickerBox(window, fbox);
+            
+            Screen(window, 'Flip');
+            
+            k = checkEscapeKeys();
+            
+            if k
+                
+                exitCode = k;
+                
+                return
+                
+            end
             
         end
         
-        Screen('SelectStereoDrawBuffer', window, 0);
+        % end of draw on
         
-        drawFlickerBox(window, fbox);
+        % draw off
         
-        Screen('SelectStereoDrawBuffer', window, 1);
+        fbox.pattern = [0 0.25]; 
         
-        fbox = drawFlickerBox(window, fbox);
+        startTime = GetSecs();
         
-        Screen(window, 'Flip');
-        
-        k = pause2(tOff - 1/frameRate, @checkEscapeKeys);
-        
-        if k
+        while GetSecs - startTime < (tOff - 1/frameRate)
             
-            exitCode = k;
+            Screen('SelectStereoDrawBuffer', window, 0);
             
-            return;
+            drawFlickerBox(window, fbox);
+            
+            Screen('SelectStereoDrawBuffer', window, 1);
+            
+            fbox = drawFlickerBox(window, fbox);
+            
+            Screen(window, 'Flip');
+            
+            k = checkEscapeKeys();
+            
+            if k
+                
+                exitCode = k;
+                
+                return;
+                
+            end
             
         end
+        
+        % end of draw off
         
     end
     
@@ -264,19 +325,19 @@ paramSet2 = createTrial(1:nbars, 1, barCols, 0.5);
 paramSet3 = createTrial(1, 1:nbars, 0.5, barCols);
 
 if pmode == 1
-
+    
     paramSet = [paramSet1; paramSet2; paramSet3];
     
     rng(seed);
-
+    
     k = randperm(size(paramSet, 1));
     
     paramSet = paramSet(k, :);
-
+    
 else
     
     rng(seed);
-
+    
     k2 = randperm(size(paramSet2, 1));
     
     k3 = randperm(size(paramSet3, 1));

@@ -42,6 +42,10 @@ if samplingMode == 5
     
     spatialFreqs = [1 32] / 1600; % cycle/px
     
+    startFreq = 
+    
+    spatialFreqs = logspace2(startFreq, endFreq, n);
+    
     temporalFreqs = [0.25 30];
     
     spatialFreqs = 32 / 1600;

@@ -81,7 +81,7 @@ for i=1:n
         
     end
     
-    clc;
+    home;
     
     fprintf('Playing file %s (%d out of %d) ...\n\n', vfile, i, n);
     

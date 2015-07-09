@@ -194,7 +194,7 @@ function runGratingNoiseWrapper(channel, noiseSetting, contrast, direction, stat
 
 if nargin < 5
     
-    clc
+    home;
     
     channel = 1; % 1 (0.04 cpd) or 2 (0.2 cpd)
     
@@ -233,8 +233,6 @@ expt.rho_min = noiseParams(1);
 expt.rho_max = noiseParams(2);
 
 expt.Crmsdesired = noiseParams(3);
-
-expt.Crmsdesired = expt.Crmsdesired * 1.2;
 
 expt.contrast = contrast;
 

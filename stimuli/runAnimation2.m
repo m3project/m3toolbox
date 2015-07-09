@@ -36,7 +36,7 @@ enable3D = 0;
 %
 % The stimulus must run in full screen and so not all integer M values are
 % accepted (depending on screen aspect ratio). Incorrect M values will
-% generate a warning and dbefault to M=1
+% generate a warning and default to M=1
 %
 % -------------------------------------------------------------------------
 
@@ -146,7 +146,7 @@ if (interactiveMode == 2)
         'w'             , 'change background', ...
         };
     
-    clc;    
+    home;
     
     for i=1:2:length(arr)
         
@@ -173,7 +173,7 @@ if enable3D
     
 else
     
-    createWindow(1); % use Gamma=1 (NO calibration!)
+    createWindow();
     
 end
 

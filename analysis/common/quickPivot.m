@@ -2,7 +2,7 @@ function data = quickPivot(paramSet, resultSet, funcs)
 
 if nargin < 3
     
-    funcs = {@mean @std @length};
+    funcs = {@sum @mean @std @length};
     
 end
 

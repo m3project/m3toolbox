@@ -35,7 +35,7 @@ Fx = 8/32; %#ok % cycle/px (bugType=1)
 
 Sigx = 0.01; %#ok % cycle/px (bugType=1)
 
-bugBlockSize = 5; %(bugType=2)
+bugBlockSize = 10; %(bugType=2)
 
 bugContrast = 1;
 
@@ -45,13 +45,19 @@ bugJitter = 0; % (+-) px
 
 dir = power(-1, rand>0.5);
 
-W = 75; % bug width (px)
+W = 80; % bug width (px)
 
-H = W; % bug height (px)
+H = 80; % bug height (px)
 
 % other duration = 15; %#ok % seconds
 
 escapeEnabled = 1; %#ok
+
+initDelay = 1;
+
+bugSeed = []; % bug random seed
+
+backSeed = []; % back random seed
 
 if nargin>0
     
@@ -61,12 +67,14 @@ end
 
 %% generation background
 
+[scrW, scrH] = getResolution();
+
 [mn, mx] = calLumLevels(baseLum, backBlockContrast); % for background
 
 backPattern = genChequer(struct( ...
-    'W', 1920, 'H', 1680, 'blockSize', backBlockSize, ...
-    'random', 1, 'lum0', mn, 'lum1', mx, 'equalize01', 1, ...
-    'rshift', 1)); %#ok
+    'W', scrW, 'H', scrH, 'blockSize', backBlockSize, ...
+    'random', 1, 'lum0', mn, 'lum1', mx, 'equalize01', 0, ...
+    'rshift', 0, 'rseed', backSeed)); %#ok
 
 %% generate pattern
 
@@ -114,19 +122,21 @@ if bugType == 1
     
 elseif bugType == 2
     
-    % block-based bug
+    % regular chequered (block-based) bug
     
     bugPattern = genChequer(struct( ...
          'W', W, 'H', H, 'blockSize', bugBlockSize, ...
     'random', 0, 'lum0', mn, 'lum1', mx, 'equalize01', 1, ...
-    'rshift', 1)); %#ok
+    'rshift', 0)); %#ok
     
 elseif bugType == 4
+    
+    % random chequered bug
     
       bugPattern = genChequer(struct( ...
          'W', W, 'H', H, 'blockSize', bugBlockSize, ...
     'random', 1, 'lum0', mn, 'lum1', mx, 'equalize01', 1, ...
-    'rshift', 1)); %#ok
+    'rshift', 0, 'rseed', bugSeed)); %#ok
     
 elseif bugType == 5
     
@@ -138,7 +148,7 @@ end
 
 [sW, sH] = getResolution();
 
-getBugPosition = @(t) getBugPosSwirl_int(t, sW, sH, dir, bugSpeed, bugJitter); %#ok
+getBugPosition = @(t) getBugPosSwirl_int(t, sW, sH, dir, bugSpeed, bugJitter, initDelay); %#ok
 
 args2 = packWorkspace('bugPattern', 'getBugPosition', 'escapeEnabled', 'duration', 'backPattern');
 
@@ -190,9 +200,9 @@ pos = [sW sH]/2 + [x y] + 2*(rand(1,2)-0.5)*bugJitter;
 
 end
 
-function pos = getBugPosSwirl_int(t, sW, sH, bugDirection, bugSpeed, bugJitter)
+function pos = getBugPosSwirl_int(t, sW, sH, bugDirection, bugSpeed, bugJitter, initDelay)
 
-t = max(t-15, 0);
+t = max(t-initDelay, 0); % change (t-1) to (t-15) for experiment
 
 dt = 0.02;
 

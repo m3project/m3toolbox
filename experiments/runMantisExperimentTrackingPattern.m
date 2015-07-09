@@ -20,7 +20,7 @@ expt.makeBackup = 1;
 
 expt.defName = 'Lisa';
 
-expt.addTags = {'CAMO'};
+expt.addTags = {'CAMO', 'VAR2'};
 
 runExperiment(expt);
 
@@ -35,6 +35,14 @@ bugBlockSizes = [0 5 10 20]; % note: 0 is special code for black bug
 backBlockSizes = [0 5 10 20]; % note: 0 is special code for gray background
 
 paramSet = createRandTrialBlocks(blocks, bugBlockSizes, backBlockSizes);
+
+% adding random seeds for bug and background pattern generation
+
+n = size(paramSet, 1);
+
+rseeds = randi(1e6, [n 2]);
+
+paramSet = [paramSet rseeds];
 
 end
 
@@ -103,6 +111,12 @@ end
 args.escapeEnabled = 0;
 
 args.duration = 25;
+
+args.initDelay = 15;
+
+args.bugSeed = paramSetRow(3);
+
+args.backSeed = paramSetRow(4);
 
 runBugPattern(args);
 

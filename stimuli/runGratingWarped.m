@@ -1,91 +1,123 @@
-function [dump] = runGratingWarped(expt)
-%% initialization
+% Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk) - 7/7/2015
 
-KbName('UnifyKeyNames'); 
+function runGratingWarped(args)
 
-%% rendering stimulus
+% calculations:
 
-% parameters:
+% we need to render two gratings with spatial periods equal to those of
+% Ignacio's 0.04 and 0.2 cpds *at the center of the screen*
 
-spatialFreq     = 0.1;     % in cycles per deg
-temporalFreq    = 0.2;       % in cycles per second
-dir             = 1;       % direction
-enaAbort        = 1;        % 1 to enable user to abort by pressing Escape
-timeLimit       = 0;        % stimulus duration (seconds), 0 to disable
-contrast        = 1;        % [0, 1]
-Gamma           = [];       % must be overloaded by unpackStruct
+% I've worked out the periods of Ignacio's frequencies (by running his
+% script and inspecting the generated gratings) and found the following
 
-screenReso = 40; % px/cm
+% 0.04 cpd -> 266.6 px
+% 0.20 cpd ->  55.2 px
 
-viewD = 7;
+% now I calculate the angle (alpha) subtended by a single px at the centre
+% of the screen
+
+alpha = range(px2deg(2,40,7))/2; % Ignacio is happy with this
+
+% using alpha I calculate the deg spatial periods of Ignacio's 0.04 and 0.2
+% cpds as follows
+
+degs = [266.6 55.2] * alpha;
+
+freqs = 1./degs;
+
+% right, so now when I use freqs(1) and freqs(2) to generate the warped
+% gratings I will get px periods that are almost equal to Ignacio's 0.04
+% and 0.2 cpds *at the screen center*
+
+%% parameters
+
+duration = 5; % change to 5 for actual experiment
+
+makePlot = 0;
+
+rms = 0.14*0; %#ok
+
+signalFreq = freqs(2); %#ok
+
+freqRange = freqs(1) .* [1 1]; %#ok % cpd
+
+temporalFreq = 8; %#ok % Hz
+
+contrast = 0.5;
+
+escapeEnabled = 1;
+
+apertureDeg = 28.28 * 3;
+
+flipAperture = 0;
+
+useAperture = 0;
+
+butterOrder = 10;
+
+viewD = 7; % viewing distance (cm)
+
+screenReso = 40; % monitor resolution (px/cm)
+
+dir = 1; %#ok
 
 if nargin>0
     
-    unpackStruct(expt);         % load overridden parameter values
+    unpackStruct(args);
     
 end
 
-% create window
+%% body
 
-Gamma = 1.1;
+signalAmp = contrast; %#ok
 
-if isempty(Gamma)
+ys = genWarpedMaskedSignal(packWorkspace( ...
+    'duration', 'makePlot', 'rms', 'signalFreq', ...
+    'freqRange', 'signalAmp', 'dir', 'viewD', 'screenReso', 'temporalFreq'));
 
-    createWindow();
+% apply aperture
+
+if useAperture
     
-else
+    aperturePx = tand(apertureDeg/2) * viewD * 2 * screenReso;
     
-    createWindow(Gamma);
+    [W, ~] = getResolution();
     
-end
-
-window = getWindow();
-
-[W, H] = getResolution();
-
-% end of parameters
-
-px = -W/2:W/2;
-
-deg = px2deg(px, screenReso, viewD);
-
-% creating workspace dump
-
-dump = packWorkspace();
-
-startTime = GetSecs();
-
-while 1
+    apertureStrip = genButterAperture(W, aperturePx, butterOrder);
     
-    t = GetSecs() - startTime; 
+    frames = size(ys, 1);
     
-    phase = -dir * t * 360 * temporalFreq;
+    aperture = repmat(apertureStrip, [frames 1]);    
     
-    y = sin(2*pi*deg*spatialFreq + phase);
-
-    y = 128 + y * contrast * 128;
-    
-    id = Screen('MakeTexture', window, y);
-    
-    Screen('DrawTexture', window, id, [], [1 1 W H]);
-    
-    Screen('close', id);
-    
-    Screen(window, 'Flip');
-    
-    [~, ~, keyCode ] = KbCheck;
-    
-    if enaAbort && keyCode(KbName('Escape'))
+    if flipAperture
         
-        break;
+        apertureStrip = 1 - apertureStrip;
         
     end
     
-    if timeLimit>0 && t>timeLimit
-        
-        break;
-        
-    end    
+    ys = ys .* aperture;
     
 end
+
+if max(abs(ys(:)))>1
+    
+    error('luminance levels out of range');
+    
+end
+
+if ~makePlot
+    
+    frames = size(ys, 1);
+    
+    [scrWidthPx, ~] = getResolution();
+    
+    ys = reshape(ys', [1 scrWidthPx frames]);
+    
+    ys = 0.5 + ys * 0.5;
+    
+    runCamoPattern(struct('backPattern', ys, 'tileMode', 0, ...
+        'duration', duration, 'escapeEnabled', escapeEnabled));
+    
+end
+
 end

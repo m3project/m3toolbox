@@ -4,7 +4,7 @@ makePlot = 0;
 
 if nargin < 1
     
-    clc
+    home
     
     videoFile = 'V:\readlab\Ghaith\m3\data\mantisVideoCapture\F10 28-04-2014 15.17 (3) (GHAITH)\trial1.mp4';
     

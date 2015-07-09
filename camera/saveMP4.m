@@ -8,11 +8,13 @@ if (totalFrames == 0)
     
 end
 
-[data time] = getdata(cam1, totalFrames);
+[data, time] = getdata(cam1, totalFrames);
 
 fps = totalFrames / time(end);
 
 writerObj = VideoWriter(file, 'MPEG-4');
+
+writerObj.FrameRate = fps;
 
 writerObj.open();
 
@@ -31,7 +33,5 @@ writerObj.writeVideo(data);
 writerObj.close();
 
 stop(cam1);
-
-
 
 end

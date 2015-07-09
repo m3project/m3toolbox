@@ -1,4 +1,4 @@
-function runMantisExperimentDynamicAnaglyph()
+function runMantisExperimentCorrAnaglyph()
 
 expt = struct;
 
@@ -10,9 +10,9 @@ expt.runTrialFun = @runTrial;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisDynamicAnaglyph\';
+expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisCorrAnaglyph\';
 
-expt.name = 'Mantis Camouflaged Dynamic Anaglyph';
+expt.name = 'Mantis Camouflaged Corr Anaglyph';
 
 expt.recordVideos = 1;
 
@@ -26,11 +26,11 @@ end
 
 function paramSet = genParamSet()
 
-blocks = 10;
+blocks = 5;
 
 viewD = input('Enter distance between mantis and screen (cm): ');
 
-paramSet = createRandTrialBlocks(blocks, [-1 0 +1], viewD);
+paramSet = createRandTrialBlocks(blocks,  [-1 0 1], [-1 1], viewD);
 
 rSeeds = randi(1e5, size(paramSet, 1), 1);
 
@@ -46,8 +46,6 @@ expt = struct();
 
 expt.enableKeyboard = 0;
 
-expt.disparityEnable = paramSetRow(1);
-
 expt.bugY = -100; % hide bug
 
 expt.interTrialTime = 0;
@@ -58,11 +56,15 @@ expt.motionDuration = 1;
 
 expt.finalPresentationTime = 0;
 
-expt.viewD = paramSetRow(2);
+expt.disparityEnable = paramSetRow(1);
 
-expt.randomSeed = paramSetRow(3);
+expt.corrSetting = paramSetRow(2);
 
-runDynamicAnaglyph(expt);
+expt.viewD = paramSetRow(3);
+
+expt.randomSeed = paramSetRow(4);
+
+runCorrAnaglyph(expt);
 
 end
 
@@ -76,15 +78,17 @@ expt.enableKeyboard = 0;
 
 expt.disparityEnable = paramSetRow(1);
 
-expt.viewD = paramSetRow(2);
+expt.corrSetting = paramSetRow(2);
+
+expt.viewD = paramSetRow(3);
 
 expt.interTrialTime = 2;
 
 expt.preTrialDelay = 0;
 
-expt.randomSeed = paramSetRow(3);
+expt.randomSeed = paramSetRow(4);
 
-runDynamicAnaglyph(expt);
+runCorrAnaglyph(expt);
     
 exitCode = 0;
 

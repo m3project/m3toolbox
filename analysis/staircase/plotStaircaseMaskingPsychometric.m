@@ -42,7 +42,7 @@ ylabel('Threshold');
 
 thresholds = [];
 
-clc
+home;
 
 for i=1:n
     

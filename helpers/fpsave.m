@@ -56,10 +56,14 @@ while 1
             if isErr('MATLAB:assertion:failed')
                 
                 % assertion (filePath should not be an existing file) failed
+
+                [pathstr, name, ~] = fileparts(filePath);
                 
-                [pathstr, ~, ~] = fileparts(filePath);
+                oldFilePath = filePath;
                 
-                filePath = getNonExistingFileName(pathstr);
+                filePath = getNonExistingFileName(pathstr, name);
+                
+                warning('file %s exists, saving to %s instead', oldFilePath, filePath);
                 
                 continue; % retry save
                 
@@ -106,7 +110,7 @@ while 1
                 
                 warning('filename not specified');
                 
-                filePath = getNonExistingFileName(filePath);
+                filePath = getNonExistingFileName(filePath, 'fpsave');
                 
                 continue; % retry save
                 
@@ -134,11 +138,9 @@ end
 
 end
 
-function filePath = getNonExistingFileName(parentDir)
+function filePath = getNonExistingFileName(parentDir, prefix)
 
-prefix = 'fpsave';
-
-datePart = datestr(now, 'yyyy-mm-dd-hhMM-ss.FFF');
+datePart = datestr(now, 'yyyy-mm-dd-hhMM-ss');
 
 fileName = sprintf('%s-%s', prefix, datePart);
 

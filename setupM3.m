@@ -40,9 +40,19 @@ for i=1:length(myList)
     
 end
 
-disp('M3 toolbox has been setup successfully.');
+if unsetup
+    
+    disp('removed M3 toolbox from Matlab''s path');
+    
+else
+
+    disp('M3 toolbox has been setup successfully.');
+
+end
 
 rehash
+
+savepath
 
 end
 

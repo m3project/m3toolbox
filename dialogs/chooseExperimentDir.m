@@ -1,4 +1,4 @@
-function [dir, contExpt] = chooseExperimentDir(exptName, exptFolder, defName, addTags)
+function [dir, contExpt] = chooseExperimentDir(exptName, exptFolder, defName, addTags, ntrials)
 
 if nargin<2
     
@@ -10,15 +10,15 @@ end
 
 title = 'Start Experiment';
 
-w = 300;
+w = 400;
 
-w2 = 200;
+w2 = 300;
 
 m1 = 25;
 
 n = 1;
 
-names = {'Lisa', 'Nat', 'Rob', 'Judith', 'Vivek', 'Ghaith', 'Will', 'Diana', 'Thomas', 'Geoffrey', 'Jimmy'};
+names = {'Lisa', 'Nat', 'Vivek', 'Ghaith', 'Will', 'Diana', 'Jimmy', 'Steven'};
 
 defNameInd = 1;
 
@@ -75,6 +75,13 @@ formats(n, 1).enable ='off';
 
 n = n+1;
 
+prompt(n,:) = {'Number of Trials :','ntrials',''};
+formats(n, 1).size = w;
+formats(n, 1).margin = [m1 0];
+formats(n, 1).enable ='off';
+
+n = n + 1;
+
 prompt(n,:) = {'Parent Directory :','topfolder',''};
 formats(n, 1).size = w;
 formats(n, 1).margin = [m1 0];
@@ -87,7 +94,7 @@ formats(n, 1).size = w;
 formats(n, 1).margin = [m1 0];
 formats(n, 1).enable ='off';
 
-n = n + 1;
+n = n+1;
 
 prompt(n, :) = {'Continue previous experiment', 'continue', ''};
 formats(n, 1).size = w;
@@ -103,10 +110,13 @@ defs(1).experiment = exptName;
 defs(1).datetime = dateStr;
 defs(1).topfolder = exptFolder;
 defs(1).name = defNameInd;
+defs(1).ntrials = num2str(ntrials);
 
 options.AlignControls = 'on';
 options.FontSize = 10;
 options.Sep = 16;
+
+options.CreateFcn = @onDialogCreate;
 
 [answer, cancelled] = inputsdlg(prompt, title, formats, defs, options);
 
@@ -161,5 +171,29 @@ else
     dir = sprintf('%s %s %s', answer.subject, dateStr, tagStr);
     
 end
+
+end
+
+function onDialogCreate(varargin)
+
+fh = varargin{1};
+
+screenSize = get(0, 'ScreenSize');
+
+pos = get(fh, 'Position');
+
+w = pos(3);
+
+h = pos(4);
+
+sW = screenSize(3);
+
+sH = screenSize(4);
+
+x1 = (sW - w)/2;
+
+y1 = (sH - h)/2;
+
+set(fh, 'Position', [x1 y1 w h]);
 
 end

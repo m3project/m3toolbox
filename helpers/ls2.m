@@ -8,6 +8,8 @@ function subdirs = ls2(parent, prefix)
     
     k = 1;
     
+    subdirs = {};
+    
     for i=1:n
         
         d = dirs(i);

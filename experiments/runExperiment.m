@@ -1,5 +1,7 @@
 function runExperiment(expt)
 
+% error('toolbox code under maintenance - Ghaith');
+
 obj1 = onCleanup(@cleanup);
 
 signin();
@@ -15,6 +17,12 @@ runBeforeTrialFun   = @runBeforeTrial;
 runTrialFun         = @runTrial;
 
 runAfterTrialFun    = @runAfterTrial;
+
+runBeforeExptFun    = @runBeforeExpt;
+
+runAfterExptFun     = @runAfterExpt;
+
+runChecksFun        = @runChecks;
 
 recordVideos        = 0;
 
@@ -46,10 +54,19 @@ if strcmp(getenv('computername'), 'READLAB14')
     
 end
 
-% if the 'continue experiment' option is selected in the
-% chooseExperimentDir dialog then the function will return the 
+if runChecksFun() == 1
+    
+    error('current machine/configuration is incompatible with this experiment');
+    
+end
 
-[exptDir, contExpt] = chooseExperimentDir(name, workDir, defName, addTags);
+% if the 'continue experiment' option is selected in the
+% chooseExperimentDir dialog then the function will return the
+
+ntrials = size(genParamSetFun(), 1);
+
+[exptDir, contExpt] = chooseExperimentDir(name, workDir, defName, ...
+    addTags, ntrials);
 
 if isempty(exptDir)
     
@@ -73,11 +90,19 @@ else
         
     end
     
-    mkdir(fullDir);
-
-    paramSet = genParamSetFun();
+    mkdir(fullDir); 
     
-    hardwareInfo = getHardwareInfo(); %#ok
+end
+
+% adjust recording camera
+
+home;
+
+if recordVideos
+    
+    disp('Adjust recording camera');
+
+    previewRecordingCam();
     
 end
 
@@ -103,9 +128,17 @@ if contExpt
    
     load(paramFile);
     
-    load(resultsFile);
+    if exist(resultsFile, 'file')
+    
+        load(resultsFile);
+    
+    end
     
 else
+    
+    paramSet = genParamSetFun();
+    
+    hardwareInfo = getHardwareInfo(); %#ok
     
     save(paramFile, 'paramSet');
     
@@ -129,6 +162,8 @@ if recordVideos
     
 end
 
+runBeforeExptFun();
+
 % start trials
 
 trialCount = size(paramSet, 1);
@@ -143,7 +178,7 @@ ticID = tic;
 
 for i=firstTrial:trialCount
     
-    clc;
+    home;
     
     j = i - firstTrial + 1;
     
@@ -241,6 +276,8 @@ if trialCount == 0
     
 end
 
+runAfterExptFun();
+
 if exitCode == 0
     
     disp('Experiment completed');
@@ -304,5 +341,25 @@ signout();
 closeWindow();
 
 commandwindow();
+
+end
+
+function runBeforeExpt()
+
+% template function
+
+end
+
+function runAfterExpt()
+
+% template function
+
+end
+
+function errorCode = runChecks()
+
+% template function
+
+errorCode = 0;
 
 end

@@ -1,6 +1,6 @@
 % this script is an adaptation of runDotsAnglyph
 
-function exitCode = runDynamicAnaglyph(expt)
+function exitCode = runCorrAnaglyph(expt)
 
 KbName('UnifyKeyNames');
 
@@ -22,7 +22,7 @@ refreshCycle = 1; % background refresh rate (in frames)
 
 syncStimBackground = 1; % synchronize bug position updates with background refresh cycles
 
-bugY = 0.6;
+bugY = 0.62;
 
 viewD = 10; % viewing distance (cm)
 
@@ -42,7 +42,7 @@ unitArea = 100*100; % px
 
 r = 60; % dot radius
 
-dotDensity = 3; % number of dots in unit area
+dotDensity =3; % number of dots in unit area
 
 n = round((1920*1680) / unitArea * dotDensity); % number of dots  
 
@@ -57,6 +57,8 @@ backDisparity = nan; % 0 to disable, number to set disparity or `nan` to match n
 interTrialTime = 1;
 
 jitter = 10; % px
+
+corrSetting =1; % -1 = anti-correlated, 0 = random, +1 = correlated
 
 %% parameters
 
@@ -102,6 +104,14 @@ virtBS1= virtBS2 * virtDm2 / viewD;
 
 %rotFreq = 0.1; motionDuration = 50; % for testing
 
+ %% check
+ 
+ if virtDm1 ~= virtDm2
+     
+     error('there''s a slight issue here, size of background hole does not scale with target size');
+     
+ end
+ 
 %% parameter overrides
 
 if nargin>0
@@ -239,6 +249,31 @@ while 1
         xs0 = (1.2 * rand(n, 1) - 0.1) * sW;
         
         ys = (1.2 * rand(n, 1) - 0.1) * sH;
+            
+        cols0 = power(-1, rand(n, 1) > 0.5) * [1 1 1];
+        
+        % bflip0 is an hx3 matrix that holds rows of either [1 1 1] or [-1
+        % -1 -1]. When random correlation is enabled (corrSetting=0) this
+        % matrix is dot multiplied with dot colors to randomize luminance
+        % levels. bflip0 is used to channel 0 and a corresponding rflip1 is
+        % used with channel1
+        
+        h = size(cols0, 1); 
+        
+        bflip0 = power(-1, rand(h, 1)>0.5) * [1 1 1];
+        bflip1 = power(-1, rand(h, 1)>0.5) * [1 1 1];
+        
+        bflip = cat(3, bflip0, bflip1); % concat into 3d matrix
+        
+        % tflip is similar in structure and function to bflip but is used
+        % with target dots
+        
+        h2 = 500; % maximum target dots
+        
+        tflip0 = power(-1, rand(h2, 1)>0.5) * [1 1 1];
+        tflip1 = power(-1, rand(h2, 1)>0.5) * [1 1 1];
+        
+        tflip = cat(3, tflip0, tflip1); % concat into 3d matrix
         
         % target dots:
 
@@ -255,6 +290,12 @@ while 1
         xst = xst(k);
         
         yst = yst(k);
+        
+        nDots = size(xst, 1);
+        
+        colst = power(-1, rand(nDots, 1) > 0.5) * [1 1 1];
+        
+     
         
     end
     
@@ -299,17 +340,37 @@ while 1
         
         k = dst(xs-(bugX+d), ys-bugY) > bugR;
         
-        pos = [xs(k) ys(k)];
+        pos = [xs(k) ys(k)];        
         
         % add target dots to background
         
         tgt_pos = [xst+bugX+d yst+bugY];
 
         pos = [pos; tgt_pos]; %#ok
-
+        
+        cols = [cols0(k, :); colst];
+        
+        % apply dot correlation setting (by changing dot colors)
+        
+        if corrSetting == -1
+            
+            cols = cols * power(-1, channel); % multiply by channel sign
+            
+        elseif corrSetting == 0
+            
+            bflip_seg = bflip(k, :, channel+1);
+            
+            tflip_seg = tflip(1:nDots, :, channel+1);
+            
+            allflip = [bflip_seg; tflip_seg];
+            
+            cols = cols .* allflip;
+            
+        end
+        
         % End of new section
         
-        Screen(window, 'DrawDots', pos', r, [1 1 1] * dotBrightness, [], 2);
+        Screen(window, 'DrawDots', pos', r, cols', [], 2);
         
     end
     

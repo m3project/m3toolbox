@@ -1,4 +1,4 @@
-function measureAngle(outputFile)
+function measureAngles(outputFile)
 
 if nargin<1
     
@@ -63,7 +63,7 @@ for i=1:n
         
     end
     
-    clc;
+    home;
     
     fprintf('Processing file %s (%d out of %d) ...\n\n', vfile, i, n);
     
