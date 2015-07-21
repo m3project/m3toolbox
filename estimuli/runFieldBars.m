@@ -22,9 +22,13 @@ frameRate = Screen(window, 'FrameRate');
 
 %% parameters
 
-m = 200; % horizontal margin
+m = 200; % horizontal margin - both left and right (px)
 
-aperture = [m 0 sW-m sH]; % x1, y1, x2, y2
+screenReso = 37; % px/cm
+
+viewD = 7; % viewing distance (cm)
+
+%aperture = [m 0 sW-m sH]; % x1, y1, x2, y2
 
 % aperture = [200 200 300 400]; % use this for testing
 
@@ -70,9 +74,13 @@ fprintf('estimated total time (binocular) = %g minutes\n', totalTime/60);
 
 %% rendering
 
-barW = ceil((aperture(3) - aperture(1)) / nbars);
+barPos = calBarPositions(sW, screenReso, viewD, m, nbars);
 
-getBar = @(i) [aperture(1)+(i-1)*barW aperture(2) aperture(1)+i*barW aperture(4)];
+% barW = ceil((aperture(3) - aperture(1)) / nbars);
+
+% getBar = @(i) [aperture(1)+(i-1)*barW aperture(2) aperture(1)+i*barW aperture(4)];
+
+getBar = @(i) [barPos(i, 1) 0 barPos(i, 2) sH];
 
 if drawGrid
     
@@ -87,6 +95,8 @@ if drawGrid
     end
     
     Screen(window, 'flip');
+    
+    pause
     
     return
     

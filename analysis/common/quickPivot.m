@@ -20,11 +20,13 @@ for i=1:n
     
     g = groups{i};
     
+    data(i, 1) = g(1);
+    
     for j=1:k
         
         fun = funcs{j};
     
-        data(i, j) = fun(g(:,2));
+        data(i, j+1) = fun(g(:,2));
     
     end
     

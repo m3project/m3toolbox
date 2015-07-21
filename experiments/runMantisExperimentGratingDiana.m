@@ -24,7 +24,7 @@ expt.recordVideos = 1;
 
 expt.makeBackup = 1;
 
-expt.addTags = {};
+expt.addTags = {'VAR2'};
 
 runExperiment(expt);
 
@@ -41,6 +41,8 @@ endFreq = 0.9; % cpd
 numFreqs = 10;
 
 freqs = logspace2(startFreq, endFreq, numFreqs);
+
+freqs = [0 freqs];
 
 blocks = 10;
 
@@ -90,9 +92,21 @@ viewD = 7; % viewing distance (cm)
 
 sf = 37; % monitor resolution (px/cm)
 
+contrast = 1;
+
 disp('rendering the stimulus');
 
-args = struct('duration', 5, 'contrast', 1, ...
+spatialFreq = paramSetRow(1);
+
+if spatialFreq == 0
+    
+    % special code for gray screeb
+    
+    contrast = 0;
+    
+end
+
+args = struct('duration', 5, 'contrast', contrast, ...
     'signalFreq', paramSetRow(1), 'freqRange', [1 1] * 0, ...
     'dir', paramSetRow(2), 'makePlot', 0, 'rms', 0, ...
     'escapeEnabled', 0, 'apertureDeg', 1, 'useAperture', 0, ...
@@ -108,10 +122,9 @@ end
 
 function resultRow = runAfterTrial(varargin)
 
-resultRow = getDirectionJudgement();
+resultRow = getObserverResponse();
 
 end
-
 
 function runAlignmentStimulusNoBack()
 
@@ -205,5 +218,49 @@ motionFuncs.XY      = @(t) [X(t1(t)) Y(t1(t))];
 motionFuncs.Angle   = @(t) 270 - (t1(t) * v * 360);
 motionFuncs.F       = @(t) t1(t) * 60;
 motionFuncs.S       = @(t) 1;
+
+end
+
+function key = getObserverResponse()
+
+% checking for key presses
+
+disp('Press (Left, Right) to indicate mantid viewing direction');
+disp('Press (Up) to indicate mantis did not move');
+disp('Press (p) to indicate mantis was peering');
+
+pause(0.1);
+
+while (1)
+    
+    drawnow
+    
+    [~, ~, keyCode ] = KbCheck;
+    
+    if (keyCode(KbName('LeftArrow')))
+        
+        key = -1; break;
+        
+    end
+    
+    if (keyCode(KbName('RightArrow')))
+        
+        key = 1; break;
+        
+    end
+    
+    if (keyCode(KbName('UpArrow')))
+        
+        key = 0; break;
+        
+    end
+    
+    if (keyCode(KbName('p')))
+        
+        key = 2; break;
+        
+    end    
+    
+end
 
 end

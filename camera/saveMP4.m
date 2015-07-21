@@ -10,7 +10,7 @@ end
 
 [data, time] = getdata(cam1, totalFrames);
 
-fps = totalFrames / time(end);
+fps = totalFrames / range(time);
 
 writerObj = VideoWriter(file, 'MPEG-4');
 

@@ -24,7 +24,7 @@ expt.recordVideos = 1;
 
 expt.makeBackup = 1;
 
-expt.addTags = {'VAR1'};
+expt.addTags = {'VAR2'};
 
 runExperiment(expt);
 
@@ -34,15 +34,15 @@ function paramSet = genParamSet()
 
 % Important: make sure Gamma value in runTrial is correct
 
-blocks = 10;
+blocks = 5;
 
 contrasts = [0.0625/4 0.0625/2 0.0625 0.125 0.25 0.5];
 
 signalFreqs = getIgnacioFreqs();
 
-noiseFreqs = 0;
+% noiseFreqs = 0;
 
-% noiseFreqs = [getIgnacioFreqs() 0]; % for the next round of the
+noiseFreqs = [getIgnacioFreqs() 0]; % for the next round of the
 % experiment
 
 dirs = [-1 1];

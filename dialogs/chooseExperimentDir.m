@@ -18,7 +18,7 @@ m1 = 25;
 
 n = 1;
 
-names = {'Lisa', 'Nat', 'Vivek', 'Ghaith', 'Will', 'Diana', 'Jimmy', 'Steven'};
+names = {'Lisa', 'Vivek', 'Ghaith', 'Will', 'Diana', 'Jimmy', 'Steven'};
 
 defNameInd = 1;
 
@@ -156,7 +156,7 @@ else
         
     end
     
-    if nargin == 4
+    if nargin >= 4
         
         tags = {tags{:} addTags{:}};
         

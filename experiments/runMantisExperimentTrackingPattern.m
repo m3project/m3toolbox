@@ -10,6 +10,8 @@ expt.runTrialFun = @runTrial2;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
+expt.runBeforeExptFun = @runBeforeExpt;
+
 expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisTrackPattern\';
 
 expt.name = 'Mantis Track Pattern';
@@ -64,11 +66,15 @@ paramSet = createRandTrialBlocks(blocks, dirs, spatialFreqsCPPX);
 
 end
 
-function runBeforeTrial(~)
+function runBeforeExpt()
 
 Gamma = 2.783; % this is for Lisa's Phillips 107b3
 
 createWindow(Gamma);
+
+end
+
+function runBeforeTrial(~)
 
 runAlignmentStimulus_internal(0, 0, 0);
 

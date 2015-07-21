@@ -7,8 +7,8 @@ function [L, U] = BinoConf_ScoreB(m, n, varargin)
 
 [Lo, Up] = BinoConf_Score(m,n,varargin{:});
 
-L = Lo - m./n;
+L = m./n - Lo;
 
-U = m./n - Up;
+U = Up - m./n;
 
 end
