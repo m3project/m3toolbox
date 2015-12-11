@@ -4,6 +4,10 @@ exitCode = 0;
 
 obj1 = onCleanup(@cleanup);
 
+sobj = initSerial();
+
+ss = @(str) sendSerial(sobj, str);
+
 KbName('UnifyKeyNames');
 
 Gamma = 2.188; % for DELL U2413
@@ -16,43 +20,53 @@ createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
 
 window = getWindow();
 
-frameRate = Screen(window, 'FrameRate');
-
 [sW, sH] = getResolution();
+
+fps = getFrameRate();
 
 %% parameters
 
-m = 200; % horizontal margin - both left and right (px)
+cModeDelay = 4; % number of seconds between patterns
+
+m = 666; % horizontal margin - both left and right (px) (was 200 till 19/08/2015)
+
+vm = [0 0]; % vertical margin - [top bottom] (px)
 
 screenReso = 37; % px/cm
 
-viewD = 7; % viewing distance (cm)
+viewD = 10; % viewing distance (cm)
 
 %aperture = [m 0 sW-m sH]; % x1, y1, x2, y2
 
 % aperture = [200 200 300 400]; % use this for testing
 
-nbars = 10; % number of bars
+nbars = 6; % number of bars
 
-barCols = [0]; % bar colors (0 is black, 0.5 is gray [background] and 1 is white)
+barCols = 0; % bar colors (0 is black, 0.5 is gray [background] and 1 is white)
 
-tOn = 10*0.166666666; % seconds
+tOn = 0.5; % seconds (will be rounded to the nearest number of frames)
 
-tOff = 0.5; % seconds
+tOff = 0.5; % seconds (will be rounded to the nearest number of frames)
 
 drawGrid = 0; % set to 1 to render the bar grid instead of the pattern
 
 generateParams = 0; % set to 1 to export bar positions and patterns (to file)
 
-barFlickerFramePeriod = 1; % how often the bars flicker (in frames) when flickering is enabled
+barFlickerFramePeriod = 3; % how often the bars flicker (in frames) when flickering is enabled
 
-barFlickerEnabled = 0;
+barFlickerEnabled = 0; % starting (initial) value of the setting
 
 if nargin == 1
     
     if ischar(varargin{1})
         
         generateParams = 1;
+        
+    end
+    
+    if isstruct(varargin{1})
+        
+        unpackStruct(varargin{1});
         
     end
     
@@ -80,13 +94,13 @@ barPos = calBarPositions(sW, screenReso, viewD, m, nbars);
 
 % getBar = @(i) [aperture(1)+(i-1)*barW aperture(2) aperture(1)+i*barW aperture(4)];
 
-getBar = @(i) [barPos(i, 1) 0 barPos(i, 2) sH];
+getBar = @(i) [barPos(i, 1) vm(1) barPos(i, 2) sH-vm(2)];
 
 if drawGrid
     
-    clearWindow([0 0 0], 1);
+    clearWindow([0 0 0], 1); %#ok
     
-    Screen(window, 'FrameRect', [1 0 0] * 255, aperture);
+%     Screen(window, 'FrameRect', [1 0 0] * 255, aperture);
     
     for i=1:nbars
         
@@ -123,7 +137,7 @@ if generateParams
     
     exitCode = data;
     
-    %     save('c:\runFieldBars_data.mat', 'data');
+    save('d:\runFieldBars_data.mat', 'data');
     
     return
     
@@ -131,23 +145,35 @@ end
 
 fbox = createFlickerBox(150, 55);
 
+% fbox.simulate = 1;
+
 numPressed = 1;
 
-pmode = 1; % presentation mode: 0 = monocular, 1 = binocular
+pmode = 1; % presentation mode: 0 = monocular, 1 = binocular, 2 = two-bar
+
+onFrames = round(tOn * fps);
+
+offFrames = round(tOff * fps);
+
+cMode = 0; % continous presentation mode (0 = off, 1 = on)
 
 while 1
     
-    clearWindow([1 1 1]*0.5, 1);
-    
     disp('Press (1-9) to select presentation pattern');
     
-    disp('Press (m) for monocular mode or (b) for binocular');
+    disp('Press (m) for monocular, (b) for binocular or (t) for two-bar mode');
     
     disp('Press (f) for flickering bars or (s) for static bars');
     
+    disp('Press (d) for dark bars or (l) for light bars');
+    
+    disp('Press (c) to start continuous presentation');
+    
     disp('Press Space to start ...');
     
-    while 1
+    while ~cMode
+        
+        fbox = drawBlank(window, fbox);
         
         [~, ~, keyCode ] = KbCheck;
         
@@ -159,19 +185,33 @@ while 1
             
         end
         
-        if keyCode(KbName('m')) && pmode == 1
+        if keyCode(KbName('m')) && pmode ~= 0
             
             pmode = 0;
             
             disp('switched to monocular');
             
+            ss('m (monocular)');
+            
         end
         
-        if keyCode(KbName('b')) && pmode == 0
+        if keyCode(KbName('b')) && pmode ~= 1
             
             pmode = 1;
             
             disp('switched to binocular');
+            
+            ss('b (binocular)');
+            
+        end
+        
+        if keyCode(KbName('t')) && pmode ~= 2
+            
+            pmode = 2;
+            
+            disp('switched to two-bar');
+            
+            ss('t (two-bar)');
             
         end
         
@@ -181,6 +221,8 @@ while 1
             
             disp('switched to flickering bars');
             
+            ss('f (flickering bars)');
+            
         end
         
         if keyCode(KbName('s')) && barFlickerEnabled == 1
@@ -189,7 +231,29 @@ while 1
             
             disp('switched to static bars');
             
+            ss('s (static bars)');
+            
         end
+        
+        if keyCode(KbName('d')) && ~isequal(barCols, 0)
+            
+            barCols = 0;
+            
+            disp('switched to dark bars');
+            
+            ss('d (dark bars)');
+            
+        end    
+        
+        if keyCode(KbName('l')) && ~isequal(barCols, 1)
+            
+            barCols = 1;
+            
+            disp('switched to light bars');
+            
+            ss('l (light bars)');
+            
+        end          
         
         numsPressed = intersect(find(keyCode), ('1':'9') + 0);
         
@@ -203,33 +267,66 @@ while 1
                 
                 fprintf('selected pattern %d\n', numPressed);
                 
+                str1 = sprintf('%d (pattern %d)', numPressed, numPressed);
+                
+                ss(str1);
+                
             end
             
         end
         
         if (keyCode(KbName('Space')))
             
+            str1 = ifelse(barCols, 'light', 'dark');
+            
+            str2 = ifelse(barFlickerEnabled, 'flickering', 'static');
+            
+            str3 = ifelse(pmode, 'binocular', 'monocular');
+            
+            str4 = sprintf('pattern %d', numPressed);
+            
+            strAll = sprintf( ...
+                'space (start presenting: %s, %s, %s, %s)', ...
+                str1, str2, str3, str4);
+            
+            ss(strAll);
+            
             break;
             
         end
+        
+        if (keyCode(KbName('c')))
+            
+            cMode = 1;
+            
+            numPressed = 1;
+            
+            ss('started continuous presentation mode');
+            
+            break;
+            
+        end
+        
         
     end
     
     home
     
-    temp_arr = {'monocular', 'binocular'};
+    temp_arr = {'monocular', 'binocular', 'two-bar'};
     
     fprintf('Selected mode : %s\n\n', temp_arr{pmode+1});
     
     fprintf('Selected pattern : %i\n\n', numPressed);
     
-    paramSet = genParamSet(nbars, barCols, numPressed, pmode);
+    paramSet = genParamSet(nbars, barCols, numPressed, pmode);    
     
     % start presenting
     
     for i=1:size(paramSet, 1)
         
         p = paramSet(i, :);
+        
+        ss(sprintf('condition %d of %d', i, size(paramSet, 1)));
         
         fprintf('condition %d of %d: ', i, size(paramSet, 1));
         
@@ -239,15 +336,13 @@ while 1
         
         % draw ON
         
-        w = 0;
-        
-        fbox.pattern = [0 1];
+        w = 0;        
         
         j = 1;
         
-        startTime = GetSecs();
+        ss('ON');
         
-        while GetSecs - startTime < (tOn - 1/frameRate)
+        for dummy=1:onFrames
             
             w = mod(w+1, barFlickerFramePeriod);
             
@@ -255,6 +350,14 @@ while 1
             
                 j = 1 - j;
             
+            end
+            
+            fbox.pattern = 0.5 * (1 + j);
+            
+            if barCols
+                
+                fbox.pattern = fbox.pattern * 0.1;
+                
             end
             
             c1 = j * p(3) + (1-j) * 0.5;
@@ -284,17 +387,31 @@ while 1
                 
             end
             
+            if checkS() && cMode
+               
+                ss('pressed (s) - continuous mode will end after this pattern');
+                
+                cMode = 0;
+                
+            end
+            
         end
         
         % end of draw on
         
         % draw off
         
-        fbox.pattern = [0 0.25]; 
+        ss('OFF');
         
-        startTime = GetSecs();
+        fbox.pattern = 0.2;
         
-        while GetSecs - startTime < (tOff - 1/frameRate)
+        if barCols
+            
+            fbox.pattern = fbox.pattern * 0.1;
+            
+        end
+        
+        for dummy=1:offFrames
             
             Screen('SelectStereoDrawBuffer', window, 0);
             
@@ -307,6 +424,14 @@ while 1
             Screen(window, 'Flip');
             
             k = checkEscapeKeys();
+            
+            if checkS() && cMode
+               
+                ss('pressed (s) - continuous mode will end after this pattern');
+                
+                cMode = 0;
+                
+            end
             
             if k
                 
@@ -322,6 +447,38 @@ while 1
         
     end
     
+    ss('end of pattern');
+    
+    if cMode
+        
+        pause(cModeDelay);
+        
+        numPressed = numPressed + 1;
+        
+        ss(sprintf('starting pattern %d', numPressed));
+        
+        if numPressed > 9            
+            
+            numPressed = 1;
+            
+        end
+        
+    end
+    
+end
+
+end
+
+function s = checkS()
+
+s = 0;
+
+[~, ~, keyCode] = KbCheck;
+    
+if keyCode(KbName('s'))
+    
+    s = 1;    
+
 end
 
 end
@@ -334,7 +491,17 @@ paramSet2 = createTrial(1:nbars, 1, barCols, 0.5);
 
 paramSet3 = createTrial(1, 1:nbars, 0.5, barCols);
 
-if pmode == 1
+if pmode == 2
+    
+    % two bars
+    
+    conds = [3 4 0 0; 4 3 0 0] + [0 0 1 1; 0 0 1 1] * barCols;
+    
+    paramSet = repmat(conds, [1e4/2 1]);
+
+elseif pmode == 1
+    
+    % monocular
     
     paramSet = [paramSet1; paramSet2; paramSet3];
     
@@ -344,7 +511,9 @@ if pmode == 1
     
     paramSet = paramSet(k, :);
     
-else
+elseif pmode == 0
+    
+    % binocular
     
     rng(seed);
     
@@ -362,7 +531,7 @@ else
     % paramSet3 alternate
     
     nconds = size(paramSet, 1);
-    
+     
     k = transp(reshape(1:nconds, [nconds/2 2]));
     
     k2 = k(:);
@@ -377,4 +546,20 @@ function cleanup
 
 closeWindow();
 
+end
+
+function fbox = drawBlank(window, fbox)
+
+fbox.pattern = 0;
+
+Screen('SelectStereoDrawBuffer', window, 0);
+
+drawFlickerBox(window, fbox);
+
+Screen('SelectStereoDrawBuffer', window, 1);
+
+fbox = drawFlickerBox(window, fbox);
+
+Screen(window, 'Flip');
+     
 end

@@ -27,6 +27,22 @@ elseif keyCode(KbName('Alt'))
         
         exitCode = 100 + min(numsPressed) - '0'; % special exit code to switch stimuli
         
+        return
+        
+    end
+    
+    chars = 'qwertyuiop';
+    
+    for i=1:length(chars)
+        
+        if keyCode(KbName(chars(i)))
+            
+            exitCode = 110 + i - 1;
+            
+            return;
+            
+        end
+        
     end
     
 end

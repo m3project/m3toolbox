@@ -40,13 +40,13 @@ if samplingMode == 5
     
     gratingTypes = 1; % only square
     
-    spatialFreqs = [1 32] / 1600; % cycle/px
+%     spatialFreqs = [1 32] / 1600; % cycle/px
     
-    startFreq = 
+%     startFreq = 
     
-    spatialFreqs = logspace2(startFreq, endFreq, n);
+%     spatialFreqs = logspace2(startFreq, endFreq, n);
     
-    temporalFreqs = [0.25 30];
+%     temporalFreqs = [0.25 30];
     
     spatialFreqs = 32 / 1600;
     

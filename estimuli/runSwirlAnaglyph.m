@@ -1,10 +1,4 @@
-function exitCode = runSwirlAnaglyph(logEvent, keyPress)
-
-if nargin<1
-    
-    logEvent = @(str) str; % dummy function
-    
-end
+function exitCode = runSwirlAnaglyph(~, keyPress)
 
 if nargin<2
     
@@ -12,7 +6,9 @@ if nargin<2
     
 end
 
-logEvent('runSwirlAnaglyph');
+sobj = initSerial();
+
+ss = @(str) sendSerial(sobj, str);
 
 %% flicker brightness levels
 
@@ -56,7 +52,7 @@ disparityEnable = 1; % disparity setting (-1, 0 or +1)
 
 previewMotionFunc = 0; % set to 1 to see a figure of the swirl function versus time
 
-cx = 970; % center in x coords (px) (screen center in behavioral expt)
+cx = 960; % center in x coords (px) (screen center in behavioral expt)
 
 cy = 710; % center in y coords (px) (screen center in behavioral expt)
 
@@ -100,6 +96,8 @@ enableLoomDisparity = 1;
 
 enableChannels = 0; % 0 = both, -1=only left, +1=only right
 
+enableCyclingMode = 0;
+
 %% print keyboard shortcuts
 
 shortcuts = {
@@ -108,7 +106,8 @@ shortcuts = {
     '0',                        'Set disparity to zero', ... 
     'b',                        'enable blue channel only', ... 
     'g',                        'enable green channel only', ... 
-    'k',                        'enable both channels', ...     
+    'k',                        'enable both channels', ...
+    'c',                        'enable cycling mode', ...
     'Space or s',               'Start bug motion', ...
     'Escape or End',            'Exit stimulus'
     };
@@ -306,6 +305,20 @@ while 1
             
             Screen('FillOval', window, bugColor, rectL');
             
+        elseif enableCyclingMode
+            
+            disparityEnable = -disparityEnable; % flip disparity
+            
+            % now restart animation
+            
+            startTime = GetSecs();
+            
+            flickerCount = 0;
+            
+            dispStr = ifelse(disparityEnable==1, '+', '-');
+            
+            ss(sprintf('started swirl (%s disp)', dispStr));
+            
         end
         
     end
@@ -356,7 +369,7 @@ while 1
             
             disparityEnable = +1;
             
-            logEvent('set disparity to positive');
+            ss('set disparity to positive');
             
         end
         
@@ -364,7 +377,7 @@ while 1
             
             disparityEnable = -1;
             
-            logEvent('set disparity to negative');
+            ss('set disparity to negative');
             
         end
         
@@ -372,7 +385,7 @@ while 1
             
             disparityEnable = 0;
             
-            logEvent('set disparity to 0');
+            ss('set disparity to 0');
             
         end
         
@@ -380,7 +393,7 @@ while 1
             
             enableChannels = 0;
             
-            logEvent('enabled both channels');
+            ss('enabled both channels');
             
         end
         
@@ -388,7 +401,7 @@ while 1
             
             enableChannels = +1;
             
-            logEvent('enabled blue channel only');
+            ss('enabled blue channel only');
             
         end
         
@@ -396,7 +409,15 @@ while 1
             
             enableChannels = -1;
             
-            logEvent('enabled green channel only');
+            ss('enabled green channel only');
+            
+        end
+        
+        if keyCode(KbName('c'))
+            
+            enableCyclingMode = 1;
+            
+            ss('enabled cycling mode');
             
         end
         
@@ -406,7 +427,9 @@ while 1
             
             flickerCount = 0;
             
-            logEvent('started swirl');
+            dispStr = ifelse(disparityEnable==1, '+', '-');
+            
+            ss(sprintf('started swirl (%s disp)', dispStr));
             
         end
         

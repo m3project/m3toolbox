@@ -1,4 +1,4 @@
-% adds M3 toolbox sub-directories to Matlab's path
+ % adds M3 toolbox sub-directories to Matlab's path
 %
 % Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk) - 13/10/2014
 

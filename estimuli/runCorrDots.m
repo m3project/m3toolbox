@@ -141,9 +141,13 @@ enableChannels = 0;
 
 resetRandSequence();
 
+i = 0;
+
 while 1
     
     t = GetSecs() - t0;
+    
+    i = i + 1;
     
     dispArrIndexer = min(dispArrIndexer+1, length(dispArr));
     
@@ -177,7 +181,7 @@ while 1
     
     colV = randi(2, [npoints 1])-1; % color vector
     
-    if stimOn || (dispArrIndexer < length(dispArr))
+    if stimOn || (dispArrIndexer <= length(dispArr)) || (i == 1)
         
         for channel = [0 1]
             
@@ -193,8 +197,7 @@ while 1
                     
                     continue;
                     
-                end
-                
+                end                
                 
             end
             
@@ -253,11 +256,11 @@ while 1
             
         end
         
-        
+    Screen(window, 'Flip');    
         
     end
     
-    Screen(window, 'Flip');
+    
     
     % checking for key presses
     

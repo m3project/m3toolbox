@@ -4,7 +4,8 @@ home;
 
 %% settings
 
-rootExptsPath = 'V:\readlab\Ronny\runRonny Experiments';
+%rootExptsPath = 'V:\readlab\Ronny\runRonny Experiments';
+rootExptsPath = 'D:\experiment_logfiles';
 
 dStr = lower(datestr(now,'yyyy-mm-dd-HHMM.SS'));
 
@@ -62,7 +63,8 @@ end
 
 if nargin < 1
 
-    funcs = {@runDiscLoom, @runGratingwithMenu, @runTargetwithMenuAnaglyph, @runSwirlAnaglyph, @runDotsAnaglyph_ephys, @runLargeField, @runCorrDots, @runBarScan, @runFieldBars};
+    funcs = {@runDiscLoom, @runGratingwithMenu, @runTargetwithMenuAnaglyph, @runSwirlAnaglyph, @runDotsAnaglyph_ephys, @runLargeField, @runCorrDots, @runBarScan, @runFieldBars, ...
+        @runFieldBarsShort, @runLoomAnaglyphStatic, @flashWhite, @runFlashAnaglyph, @runFieldDots};
 
 end
 

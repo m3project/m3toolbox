@@ -15,7 +15,7 @@ makePlot = 0; % when set to 1, the script plots size and trajectory instead of r
 
 sizeScaleEnable = 1;
 
-disparityEnable = 1;
+disparityEnable = 0;
 
 disparitySizeCondition = 1; % when set to 1, the bug size in the case of (disparityEnable=1, sizeEnable=0) is initially small
 
@@ -25,7 +25,7 @@ iod = 0.4; % mantis inter-ocular distance (cm)
 
 sf = 40; % screen scaling factor (px/cm)
 
-viewD = 5;% viewing distance (cm)
+viewD = 2.5;% viewing distance (cm)
 
 virtDm1 = 2.5; % virtual distance 1 from mantis (cm)
 
@@ -37,9 +37,9 @@ virtBS2 = viewD / virtDm2 * bugSize;
 
 virtBS1= virtBS2 * virtDm2 / viewD;
 
-duration = 2.25; % duration of motion from distance 1 to 2 (seconds)
+duration = 0.25; % duration of motion from distance 1 to 2 (seconds)
 
-bugY = 0.59; % vertical location of bug (0 to 1)
+bugY = 0.5; % vertical location of bug (0 to 1)
 
 bugJitter = 5; % bug jitter in pixels (0 to disable)
 
@@ -49,7 +49,7 @@ finalPresentationTime = 2; % time stimulus remains on screen after looming (seco
 
 enableLoomDisparity = 1;
 
-enableChannels = 0; % 0 = both, -1=only left, +1=only right
+enableChannels = 1; % 0 = both, -1=only left, +1=only right
 
 if nargin>0
     

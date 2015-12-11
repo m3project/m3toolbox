@@ -1,6 +1,6 @@
 % a heuristic optimization  algorithm
 %
-% starts with a bound [lower, upper] that is assumed to contained
+% starts with a bound [lower, upper] that is assumed to contain
 % a minimum of function fun. `points` points are evaluated and the minimum
 % of these computed (min). The range [lower, upper] is then scaled by a
 % factor of s (must be less than 1) and shifted such that (lower+upper)/2
@@ -46,7 +46,7 @@ for i=1:iters
     
     vals = lower:step:upper;
     
-    y = fun(vals);
+    y = arrayfun(fun, vals);
     
     [err, k] = min(y);
     

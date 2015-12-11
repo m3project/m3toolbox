@@ -1,3 +1,4 @@
+
 function runMantisExperimentTrackingPattern()
 
 expt = struct;
@@ -48,7 +49,7 @@ paramSet = [paramSet rseeds];
 
 end
 
-function paramSet = genParamSet()
+function paramSet = genParamSet() %#ok
 
 blocks = 10;
 
@@ -134,7 +135,7 @@ dump = [];
 
 end
 
-function [exitCode, dump] = runTrial(paramSetRow)
+function [exitCode, dump] = runTrial(paramSetRow) %#ok
 
 disp('rendering the stimulus ...');
 

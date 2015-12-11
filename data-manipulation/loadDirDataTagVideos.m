@@ -5,24 +5,22 @@
 %
 % metaSet contains subject ids
 
-function [paramSet, resultSet, metaSet] = loadDirData(dir, include, ...
-    exclude, allowIncomplete, mustIncludeAll)
+function [paramSet, resultSet, metaSet] = loadDirDataTagVideos(dir, include, ...
+    exclude, resultsFile, allowIncomplete, mustIncludeAll)
 
-if nargin < 4
+if nargin < 5
     
     allowIncomplete = 0;
     
 end
 
-if nargin < 5
+if nargin < 6
     
     mustIncludeAll = 0;
     
 end
 
 paramFile = 'params.mat';
-
-resultsFile = 'results.mat';
 
 list = getDirList(dir, include, exclude, mustIncludeAll);
 
@@ -74,9 +72,9 @@ for i=1:n
     fileData2 = load(rFile);
     
     n1 = size(fileData1.paramSet, 1);
-    n2 = size(fileData2.resultSet, 1);
+    n2 = size(fileData2.newResultSet.values, 1);
     
-    if n1 ~= n2 && ~isfield(fileData2.resultSet, 'app') && ~allowIncomplete
+    if n1 ~= n2 && ~isfield(fileData2.newResultSet.values, 'app') && ~allowIncomplete
         
         % the second term in the expression above is to allow loading data
         % from one of Vivek's experiments which has stores data in
@@ -89,7 +87,7 @@ for i=1:n
     end
  
     k1 = size(fileData1.paramSet, 1);
-    k2 = size(fileData2.resultSet, 1);
+    k2 = size(fileData2.newResultSet.values, 1);
     
     hash = DataHash(sort(fileData1.paramSet));
     
@@ -97,13 +95,11 @@ for i=1:n
         
         fileData1.paramSet = fileData1.paramSet(1:k2, :);
         
-    end
-        
-        
+    end        
     
     paramSet = [paramSet; fileData1.paramSet]; %#ok
     
-    resultSet = [resultSet; fileData2.resultSet]; %#ok
+    resultSet = [resultSet; fileData2.newResultSet.values]; %#ok
     
     subj = getSubjectName(dirI);
     

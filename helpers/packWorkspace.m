@@ -1,6 +1,6 @@
 % This function packs all workspace variables into a struct.
 %
-% If some arguments were supplied, only those variables whose names match
+% If some arguments are supplied, only those variables whose names match
 % an argument will be packed.
 %
 % Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk)

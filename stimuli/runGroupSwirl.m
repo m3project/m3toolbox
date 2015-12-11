@@ -2,7 +2,7 @@ function [is, centerX, centerY]  = runGroupSwirl(expt, is, centerX, centerY)
 
 bugColor = 0;
 
-bugY = 0.49;
+bugY = 0.62;
 
 n = 10; % number of dots
 

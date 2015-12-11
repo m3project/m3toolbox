@@ -2,11 +2,11 @@ function runMantisExperimentGratingAperture()
 
 expt = struct;
 
-expt.genParamSetFun = @genParamSet;
+expt.genParamSetFun = @genParamSet_VARB;
 
 expt.runBeforeTrialFun = @runBeforeTrial;
 
-expt.runTrialFun = @runTrial;
+expt.runTrialFun = @runTrial_VARB;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
@@ -20,11 +20,74 @@ expt.recordVideos = 1;
 
 expt.makeBackup = 1;
 
-expt.addTags = {'0.05 CONTRAST'};
+expt.addTags = {'VARB'};
+
+expt.runBeforeExptFun = @runBeforeExpt;
 
 checkResolution();
 
 runExperiment(expt);
+
+end
+
+function [exitCode, dump] = runTrial_VARB(paramSetRow)
+
+disp('rendering the stimulus');
+
+gratingSizeDegs = paramSetRow(1);
+
+region = paramSetRow(2);
+
+contrast = paramSetRow(3);
+
+dir = paramSetRow(4);
+
+if region == 0
+    
+    % central
+    
+    apertureDeg = gratingSizeDegs;
+    
+    flipAperture = 0;
+    
+else
+    
+    % peripheral
+    
+    apertureDeg = 141.4 - gratingSizeDegs;
+    
+    flipAperture = 1;
+    
+end
+
+args = struct('duration', 5, 'apertureDeg', apertureDeg, ...
+    'dir', dir, ...
+    'flipAperture', flipAperture, ...
+    'spatialFreq', 1/53, 'contrast', contrast);
+
+runGratingAperture(args);
+
+exitCode = 0;
+
+dump = [];
+
+end
+
+function paramSet = genParamSet_VARB()
+
+% Important: make sure Gamma value in runTrial is correct
+
+blocks = 3;
+
+gratingSizeDegs = (1:5) * 28.28;
+
+region = [0 1]; % 0 is central, 1 is peripheral
+
+contrast = [0.01 0.05 1];
+
+dirs = [-1 1];
+
+paramSet = createRandTrialBlocks(blocks, gratingSizeDegs, region, contrast, dirs);
 
 end
 
@@ -54,17 +117,23 @@ paramSet = createRandTrialBlocks(blocks, apertureSizeDegs, dirs);
 
 end
 
-function Gamma = getGamma()
+function runBeforeExpt()
 
-Gamma = 1.3476;
+%Gamma = 2.783; % this is for Lisa's Phillips 107b3
+
+% Gamma = 1.3476; % for the monitor used in the mantis CSF experiment
+
+% Gamma = 1.7; % this is for the CSF (hp p1130 monitor) - I measured this with Diana on the 2nd of Nov 2015
+
+Gamma = 2.0;  % this is for the CSF (hp p1130 monitor) - I measured this with Diana on the 17nd of Nov 2015
+
+createWindow(Gamma);
 
 end
 
 function runBeforeTrial(varargin)
 
-createWindow(getGamma());
-
-runAlignmentStimulus();
+runAlignmentStimulus(0,0,0);
 
 end
 

@@ -12,15 +12,21 @@
 
 function degs = px2deg(scrWidthPx, screenReso, viewD)
 
-if mod(scrWidthPx, 2) > 0
+isOdd = mod(scrWidthPx, 2) > 0;
+
+if isOdd
+
+    k = 1:floor(scrWidthPx/2);
+
+    px = [-k(end:-1:1) 0 k];
     
-    error('scrWidthPx must be an integer multiple of 2');
-    
+else
+
+    k = (1:scrWidthPx/2) - 0.5;
+
+    px = [-k(end:-1:1) k];
+
 end
-
-k = (1:scrWidthPx/2) - 0.5;
-
-px = [-k(end:-1:1) k];
 
 cm = px / screenReso;
 

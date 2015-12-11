@@ -56,7 +56,7 @@ while 1
             if isErr('MATLAB:assertion:failed')
                 
                 % assertion (filePath should not be an existing file) failed
-
+                
                 [pathstr, name, ~] = fileparts(filePath);
                 
                 oldFilePath = filePath;

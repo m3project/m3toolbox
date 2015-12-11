@@ -2,7 +2,7 @@ function correctGamma()
 
 KbName('UnifyKeyNames');
 
-createWindow(1);
+createWindow(1.001);
 
 w = getWindow();
 
@@ -56,11 +56,11 @@ while 1
     
     oldKeyIsDown = keyIsDown;
     
-    Screen(w, 'FillRect' , [1 1 1] * 255 * b , [] );
+    Screen(w, 'FillRect' , [1 1 1] * 1 * b , [] );
     
     str = sprintf('%1.1f', b);
     
-    Screen(w, 'DrawText', str, sW * 0.75, sH * 0.75, (1 - b>0.5) * [1 1 1] * 255);
+    Screen(w, 'DrawText', str, sW * 0.75, sH * 0.75, (1 - b>0.5) * [1 1 1] * 1);
     
     Screen(w, 'Flip');
     

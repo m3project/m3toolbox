@@ -1,4 +1,4 @@
-function exitCode = flashWhite()
+function exitCode = flashWhite(varargin)
 %% Initialization
 
 KbName('UnifyKeyNames');
@@ -11,9 +11,9 @@ createWindow(Gamma);
 
 %% parameters
 
-tOn = 0.25;
+tOn = 2;
 
-tOff = 1;
+tOff = 2;
 
 %% functions
 
@@ -21,7 +21,7 @@ T = tOn + tOff;
 
 %% rendering loop:
 
-flashEna = 0;
+flashEna = 1;
 
 window = getWindow();
 
@@ -45,13 +45,13 @@ while 1
 
     Screen('Flip', window);    
     
-     [~, ~, keyCode] = KbCheck;
+    [~, ~, keyCode] = KbCheck;
     
-    if keyCode(KbName('Escape'))
+    exitCode = checkEscapeKeys(keyCode);
+    
+    if exitCode
         
-        exitCode = 0;
-        
-        break;
+        return
         
     end
     
@@ -63,14 +63,6 @@ while 1
         
     end
     
-    if keyCode(KbName('END'))
-        
-        exitCode = 1;
-        
-        break;
-        
-    end
-   
 end
 
 closeWindow();

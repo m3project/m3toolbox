@@ -50,7 +50,9 @@ if strcmp(getenv('computername'), 'READLAB14')
     
     makeBackup = 0;
     
-    warning('running on Ghaith''s desktop machine, backup and video recording disabled');
+    runChecksFun = @runChecks;
+    
+    warning('running on Ghaith''s desktop machine: backup, video recording and hardware check all disabled');
     
 end
 
@@ -63,7 +65,9 @@ end
 % if the 'continue experiment' option is selected in the
 % chooseExperimentDir dialog then the function will return the
 
-ntrials = size(genParamSetFun(), 1);
+paramSet = genParamSetFun();
+
+ntrials = size(paramSet, 1);
 
 [exptDir, contExpt] = chooseExperimentDir(name, workDir, defName, ...
     addTags, ntrials);
@@ -135,8 +139,6 @@ if contExpt
     end
     
 else
-    
-    paramSet = genParamSetFun();
     
     hardwareInfo = getHardwareInfo(); %#ok
     

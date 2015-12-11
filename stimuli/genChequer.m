@@ -3,7 +3,7 @@
 % W         : pattern width (px)
 % H         : pattern height (px)
 % blockSize : chequer size (px)
-% random    : 0 = regular pattern (default), 1 = random pattern
+% random    : 0 = regular pattern, 1 = random pattern
 % lum0      : luminance level of 0 blocks (default = 0)
 % lum1      : luminance level of 1 blocks (default = 1)
 % equalize  : if 1 then 0 and 1 blocks have equal counts

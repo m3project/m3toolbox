@@ -31,7 +31,7 @@ if fbox.simulate
 %         
 %     else
         
-        ylim([0 1]);
+        ylim([-2 2]);
     
 %     end
     

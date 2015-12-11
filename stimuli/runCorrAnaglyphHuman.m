@@ -1,18 +1,22 @@
 % this script is an adaptation of runDotsAnglyph
 
-function exitCode = runCorrAnaglyph(expt)
+function exitCode = runCorrAnaglyphHuman(expt)
 
 KbName('UnifyKeyNames');
 
 exitCode = 0;
 
-Gamma = 2.127; % for DELL U2413
+%Gamma = 2.127; % for DELL U2413
 
-LeftGains = [0 0.66 0];
+Gamma = 1.0;
 
-RightGains = [0 0 1];
+% LeftGains = [0 0.66 0];
 
-createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
+% RightGains = [0 0 1];
+
+% createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
+
+createWindow3D(Gamma);
 
 %% Vivek parameters 
 

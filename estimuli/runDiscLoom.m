@@ -1,10 +1,4 @@
-function exitCode = runDiscLoom(logEvent, keyPress)
-
-if nargin<1
-    
-    logEvent = @(str) str; % dummy function
-    
-end
+function exitCode = runDiscLoom(~, keyPress)
 
 if nargin<2
     
@@ -12,15 +6,17 @@ if nargin<2
     
 end
 
-logEvent('runDiscLoom');
+sobj = initSerial();
+
+ss = @(str) sendSerial(sobj, str);
 
 %% flicker brightness levels
 
-flickerLevels_motion = [0 40];
+flickerLevels_motion = [0 40] / 255;
 
-flickerLevels_loom = [80 255];
+flickerLevels_loom = [80 255] / 255;
 
-flickerLevels_receed = [80 120];
+flickerLevels_receed = [80 120] / 255;
 
 %% parameters
 
@@ -49,6 +45,8 @@ d2 = 2; % background motion buffer
 d3 = 0; % first x seconds when bug is invisible
 
 enaExtraSlide = 1; % when set to 1 the background will move in integer steps of spatialPeriod
+
+enableCycling = 0;
 
 %% setup ptb windows
 
@@ -87,6 +85,7 @@ shortcuts = {
     'Left',             'Receed (with background motion)', ...
     'l',                'Switch direction to left', ...
     'r',                'Switch direction to right', ...
+    'c',                'enable cycling mode', ...
     'Escape or End',	'Exit stimulus'
     };
 
@@ -182,6 +181,8 @@ flip_t1 = 0;
 
 processTimes = zeros(1e3, 1);
 
+cyclingIndexer = 0;
+
 i = 1;
 
 while 1
@@ -272,97 +273,110 @@ while 1
     
     exitCode = checkEscapeKeys(keyCode);
     
-    if exitCode
-        
-        return
-        
-    end
+    if exitCode; return; end
     
     if keyIsDown && ~oldKeyIsDown
         
         keyPress(keyCode);
         
-        if r(t)
+        if ~r(t)
             
-            y = [KbName('UpArrow') KbName('DownArrow') KbName('RightArrow') KbName('LeftArrow')];
+            if keyCode(KbName('UpArrow')); runInternalLoomStatic(); end
             
-            if any(keyCode(y))
+            if keyCode(KbName('DownArrow')); runInternalReceedStatic(); end
                 
-                %  warning('Current motion sequence still playing');
+            if keyCode(KbName('RightArrow')); runInternalLoomMoving(); end
                 
-            end
+            if keyCode(KbName('LeftArrow')); runInternalReceedMoving(); end
             
-        else
+            if (keyCode(KbName('l')) && dir == 1); runInternalLeft(); end
             
-            if keyCode(KbName('UpArrow'))
-                
-                r = @(ct) rLoom1(ct - t);
-                
-                mEna = @(ct) backMotionEna1(ct - t);
-                
-                logEvent('start looming (static background)');
-                
-            end
+            if (keyCode(KbName('r')) && dir == -1); runInternalRight(); end
             
-            if keyCode(KbName('DownArrow'))
+            if keyCode(KbName('c')); enableCycling=1; end
                 
-                r = @(ct) rReceed1(ct - t);
-                
-                mEna = @(ct) backMotionEna1(ct - t);
-                
-                logEvent('start receeding (static background)');
-                
-            end
-            
-            if keyCode(KbName('RightArrow'))
-                
-                r = @(ct) rLoom2(ct - t);
-                
-                mEna = @(ct) backMotionEna2(ct - t);
-                
-                logEvent('start looming (moving background)');
-                
-            end
-            
-            if keyCode(KbName('LeftArrow'))
-                
-                r = @(ct) rReceed2(ct - t);
-                
-                mEna = @(ct) backMotionEna2(ct - t);
-                
-                logEvent('start receeding (moving background)');
-                
-            end
-            
         end
-        
-        if keyCode(KbName('l')) && dir == 1
-            
-            dir = -1;
-            
-            disp('direction switched to left');
-            
-            logEvent('direction switched to left');
-            
-        end
-        
-        if keyCode(KbName('r')) && dir == -1
-            
-            dir = 1;
-            
-            disp('direction switched to right');
-            
-            logEvent('direction switched to right');
-            
-        end        
        
     end
     
     oldKeyIsDown = keyIsDown;
     
+    if enableCycling && ~r(t)
+        
+        cyclingIndexer = mod(cyclingIndexer, 4) + 1;
+        
+        funcs = {@runInternalLoomStatic, @runInternalReceedStatic, ...
+            @runInternalLoomMoving, @runInternalReceedMoving};
+        
+        funcs{cyclingIndexer}();
+        
+    end
+    
 end
 
 closeWindow();
+
+%% child functions:
+
+    function runInternalLoomStatic()
+        
+        r = @(ct) rLoom1(ct - t);
+        
+        mEna = @(ct) backMotionEna1(ct - t);
+        
+        ss('start looming (static background)');
+        
+    end
+
+    function runInternalReceedStatic()
+        
+        r = @(ct) rReceed1(ct - t);
+        
+        mEna = @(ct) backMotionEna1(ct - t);
+        
+        ss('start receeding (static background)');
+        
+    end
+
+    function runInternalLoomMoving()
+        
+        r = @(ct) rLoom2(ct - t);
+        
+        mEna = @(ct) backMotionEna2(ct - t);
+        
+        ss('start looming (moving background)');
+        
+    end
+
+    function runInternalReceedMoving()
+        
+        r = @(ct) rReceed2(ct - t);
+        
+        mEna = @(ct) backMotionEna2(ct - t);
+        
+        ss('start receeding (moving background)');
+        
+    end
+
+    function runInternalLeft()
+        
+        dir = -1;
+        
+        disp('direction switched to left');
+        
+        ss('direction switched to left');
+        
+    end
+
+    function runInternalRight()
+        
+        dir = 1;
+        
+        disp('direction switched to right');
+        
+        ss('direction switched to right');
+        
+    end
 
 end
 
