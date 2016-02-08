@@ -2,11 +2,11 @@ function runMantisExperimentGratingAperture()
 
 expt = struct;
 
-expt.genParamSetFun = @genParamSet_VARB;
+expt.genParamSetFun = @genParamSet_VARC;
 
 expt.runBeforeTrialFun = @runBeforeTrial;
 
-expt.runTrialFun = @runTrial_VARB;
+expt.runTrialFun = @runTrial_VARC;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
@@ -20,7 +20,7 @@ expt.recordVideos = 1;
 
 expt.makeBackup = 1;
 
-expt.addTags = {'VARB'};
+expt.addTags = {'VARC'};
 
 expt.runBeforeExptFun = @runBeforeExpt;
 
@@ -29,6 +29,15 @@ checkResolution();
 runExperiment(expt);
 
 end
+
+function [exitCode, dump] = runTrial_VARC(paramSetRow)
+
+% 6/1/2016
+
+[exitCode, dump] = runTrial_VARB(paramSetRow);
+
+end
+
 
 function [exitCode, dump] = runTrial_VARB(paramSetRow)
 
@@ -73,7 +82,28 @@ dump = [];
 
 end
 
-function paramSet = genParamSet_VARB()
+
+function paramSet = genParamSet_VARC()
+
+% 6/1/2016 - replaced contrast level 0.01 with 0.2
+
+% Important: make sure Gamma value in runTrial is correct
+
+blocks = 3;
+
+gratingSizeDegs = (1:5) * 28.28;
+
+region = [0 1]; % 0 is central, 1 is peripheral
+
+contrast = [0.05 0.2 1];
+
+dirs = [-1 1];
+
+paramSet = createRandTrialBlocks(blocks, gratingSizeDegs, region, contrast, dirs);
+
+end
+
+function paramSet = genParamSet_VARB() %#ok<DEFNU>
 
 % Important: make sure Gamma value in runTrial is correct
 
@@ -93,9 +123,11 @@ end
 
 function checkResolution()
 
+pc = getenv('computername');
+
 [sW, sH] = getResolution();
 
-if ~isequal([sW sH], [1600 1200])
+if ~isequal([sW sH], [1600 1200]) && ~isequal(pc, 'READLAB14')
     
     error('this experiment was designed for a screen size of 1600 x 1200 px');
     
@@ -103,7 +135,7 @@ end
 
 end
 
-function paramSet = genParamSet()
+function paramSet = genParamSet() %#ok<DEFNU>
 
 % Important: make sure Gamma value in runTrial is correct
 
@@ -137,7 +169,7 @@ runAlignmentStimulus(0,0,0);
 
 end
 
-function [exitCode, dump] = runTrial(paramSetRow)
+function [exitCode, dump] = runTrial(paramSetRow) %#ok<DEFNU>
 
 disp('rendering the stimulus');
 

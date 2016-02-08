@@ -1,15 +1,14 @@
-
 function runMantisExperimentTrackingPattern()
 
 expt = struct;
 
-expt.genParamSetFun = @genParamSet2;
+expt.genParamSetFun = @genParamSet3;
 
 expt.runBeforeTrialFun = @runBeforeTrial;
 
-expt.runTrialFun = @runTrial2;
+expt.runTrialFun = @runTrial3;
 
-expt.runAfterTrialFun = @runAfterTrial;
+expt.runAfterTrialFun = @runAfterTrial_VAR3;
 
 expt.runBeforeExptFun = @runBeforeExpt;
 
@@ -23,13 +22,33 @@ expt.makeBackup = 1;
 
 expt.defName = 'Lisa';
 
-expt.addTags = {'CAMO', 'VAR2'};
+expt.addTags = {'CAMO', 'VAR3'};
 
 runExperiment(expt);
 
 end
 
-function paramSet = genParamSet2()
+function paramSet = genParamSet3()
+
+blocks = 5;
+
+bugBlockSizes = [-1 0 5 20]; % note: 0 is special code for black bug
+
+backBlockSizes = [5 20]; % note: 0 is special code for gray background
+
+paramSet = createRandTrialBlocks(blocks, bugBlockSizes, backBlockSizes);
+
+% adding random seeds for bug and background pattern generation
+
+n = size(paramSet, 1);
+
+rseeds = randi(1e6, [n 2]);
+
+paramSet = [paramSet rseeds];
+
+end
+
+function paramSet = genParamSet2() %#ok
 
 blocks = 5;
 
@@ -49,7 +68,7 @@ paramSet = [paramSet rseeds];
 
 end
 
-function paramSet = genParamSet() %#ok
+function paramSet = genParamSet() %#ok<DEFNU>
 
 blocks = 10;
 
@@ -81,7 +100,7 @@ runAlignmentStimulus_internal(0, 0, 0);
 
 end
 
-function [exitCode, dump] = runTrial2(paramSetRow)
+function [exitCode, dump] = runTrial3(paramSetRow)
 
 disp('rendering the stimulus ...');
 
@@ -91,7 +110,11 @@ bugBlockSize = paramSetRow(1);
 
 backBlockSize = paramSetRow(2);
 
-if bugBlockSize == 0
+if bugBlockSize == -1
+    
+    args.bugType = 6;
+
+elseif bugBlockSize == 0
     
     args.bugType = 5;
     
@@ -135,7 +158,7 @@ dump = [];
 
 end
 
-function [exitCode, dump] = runTrial(paramSetRow) %#ok
+function [exitCode, dump] = runTrial(paramSetRow) %#ok<DEFNU>
 
 disp('rendering the stimulus ...');
 
@@ -187,7 +210,7 @@ dump = [];
 
 end
 
-function resultRow = runAfterTrial(varargin)
+function resultRow = runAfterTrial(varargin) %#ok<DEFNU>
 
 delay = 0; % inter-trial delay (seconds)
 
@@ -198,6 +221,29 @@ numSaccades = getNumber('Number of saccades/sways: ', checkPositive);
 response = getTrackResponseJudgement();
 
 resultRow = [numSaccades response];
+
+sprintf('pausing for %i seconds ...\n', delay);
+
+pause(delay);
+
+end
+
+
+function resultRow = runAfterTrial_VAR3(varargin)
+
+delay = 0; % inter-trial delay (seconds)
+
+checkPositive = @(str) str2double(str) >= 0;
+
+checkBinary = @(str) (str2double(str) >= 0) && (str2double(str) <= 1);
+
+numSaccades = getNumber('Number of saccades/sways: ', checkPositive);
+
+peering     = getNumber('Peering   (0=no, 1=yes)       ? ', checkBinary);
+
+strike      = getNumber('Number of strikes             : ', checkPositive);
+
+resultRow = [numSaccades peering strike];
 
 sprintf('pausing for %i seconds ...\n', delay);
 

@@ -1,4 +1,4 @@
-function exitCode = runCorrAnaglyph(expt)
+function exitCode = runCorrAnaglyph_delme2(expt)
 
 KbName('UnifyKeyNames');
 
@@ -38,9 +38,9 @@ preTrialDelay = 0; % seconds
 
 unitArea = 100*100; % px
 
-r = 60; % dot radius
+r = 20; % dot radius
 
-dotDensity = 3; % number of dots in unit area
+dotDensity = 55; % number of dots in unit area
 
 n = round((1920*1680) / unitArea * dotDensity); % number of dots  
 
@@ -54,9 +54,9 @@ backDisparity = nan; % 0 to disable, number to set disparity or `nan` to match n
 
 interTrialTime = 0;
 
-jitter = 10; % px
+jitter = 0; % px
 
-corrSetting =-1; % -1 = anti-correlated, 0 = random, +1 = correlated
+corrSetting =1; % -1 = anti-correlated, 0 = random, +1 = correlated
 
 %% parameters
 
@@ -318,7 +318,8 @@ while 1
         pos = [pos; tgt_pos]; %#ok
         
         cols = [cols0(k, :); colst];
-        
+        pos = tgt_pos;
+        cols = colst;
         % apply dot correlation setting (by changing dot colors)
         
         if corrSetting == -1

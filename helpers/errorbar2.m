@@ -4,18 +4,10 @@ h2 = plot(x,y,varargin{:});
 
 h = ~ishold;
 
-if h
-    hold on;
-end
+if h, hold on, end
 
-for i=1:length(x)
-   
-    plot([1 1]*x(i), y(i) + [-l(i) u(i)]);
-    
-end
+errorbar(x, y, -l, u);
 
-if h
-    hold off
-end
+if h, hold off, end
 
 end

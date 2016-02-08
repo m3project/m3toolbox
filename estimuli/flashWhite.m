@@ -9,6 +9,10 @@ Gamma = 2.188; % for DELL U2413
 
 createWindow(Gamma);
 
+sobj = initSerial();
+
+ss = @(str) sendSerial(sobj, str);
+
 %% parameters
 
 tOn = 2;
@@ -27,6 +31,12 @@ window = getWindow();
 
 startTime = GetSecs();
 
+conds = {'off', 'on'};
+
+prevFlash = 0;
+
+oldKeyIsDown = 0;
+
 while 1
     
     tnow = GetSecs();
@@ -42,10 +52,20 @@ while 1
     flash = t<tOn;
     
     Screen(window, 'FillRect', [1 1 1] * flash * 255 * flashEna, []);
-
-    Screen('Flip', window);    
     
-    [~, ~, keyCode] = KbCheck;
+    Screen('Flip', window);
+    
+    currFlash = flash * flashEna;
+    
+    if currFlash ~= prevFlash
+        
+        ss(conds{currFlash+1});
+    
+    end
+        
+    prevFlash = currFlash;   
+    
+    [keyIsDown, ~, keyCode] = KbCheck;
     
     exitCode = checkEscapeKeys(keyCode);
     
@@ -55,16 +75,14 @@ while 1
         
     end
     
-    if keyCode(KbName('Space'))
+    if keyCode(KbName('Space')) && ~oldKeyIsDown
         
         flashEna = 1 - flashEna;
         
-        pause(0.2);
-        
     end
     
+    oldKeyIsDown = keyIsDown;
+    
 end
-
-closeWindow();
 
 end

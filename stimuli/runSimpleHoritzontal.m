@@ -10,7 +10,7 @@ jitter = 5; % pixels
 
 speed = 1000; % px/sec
 
-dir = -1;
+dir = power(-1, rand>0.5);
 
 timeLimit = 3; % in seconds (0 to disable)
 

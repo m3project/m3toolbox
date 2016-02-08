@@ -7,6 +7,10 @@
 % viewD : distance between viewer and screen
 % IOD   : distance between viewer eyes
 %
+% note that the output of this function is signed disparity (i.e. positive
+% and negative outputs indicates crossed and uncrossed conditions
+% respectively)
+%
 % Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk) - 13/03/2015
 
 function disparity = calDisp(simD, viewD, IOD)
@@ -21,7 +25,7 @@ else
     
     % object behind screen
     
-    disparity = IOD .* (simD - viewD) ./ simD;
+    disparity = -IOD .* (simD - viewD) ./ simD;
     
 end
 

@@ -110,7 +110,7 @@ for i=1:n
     subjID = find(strcmp(uniqueSubjects, subj), 1, 'first');
     
     metaSet = [metaSet; ones(size(fileData1.paramSet, 1), 1) * subjID]; %#ok
-   
+
     if ~ismember(hash, hashes)
         
         hashes = [hashes hash]; %#ok

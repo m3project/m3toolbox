@@ -64,7 +64,7 @@ end
 if nargin < 1
 
     funcs = {@runDiscLoom, @runGratingwithMenu, @runTargetwithMenuAnaglyph, @runSwirlAnaglyph, @runDotsAnaglyph_ephys, @runLargeField, @runCorrDots, @runBarScan, @runFieldBars, ...
-        @runFieldBarsShort, @runLoomAnaglyphStatic, @flashWhite, @runFlashAnaglyph, @runFieldDots};
+        @runFieldBarsShort, @runLoomAnaglyphStatic, @flashWhite, @runFlashAnaglyph, @runFieldLines};
 
 end
 

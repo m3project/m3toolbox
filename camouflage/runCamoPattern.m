@@ -110,7 +110,11 @@ while exitCode == 0
         
         bugRect = [1 0 1 0] * bugX + [0 1 0 1] * bugY + [0 0 bugSize];
         
-        Screen('DrawTexture', window, bugTex, [], bugRect);
+        if numel(bugPattern)>1
+        
+            Screen('DrawTexture', window, bugTex, [], bugRect);
+        
+        end
         
         Screen(window, 'Flip');        
         

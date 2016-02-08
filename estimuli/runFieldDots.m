@@ -4,13 +4,35 @@
 
 function exitCode = runFieldDots(varargin)
 
+% dot reso is number of dots per unit area
+
+stimType = 0;
+
+dotReso = 55; % dots (per unit area - as defined in renderFieldDots)
+
+% NB: stimType and dotReso can be overriden by supplying a packed struct as
+% an input to this function. The function runFieldLines() does that.
+
+if nargin>0
+    
+    if isstruct(varargin{1})
+        
+        args = varargin{1};
+        
+        unpackStruct(args);
+        
+    end
+    
+end
+
 exitCode = 0;
 
 sobj = initSerial();
 
 ss = @(str) sendSerial(sobj, str);
 
-expt = struct('dot_pB', 0.5, 'dotContrast', 1, 'ss', ss);
+expt = struct('dot_pB', 0.5, 'dotContrast', 1, 'ss', ss, ...
+    'stimType', stimType, 'dotReso', dotReso, 'bars', [3 4]);
 
 initWindow();
 
@@ -19,6 +41,8 @@ while 1 % outer loop (input and presentation)
     disp('Press (1-9) to set dot contrast to 0.1 -> 0.9');
     
     disp('Press (0) to set dot contrast to 1.0');
+    
+    disp('Hold (t) and press (1-5) to select bar positions');
     
     disp('Press (d) for dark dots, (l) for light dots or (m) for mixed dots');
     
@@ -58,21 +82,46 @@ while 1 % outer loop (input and presentation)
             
         end
         
-        numsPressed = intersect(find(keyCode), ('0':'9') + 0);
-        
-        if ~isempty(numsPressed)
+        if keyCode(KbName('t'))
             
-            numPressed = min(numsPressed) - '0';
+            numsPressed = intersect(find(keyCode), ('1':'5') + 0);
             
-            newContrast = ifelse(numPressed>0, numPressed/10, 1);
+            if ~isempty(numsPressed)
+                
+                numPressed = min(numsPressed) - '0';
+                
+                new_bars = numPressed + [0 1];
+                
+                if ~isequal(new_bars, expt.bars)
+                    
+                    expt.bars = new_bars;
+                    
+                    ss(sprintf('switched to bars %d,%d', ...
+                        new_bars(1), new_bars(2)));
+                    
+                end
+                
+            end
             
-            if newContrast ~= expt.dotContrast
+        else
+            
+            numsPressed = intersect(find(keyCode), ('0':'9') + 0);
+            
+            if ~isempty(numsPressed)
                 
-                expt.dotContrast = newContrast;
+                numPressed = min(numsPressed) - '0';
                 
-                str1 = sprintf('dot contrast = %1.1f', newContrast);
+                newContrast = ifelse(numPressed>0, numPressed/10, 1);
                 
-                ss(str1);
+                if newContrast ~= expt.dotContrast
+                    
+                    expt.dotContrast = newContrast;
+                    
+                    str1 = sprintf('dot contrast = %1.1f', newContrast);
+                    
+                    ss(str1);
+                    
+                end
                 
             end
             
@@ -140,7 +189,7 @@ end
 
 function exitCode = renderFieldDots(expt)
 
-% overridable parameter
+% overridable parameters
 
 dotContrast = 1;
 
@@ -150,13 +199,7 @@ escapeEnabled = 1;
 
 ss = @(str) []; % serial send function (to be overridden)
 
-%% load overrides
-
-if nargin>0
-
-    unpackStruct(expt);
-
-end
+bars = [3 4]; % two bar positions (1 through 6)
 
 %% control parameters
 
@@ -186,11 +229,23 @@ nreps = 1e5; % numer of repeats, each rep is left/off/right/off
 % (runMantisExperimentCorrAnaglyph)
 % i.e. dotReso = 55; unitArea = 1e4; dotRad = 20;
 
-dotReso = 55; % per unit area
+if ~all(isfield(expt, {'dotReso', 'stimType'}))
+    
+    error('function renderFieldDots() requires arguments `dotReso` and `stimType`');
+    
+end
 
 unitArea = 100 * 100; % px^2
 
 dotRad = 15; % dot radius (px) % changed this on 10/12/2015 (GT,RR)
+
+%% load overrides
+
+if nargin>0
+
+    unpackStruct(expt);
+
+end
 
 %% parameters from runFieldBars
 
@@ -273,7 +328,8 @@ getBar = @(i) [barPos(i, 1) vm(1) barPos(i, 2) sH-vm(2)];
 makeDots = @(rect, pB, pC) ...
     makeRandDotPattern(dotReso, unitArea, rect, pB, pC);
 
-drawDots = @(pos, channel) drawDots0(pos, window, dotRad, channel, dotContrast);
+drawDots = @(pos, channel) drawDots0(pos, window, dotRad, ...
+    channel, dotContrast, stimType, sH);
 
 %% preview grid
 
@@ -328,8 +384,8 @@ for i = repmat(1:n, [1 nreps])
         
         bgs(:, :, 2) = bgs(:, :, 1);
         
-        cutOutRect(:, :, 1) = getBar(3);
-        cutOutRect(:, :, 2) = getBar(4);
+        cutOutRect(:, :, 1) = getBar(bars(1));
+        cutOutRect(:, :, 2) = getBar(bars(2));
         
         cutOutRect(1, 3, 1) = cutOutRect(1, 3, 1) + 1;
         
@@ -395,7 +451,7 @@ for i = repmat(1:n, [1 nreps])
         
         if drawBars && abs(frameType)
             
-            barDotsChannel = moveDots(barDots, cutOutRect(:,:,1), chRect);
+            barDotsChannel = moveDots(barDots, cutOutRect(:,:, selChannel+1), chRect);
             
             drawDots(barDotsChannel, channel);
             
@@ -465,7 +521,7 @@ pos = [rx0+rr(rW) ry0+rr(rH) b c];
 
 end
 
-function drawDots0(pos, window, dotRad, channel, dotContrast)
+function drawDots0(pos, window, dotRad, channel, dotContrast, stimType, sH)
 
 if ~isempty(pos)
     
@@ -479,7 +535,19 @@ if ~isempty(pos)
     
     B = 0.5 - dotContrast * 0.5 * power(-1, B);
     
-    Screen(window, 'DrawDots', pos(:,1:2)', dotRad, (B * [1 1 1])', [], 2);
+    if ~stimType
+        
+        Screen(window, 'DrawDots', pos(:,1:2)', dotRad, (B * [1 1 1])', [], 2);
+        
+    else
+        
+        x = round(pos(:, 1) - dotRad/2);
+        
+        rectPos = [x x*0 x+dotRad x*0+sH];
+        
+        Screen(window, 'FillRect', (B * [1 1 1])' , rectPos');
+        
+    end
     
 end
 

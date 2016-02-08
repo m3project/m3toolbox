@@ -42,6 +42,40 @@ xM = scrW / 2;
 
 bars = ceil([edgePosPx(1:end-1) edgePosPx(2:end)] + xM);
 
+test1 = 1;
+
+if test1
+   
+    
+    A = 2 * atand(W / screenReso / viewD / 2);
+    
+    edges = 6 + 1;
+    
+    barAngle = A / 6;
+    
+    edgePosDegs = linspace(-A/2 + barAngle/2, A/2 - barAngle/2, edges-1)';
+    
+    edgePosDegs = edgePosDegs(:);
+    
+    edgePosPx = tand(edgePosDegs) * viewD * screenReso;
+    
+    xM = scrW / 2;
+    
+    bars2 = ceil([edgePosPx(1:end-1) edgePosPx(2:end)] + xM);
+    
+    bars3 = [];
+    
+    for i=1:5
+        
+        bars3 = [bars3; bars(i, :); bars2(i, :)];
+        
+    end
+    
+    bars = [bars3; bars(6, :)];
+
+    
+end
+
 if makePlot
     
     clf

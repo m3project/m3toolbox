@@ -4,7 +4,7 @@ function runBugPatternDianaNat(args)
 
 sr = 40; % px/cm
 
-viewD = 7; % viewing distance (cm)
+viewD = 2.5; % viewing distance (cm)
 
 %% parameters
 

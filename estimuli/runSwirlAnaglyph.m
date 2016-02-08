@@ -16,11 +16,9 @@ flickerCols = [0.01 0.03;0.05 0.12; 0.01 0.06]; % -, 0 and + disparity (avoid us
 
 flickerDutyCycles = [0.25 0.5 0.75];
 
-flickerColsB = [0.5 1];
-    
-flickerColsG = [0.25 0.35];
-
 flickerPeriod = 10;
+
+cyclingModeDelay = 8; % delay between presentations in cycling mode (sec)
 
 %% Initialization
 
@@ -36,7 +34,7 @@ createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
 
 window = getWindow();
 
-[sW, sH] = getResolution();
+[~, sH] = getResolution();
 
 %% Stimulus Settings
 
@@ -72,8 +70,6 @@ makePlot = 0; % when set to 1, the script plots size and trajectory instead of r
 
 sizeScaleEnable = 1;
 
-disparitySizeCondition = 0; % when set to 1, the bug size in the case of (disparityEnable=1, sizeEnable=0) is initially small
-
 bugColor = 0; % [0, 1]
 
 sf = 37; % screen scaling factor (px/cm)
@@ -86,11 +82,7 @@ virtBS1= virtBS2 * virtDm2 / viewD;
 
 duration = 2.25; % duration of motion from distance 1 to 2 (seconds)
 
-bugY = 0.62; % vertical location of bug (0 to 1)
-
 bugJitter = 5; % bug jitter in pixels (0 to disable)
-
-finalPresentationTime = 2; % time stimulus remains on screen after looming (seconds)
 
 enableLoomDisparity = 1;
 
@@ -101,15 +93,15 @@ enableCyclingMode = 0;
 %% print keyboard shortcuts
 
 shortcuts = {
-    'p',                        'Set disparity to positive', ... 
-    'n',                        'Set disparity to negative', ... 
-    '0',                        'Set disparity to zero', ... 
+    'p',                        'set disparity to positive', ... 
+    'n',                        'set disparity to negative', ... 
+    '0',                        'set disparity to zero', ... 
     'b',                        'enable blue channel only', ... 
     'g',                        'enable green channel only', ... 
     'k',                        'enable both channels', ...
-    'c',                        'enable cycling mode', ...
-    'Space or s',               'Start bug motion', ...
-    'Escape or End',            'Exit stimulus'
+    'c',                        'start cycling mode', ...
+    'Space or s',               'start bug motion', ...
+    'Escape or End',            'exit stimulus'
     };
 
 printKeyboardShortcuts(shortcuts);
@@ -132,7 +124,7 @@ if sizeScaleEnable
     
 else
     
-    if disparitySizeCondition
+    if disparitySizeCondition %#ok<UNRCH>
         
         virtBugSize = @(t) virtBS1 * ones(size(t)); % .* viewD./ virtDm2 ;
         
@@ -149,19 +141,13 @@ radFunc = @(t) virtBugSize(t) * sf;
 
 % position:
 
-x1 = @(t, disparityEnable) cx - disparity(t, disparityEnable)/2;
-
-x2 = @(t, disparityEnable) cx + disparity(t, disparityEnable)/2;
-
-y1 = @(t) cy;
-
-y2 = @(t) cy;
-
-[swirlX, swirlY, motionR] = getSwirl(cx, cy, motionDuration, motionR0);
+[swirlX, swirlY, motionR] = getSwirl(cx, cy, motionDuration, motionR0); %#ok<NASGU>
 
 if previewMotionFunc
     
-    t = 0:1e-2:10; plot(t, [motionR(t); (t<motionDuration)*motionR0/2]);
+    t = 0:1e-2:10; %#ok<UNRCH>
+    
+    plot(t, [motionR(t); (t<motionDuration)*motionR0/2]);
     
     xlabel('time');
     
@@ -170,8 +156,6 @@ if previewMotionFunc
     return
 
 end
-
-swirlActive = 1;
 
 %% flicker box
 
@@ -183,7 +167,7 @@ flicker = 0;
 
 if makePlot
     
-    t = 0:0.01:duration*1.5;
+    t = 0:0.01:duration*1.5; %#ok<UNRCH>
     
     subplot(2, 1, 1);
     
@@ -196,27 +180,98 @@ if makePlot
     return
 
 end
-%% rendering loop:
 
-alignMsgDisplayed = 0;
-
-startTime = GetSecs() - totalTime * 2;
-
-frameTimes = nan(500, 1);
-
-frameCounter = 1;  
-
-oldKeyIsDown = 1;
-
-flickerCount= 0;
+%% main loop:
 
 while 1
     
-    frameStart = GetSecs();
+    % input loop
     
-    t = GetSecs() - startTime;
+    Screen(window, 'flip');
     
-    if swirlActive
+    oldKeyIsDown = 1;
+    
+    while ~enableCyclingMode
+        
+        [keyIsDown, ~, keyCode] = KbCheck;
+        
+        exitCode = checkEscapeKeys(keyCode);
+        
+        if exitCode, return, end
+        
+        if keyIsDown && ~oldKeyIsDown
+            
+            keyPress(keyCode);
+            
+            if keyCode(KbName('p'))
+                
+                disparityEnable = +1; ss('set disparity to positive');
+                
+            end
+            
+            if keyCode(KbName('n'))
+                
+                disparityEnable = -1; ss('set disparity to negative');
+                
+            end
+            
+            if keyCode('0')
+                
+                disparityEnable = 0; ss('set disparity to 0');
+                
+            end
+            
+            if keyCode(KbName('k'))
+                
+                enableChannels = 0; ss('enabled both channels');
+                
+            end
+            
+            if keyCode(KbName('b'))
+                
+                enableChannels = +1; ss('enabled blue channel only');
+                
+            end
+            
+            if keyCode(KbName('g'))
+                
+                enableChannels = -1; ss('enabled green channel only');
+                
+            end
+            
+            if keyCode(KbName('c'))
+                
+                enableCyclingMode = 1; ss('started cycling mode');
+                
+            end
+            
+            if keyCode(KbName('Space')) || keyCode(KbName('s'))
+                
+                break; % break out of input loop
+                
+            end
+            
+        end
+        
+        oldKeyIsDown = keyIsDown;
+        
+    end
+    
+    %% rendering loop
+    
+    dispStr = ifelse(disparityEnable==1, '+', '-');
+    
+    ss(sprintf('started swirl (%s disp)', dispStr));
+    
+    startTime = GetSecs();
+    
+    flickerCount= 0;
+    
+    t = 0;
+    
+    while t < totalTime
+        
+        t = GetSecs() - startTime;
         
         r = radFunc(0);
         
@@ -228,230 +283,91 @@ while 1
         
         dotsR(1) = dotsR(1) + enableLoomDisparity * disparity(t, disparityEnable)/2;
         
-        if t>totalTime && ~alignMsgDisplayed
-            
-            %fprintf('\nPress escape to end alignment stimulus ...\n\n');
-            
-            alignMsgDisplayed = 1;
-            
-        end
+        jt =  rand(1, 2) * bugJitter;
         
-        if t>totalTime
+        bugHeight = r;
+        
+        dotsL = dotsL - [r/2 bugHeight] + jt;
+        dotsR = dotsR - [r/2 bugHeight] + jt;
+        
+        rectL = [dotsL; dotsL(1)+r dotsL(2)+bugHeight];
+        
+        rectR = [dotsR; dotsR(1)+r dotsR(2)+bugHeight];
+        
+        flickerEna = t<totalTime;
+        
+        if flickerEna
             
-%             break;
-            
-        end
-        
-    else
-        
-        r = radFunc(t);
-        
-        dotsL = [x1(t, disparityEnable) y1(t)];
-        
-        dotsR = [x2(t, disparityEnable) y2(t)];
-        
-        if t>duration + finalPresentationTime
-            
-            break;
+            flicker = 1 - flicker;
             
         end
-        
-    end
-    
-    jt =  rand(1, 2) * bugJitter;  
-    
-    bugHeight = r;
-    
-    dotsL = dotsL - [r/2 bugHeight] + jt;
-    dotsR = dotsR - [r/2 bugHeight] + jt;
-    
-    rectL = [dotsL; dotsL(1)+r dotsL(2)+bugHeight];
-    
-    rectR = [dotsR; dotsR(1)+r dotsR(2)+bugHeight];
-    
-    flickerEna = t<totalTime;
-    
-    if flickerEna
-        
-        flicker = 1 - flicker;
-        
-    end
-    
-%     if enableChannels == 0
         
         flickerCol = flickerCols(disparityEnable+2, flicker+1);
         
-%     elseif enableChannels == 1
-%         
-%         flickerCol = flickerColsB(flicker+1);
-%         
-%     elseif enableChannels == -1
-%         
-%         flickerCol = flickerColsG(flicker+1);
-%         
-%     end
-    
-    flickerDutyCycle = flickerDutyCycles(enableChannels+2);
-    
-    dutyOn = flickerCount < (flickerPeriod * flickerDutyCycle);
-    
-    Screen('Flip', window);
-
-    Screen('SelectStereoDrawBuffer', window, 0);
-    
-    if ismember(enableChannels, [0 +1])
+        flickerDutyCycle = flickerDutyCycles(enableChannels+2);
         
-        if t<totalTime
+        dutyOn = flickerCount < (flickerPeriod * flickerDutyCycle);        
+        
+        Screen('SelectStereoDrawBuffer', window, 0);
+        
+        if ismember(enableChannels, [0 +1])            
             
             Screen('FillOval', window, bugColor, rectL');
             
-        elseif enableCyclingMode
-            
-            disparityEnable = -disparityEnable; % flip disparity
-            
-            % now restart animation
-            
-            startTime = GetSecs();
-            
-            flickerCount = 0;
-            
-            dispStr = ifelse(disparityEnable==1, '+', '-');
-            
-            ss(sprintf('started swirl (%s disp)', dispStr));
-            
         end
         
-    end
-    
-    Screen('FillRect', window, [1 1 1] * flickerEna * flickerCol * dutyOn, flickerRect);
-    
-    Screen('SelectStereoDrawBuffer', window, 1);
-    
-    if flickerEna
-     %   fprintf('%d', dutyOn);
-    end
-    
-    if ismember(enableChannels, [0 -1])        
+        Screen('FillRect', window, [1 1 1] * flickerEna * flickerCol * dutyOn, flickerRect);
         
-        if t<totalTime
-            
+        Screen('SelectStereoDrawBuffer', window, 1);
+        
+        if ismember(enableChannels, [0 -1])
+                
             Screen('FillOval', window, bugColor, rectR');
-            
+           
         end
+        
+        Screen('FillRect', window, [1 1 1] * flickerEna * flickerCol * dutyOn , flickerRect);
+        
+        flickerCount = mod(flickerCount + 1, flickerPeriod);
+        
+        Screen('Flip', window);
+        
+        [~, ~, keyCode] = KbCheck;
+        
+        exitCode = checkEscapeKeys(keyCode);
+        
+        if exitCode, return, end
         
     end
     
-    Screen('FillRect', window, [1 1 1] * flickerEna * flickerCol * dutyOn , flickerRect);
+    %% cycling mode delay loop
     
-%     if Missed>0
-%         
-%         disp('missed')
-%         
-%     end
-    
-    flickerCount = mod(flickerCount + 1, flickerPeriod);
-    
-    [keyIsDown, ~, keyCode] = KbCheck;
-    
-    exitCode = checkEscapeKeys(keyCode);
-    
-    if exitCode
+    if enableCyclingMode
         
-        return
+        Screen('Flip', window);
+        Screen('Flip', window);
         
-    end    
-    
-    if keyIsDown && ~oldKeyIsDown
+        t0 = GetSecs();
         
-        keyPress(keyCode);
-        
-        if keyCode(KbName('p'))
+        while GetSecs() - t0 < cyclingModeDelay
             
-            disparityEnable = +1;
+            [~, ~, keyCode] = KbCheck;
             
-            ss('set disparity to positive');
+            exitCode = checkEscapeKeys(keyCode);
+            
+            if exitCode
+                
+                return
+                
+            end
             
         end
         
-        if keyCode(KbName('n'))
-            
-            disparityEnable = -1;
-            
-            ss('set disparity to negative');
-            
-        end
-        
-        if keyCode('0')
-            
-            disparityEnable = 0;
-            
-            ss('set disparity to 0');
-            
-        end
-        
-        if keyCode(KbName('k'))
-            
-            enableChannels = 0;
-            
-            ss('enabled both channels');
-            
-        end
-        
-        if keyCode(KbName('b'))
-            
-            enableChannels = +1;
-            
-            ss('enabled blue channel only');
-            
-        end
-        
-        if keyCode(KbName('g'))
-            
-            enableChannels = -1;
-            
-            ss('enabled green channel only');
-            
-        end
-        
-        if keyCode(KbName('c'))
-            
-            enableCyclingMode = 1;
-            
-            ss('enabled cycling mode');
-            
-        end
-        
-        if keyCode(KbName('Space')) || keyCode(KbName('s'))
-            
-            startTime = GetSecs();
-            
-            flickerCount = 0;
-            
-            dispStr = ifelse(disparityEnable==1, '+', '-');
-            
-            ss(sprintf('started swirl (%s disp)', dispStr));
-            
-        end
+        disparityEnable = -disparityEnable; % flip disparity
         
     end
-    
-    oldKeyIsDown = keyIsDown;
     
 end
-
-% td = diff(frameTimes);
-% 
-% x=(td(10:end)*1e3);
-% 
-% std(x)
-% 
-% hist(x, 1e2);
-% 
-% axis([16 17 0 100]);
-
-%hist(frameTimes);
-
-%closeWindow();
 
 end
 
@@ -469,4 +385,3 @@ X = @(t) centerX + cos(theta1(t) * v) .* motionR(t);
 Y = @(t) centerY + sin(theta1(t) * v) .* motionR(t);
 
 end
-

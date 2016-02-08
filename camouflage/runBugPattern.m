@@ -29,7 +29,7 @@ backBlockContrast = 1;
 
 % bug:
 
-bugType = 4; % 1 = spatial pattern, 2 = regular block, 4 = random chequer, 5 = black
+bugType = 4; % 1 = spatial pattern, 2 = regular block, 4 = random chequer, 5 = black, 6 = gray
 
 Fx = 8/32; %#ok % cycle/px (bugType=1)
 
@@ -141,6 +141,10 @@ elseif bugType == 4
 elseif bugType == 5
     
     bugPattern = zeros(W, H); %#ok
+    
+elseif bugType == 6
+    
+    bugPattern = 0.5 * ones(W, H); %#ok    
     
 end
 

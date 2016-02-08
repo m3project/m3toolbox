@@ -1,12 +1,18 @@
 % this script is an adaptation of runDotsAnglyph
-%
-% Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk) - 13/1/2016
 
-function exitCode = runCorrAnaglyphHuman(expt)
+function exitCode = runCorrAnaglyph(expt)
 
 KbName('UnifyKeyNames');
 
 exitCode = 0;
+
+Gamma = 2.127; % for DELL U2413
+
+LeftGains = [0 0.66 0];
+
+RightGains = [0 0 1];
+
+createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
 
 %% Vivek parameters 
 
@@ -16,23 +22,29 @@ refreshCycle = 1; % background refresh rate (in frames)
 
 syncStimBackground = 1; % synchronize bug position updates with background refresh cycles
 
-bugY = 0.5;
+bugY = 0.65;
 
-viewD = 60; % viewing distance (cm)
+viewD = 10; % viewing distance (cm)
 
-bugSize = 4; % bug size (cm) on the screen
+bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm2 position
 
-iod = 4 ; % inter-ocular distance (cm)
+disparityEnable = -1; % -1 ,0 or +1
+
+iod = 0.7 ; % mantis inter-ocular distance (cm)
 
 enaJitter = 1;
 
-preTrialDelay = -2; % seconds
+preTrialDelay = 0; % seconds
 
 % dot params: 
 
-dotDiam = 20; % dot diameter
+unitArea = 100*100; % px
 
-dotDensity = 3; % number of dots in unit area (assuming a screen of 1920x1680 px)
+r = 20; % dot radius
+
+dotDensity =55; % number of dots in unit area
+
+n = round((1920*1680) / unitArea * dotDensity) % number of dots  
 
 % control params:  
 
@@ -46,7 +58,7 @@ interTrialTime = 0;
 
 jitter = 10; % px
 
-corrSetting = 1; % -1 = anti-correlated, 0 = random, +1 = correlated
+corrSetting =-1; % -1 = anti-correlated, 0 = random, +1 = correlated
 
 %% parameters
 
@@ -54,7 +66,11 @@ corrSetting = 1; % -1 = anti-correlated, 0 = random, +1 = correlated
 
 backgroundBrightness = 0.5; % (0.5 in Vivek's prev behavioral expts)
 
+dotBrightness = 0.0;
+     
 % bug params:
+
+% bugR = 100; % bug radius (px)
 
 motionR0 = 800; % initial swirling radius (px)
 
@@ -64,12 +80,38 @@ finalPresentationTime = 2;
 
 rotFreq = 4; % Hz
 
+% edgeSmoothness = 0.8; % this determines how "hard/soft" the bug borders are
+
 % loom params
 
-sf = 37.7; % screen scaling factor (px/cm) for AOC D2357P
+sf = 37.0370; % screen scaling factor (px/cm) for Dell U2413
 
-virtDm1 = 55; % virtual distance 1 from mantis (cm)
 
+
+virtDm1 = 2.5; % virtual distance 1 from mantis (cm)
+
+virtDm2 = 2.5; % virtual distance 2 from mantis (cm)
+
+
+
+virtBS2 = viewD / virtDm2 * bugSize;
+  
+virtBS1= virtBS2 * virtDm2 / viewD;
+
+
+
+% overrides for testing:
+
+%rotFreq = 0.1; motionDuration = 50; % for testing
+
+ %% check
+ 
+ if virtDm1 ~= virtDm2
+     
+     error('there''s a slight issue here, size of background hole does not scale with target size');
+     
+ end
+ 
 %% parameter overrides
 
 if nargin>0
@@ -78,25 +120,46 @@ if nargin>0
     
 end
 
-%% calculated time params
+%% calculated params
 
 bugVisibleTime = motionDuration + finalPresentationTime; % duration of bug visibility(seconds) (7 secs in behavioral expt)
 
 totalTime = motionDuration + finalPresentationTime + interTrialTime;
 
-%% bug disparity and size calculations
+%% bug size calculations
+
+ta = @(t) min(t, bugVisibleTime) / bugVisibleTime; % animation time [0, 1]
+
+virtDm = @(t) virtDm1 + (virtDm2-virtDm1) * ta(t);
+
+sizeScaleEnable = 1;
 
 % disparity:
 
-disparity = -calDisp(virtDm1, viewD, iod) * sf;
+disparityMag = calDisp(virtDm1, viewD, iod) * sf;
+
+% size:
+
+if sizeScaleEnable
+    
+    virtBugSize = @(t) virtBS1 .* viewD./ virtDm(t) ;
+    
+else
+    
+    if disparitySizeCondition %#ok
+        
+        virtBugSize = @(t) virtBS1 * ones(size(t)); % .* viewD./ virtDm2 ;
+        
+    else
+        virtBugSize = @(t) virtBS1 .* viewD./ virtDm2 * ones(size(t)) ;
+        
+    end
+    
+end
 
 % radius:
 
-% virtBS = viewD / virtDm1 * bugSize;
-
-virtBS = bugSize; % on-screen size is fixed
-
-radFunc = @(t) virtBS/2 * sf;
+radFunc = @(t) virtBugSize(t)/2 * sf;
 
 %% body
 
@@ -104,23 +167,19 @@ window = getWindow();
 
 [sW, sH] = getResolution();
 
-sH = sH/2;
-
 centerX = sW/2;
 
 centerY = sH * bugY;
 
-%% calculate ndots
+testRedBlue = 0;
 
-unitArea = 100*100; % px
-
-n_mantis = round((1920*1680) / unitArea * dotDensity); % number of dots  
-
-mantisScreenArea = 1920 * 1200;
-
-effectiveDotDensity = n_mantis / mantisScreenArea * unitArea;
-
-n = round(sW * sH / unitArea * effectiveDotDensity);
+if testRedBlue
+    
+    SetAnaglyphStereoParameters('RightGains', window, [1 0 0]); %#ok
+    
+    SetAnaglyphStereoParameters('LeftGains', window, [0 0 1]);
+    
+end
 
 %% motion function
 
@@ -128,7 +187,7 @@ n = round(sW * sH / unitArea * effectiveDotDensity);
 
 %% some anon functions
 
-dst = @(x,y) sqrt(x.^2 + (y*2).^2);
+dst = @(x,y) sqrt(x.^2 + y.^2);
 
 %% rendering loop
 
@@ -218,7 +277,7 @@ while 1
         
         % target dots:
 
-        tgtDots = round(((2*bugR)^2) / unitArea * effectiveDotDensity);
+        tgtDots = round(((2*bugR)^2) / unitArea * dotDensity);
         
         xst = rand2(tgtDots, 1) * bugR;
         
@@ -234,7 +293,9 @@ while 1
         
         nDots = size(xst, 1);
         
-        colst = power(-1, rand(nDots, 1) > 0.5) * [1 1 1];     
+        colst = power(-1, rand(nDots, 1) > 0.5) * [1 1 1];
+        
+     
         
     end
     
@@ -259,7 +320,9 @@ while 1
             
         end
         
-        d = disparity/2 * (-1)^channel;
+        disparitySign = (-1)^channel;
+
+        d = disparityMag/2 * disparitySign * disparityEnable;
         
         % Start of new section:
         
@@ -307,21 +370,35 @@ while 1
         
         % End of new section
         
-%         Screen(window, 'DrawDots', pos', r, cols', [], 2);
+        Screen(window, 'DrawDots', pos', r, cols', [], 2);
         
-        rects = bsxfun(@plus, pos(:, [1 2 1 2]), [-1 -1 1 1] .* [1 0.5 1 0.5] * dotDiam/2);
-        
-        Screen(window, 'FillOval', cols', rects', dotDiam);
-        
-    end    
+    end
     
-    Screen(window, 'flip', [], 1);
+    Screen(window, 'Flip');
     
     if enableKeyboard
         
         % handle key presses
         
         [~, ~, keyCode] = KbCheck;
+        
+        if keyCode(KbName('p'))
+            
+            disparityEnable = +1;            
+            
+        end
+        
+        if keyCode(KbName('n'))
+            
+            disparityEnable = -1;
+            
+        end
+        
+        if keyCode('0')
+            
+            disparityEnable = 0;
+            
+        end
         
         if (keyCode(KbName('Space')))
             
@@ -362,6 +439,26 @@ motionR = @(t) motionR0/2 * (1+cos(theta2(t)));
 v = .5 ;
 
 X = @(t) centerX + cos(theta1(t) * v) .* motionR(t);
-Y = @(t) centerY + sin(theta1(t) * v) .* motionR(t) * 0.5;
+Y = @(t) centerY + sin(theta1(t) * v) .* motionR(t);
 
 end
+
+% function d = dispFunc(dist, t, radFunc, edgeSmoothness, disparityMag, disparityEnable, enaBackDisparity)
+% 
+% tansig01 = @(x) (tansig(x)+1)/2;
+% 
+% tansigAB = @(x, a, b) tansig01(x) * (b-a) + a';
+% 
+% if enaBackDisparity
+%     
+%     backDisparity = -disparityMag(t) * disparityEnable;
+%     
+% else
+%     
+%     backDisparity = 0;
+%     
+% end    
+% 
+% d = tansigAB((dist - radFunc(t)) * edgeSmoothness,  disparityMag(t) * disparityEnable, backDisparity);
+% 
+% end

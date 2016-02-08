@@ -6,7 +6,7 @@ function [G, ids] = splitGroups(paramSet, key)
 
 % sort the paramSet by column key
 
-[~, k] = sort(paramSet(:, key));
+[~, k] = sortrows(paramSet(:, key));
 
 paramSetS = paramSet(k, :);
 
@@ -15,9 +15,9 @@ paramSetS = paramSet(k, :);
 % Each "slice" in the matrix G(:, :, k) will contain the paramSet
 % subset for a unique key value.
 
-ids = unique(paramSetS(:, key));
+ids = unique(paramSetS(:, key), 'rows');
 
-groupRows = r / numel(ids);
+groupRows = r / size(ids, 1);
 
 if mod(groupRows, 1) ~= 0 % sanity check
    
@@ -25,7 +25,7 @@ if mod(groupRows, 1) ~= 0 % sanity check
     
 end
 
-G = reshape(paramSetS.', c, groupRows, numel(ids));
+G = reshape(paramSetS.', c, groupRows, size(ids, 1));
 
 G = permute(G, [2 1 3]);
 

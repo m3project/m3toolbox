@@ -344,6 +344,8 @@ closeWindow();
 
 commandwindow();
 
+ShowCursor();
+
 end
 
 function runBeforeExpt()

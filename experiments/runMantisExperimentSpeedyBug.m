@@ -2,13 +2,13 @@ function runMantisExperimentSpeedyBug()
 
 expt = struct;
 
-expt.genParamSetFun = @genParamSetPILOT4;
+expt.genParamSetFun = @genParamSetPILOT6;
 
 expt.runBeforeTrialFun = @runBeforeTrial;
 
-expt.runTrialFun = @runTrialPILOT4;
+expt.runTrialFun = @runTrialPILOT6;
 
-expt.runAfterTrialFun = @runAfterTrial;
+expt.runAfterTrialFun = @runAfterTrial_PILOT6;
 
 expt.runBeforeExptFun = @runBeforeExpt;
 
@@ -22,13 +22,44 @@ expt.makeBackup = 1;
 
 expt.defName = 'Diana';
 
-expt.addTags = {'PILOT4'};
+expt.addTags = {'PILOT6'};
 
 runExperiment(expt);
 
 end
 
-function paramSet = genParamSetPILOT4()
+function paramSet = genParamSetPILOT6()
+
+paramSet = genParamSetPILOT5();
+
+end
+
+function paramSet = genParamSetPILOT5()
+
+blocks = 5;
+
+dirs = [-1 1]; % direction
+
+bugType = [0 1 3 4];
+
+bgType = [0 1];
+
+% bgType:
+% 0 : gray background with luminance of 0.5
+% 1 : patterned background
+
+% bugType:
+% 0 : black bug, uniform luminance 0
+% 1 : gray  bug, uniform luminance 0.5
+% 2 : background-matching bug, a patch cut out of 1/f pattern
+% 3 : stripy bug, 8W
+% 4 : stripy bug, 2W
+
+paramSet = createRandTrialBlocks(blocks, dirs, bgType, bugType);
+
+end
+
+function paramSet = genParamSetPILOT4() %#ok<DEFNU>
 
 blocks = 5;
 
@@ -49,7 +80,7 @@ paramSet = createRandTrialBlocks(blocks, dirs, bugSpeed, bugType);
 
 end
 
-function paramSet = genParamSetPILOT3()
+function paramSet = genParamSetPILOT3() %#ok<DEFNU>
 
 blocks = 5;
 
@@ -155,7 +186,126 @@ dump = [];
 end
 
 
-function [exitCode, dump] = runTrialPILOT4(paramSetRow)
+function [exitCode, dump] = runTrialPILOT6(paramSetRow)
+
+disp('rendering the stimulus ...');
+
+bugDelay = 15; % seconds (before bug moves across the screen)
+
+args = struct('dir', paramSetRow(1), 'useNatBack', paramSetRow(2), ...
+    'bugDelay', bugDelay, 'escapeEnabled', 0, 'bugSpeed', 74);
+
+bugType = paramSetRow(3);
+
+% bugType:
+% 0 : black bug, uniform luminance 0
+% 1 : gray  bug, uniform luminance 0.5
+% 2 : background-matching bug, a patch cut out of 1/f pattern
+% 3 : stripy bug, 8W
+% 4 : stripy bug, 2W
+
+if bugType == 0
+    
+    args.m = 0;
+    
+    args.bugBaseLum = 0;
+    
+elseif bugType == 1
+    
+    args.m = 0;
+    
+    args.bugBaseLum = 0.5;
+    
+elseif bugType == 2
+    
+    args.m = -1;
+    
+elseif bugType == 3
+    
+    args.m = 8;
+    
+elseif bugType == 4
+    
+    args.m = 2;
+    
+else
+    
+    error('invalid bugType');
+    
+end
+
+runBugPatternDianaNat(args);
+
+exitCode = 0;
+
+dump = [];
+
+end
+
+
+function [exitCode, dump] = runTrialPILOT5(paramSetRow) %#ok<DEFNU>
+
+% NB: bugSpeed put here is assuming viewD=7. I changed this back to the
+% correct viewD=2.5 on 18/1/2016 so while bugSpeed=50 here really
+% corresponds to bugSpeed=140, in runTrialPILOT6 onwards bugSpeed
+% represents actual bug speed
+
+disp('rendering the stimulus ...');
+
+bugDelay = 15; % seconds (before bug moves across the screen)
+
+args = struct('dir', paramSetRow(1), 'useNatBack', paramSetRow(2), ...
+    'bugDelay', bugDelay, 'escapeEnabled', 0, 'bugSpeed', 50);
+
+bugType = paramSetRow(3);
+
+% bugType:
+% 0 : black bug, uniform luminance 0
+% 1 : gray  bug, uniform luminance 0.5
+% 2 : background-matching bug, a patch cut out of 1/f pattern
+% 3 : stripy bug, 8W
+% 4 : stripy bug, 2W
+
+if bugType == 0
+    
+    args.m = 0;
+    
+    args.bugBaseLum = 0;
+    
+elseif bugType == 1
+    
+    args.m = 0;
+    
+    args.bugBaseLum = 0.5;
+    
+elseif bugType == 2
+    
+    args.m = -1;
+    
+elseif bugType == 3
+    
+    args.m = 8;
+    
+elseif bugType == 4
+    
+    args.m = 2;
+    
+else
+    
+    error('invalid bugType');
+    
+end
+
+runBugPatternDianaNat(args);
+
+exitCode = 0;
+
+dump = [];
+
+end
+
+
+function [exitCode, dump] = runTrialPILOT4(paramSetRow) %#ok<DEFNU>
 
 disp('rendering the stimulus ...');
 
@@ -211,7 +361,7 @@ dump = [];
 
 end
 
-function [exitCode, dump] = runTrialPILOT3(paramSetRow)
+function [exitCode, dump] = runTrialPILOT3(paramSetRow) %#ok<DEFNU>
 
 disp('rendering the stimulus ...');
 
@@ -262,7 +412,7 @@ dump = [];
 
 end
 
-function [exitCode, dump] = runTrialPILOT2(paramSetRow)
+function [exitCode, dump] = runTrialPILOT2(paramSetRow) %#ok<DEFNU>
 
 disp('rendering the stimulus ...');
 
@@ -280,7 +430,34 @@ dump = [];
 
 end
 
-function resultRow = runAfterTrial(varargin)
+
+function resultRow = runAfterTrial_PILOT6(varargin)
+
+resultRow = runAfterTrial_PILOT5(varargin);
+
+end
+
+function resultRow = runAfterTrial_PILOT5(varargin)
+
+checkPositive = @(str) str2double(str) >= 0;
+
+checkBinary = @(str) (str2double(str) >= 0) && (str2double(str) <= 1);
+
+numSaccades = getNumber('Number of saccades/sways      : ', checkPositive);
+
+% optomotor   = getNumber('Number of optomotor responses : ', checkPositive);
+
+tracking    = getNumber('Tracking   (0=no, 1=yes)      : ', checkPositive);
+
+peering     = getNumber('Peering   (0=no, 1=yes)       ? ', checkBinary);
+
+strike      = getNumber('Number of strikes             : ', checkPositive);
+
+resultRow = [numSaccades tracking peering strike];
+
+end
+
+function resultRow = runAfterTrial(varargin) %#ok<DEFNU>
 
 checkPositive = @(str) str2double(str) >= 0;
 

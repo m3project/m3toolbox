@@ -12,11 +12,9 @@ RightGains = [0 0 1];
 
 createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
 
-% setRedBlueAnaglyph();
-
 %% Vivek parameters 
 
-bugY = 0.65;
+bugY = 0.5    ;
 
 viewD = 10; % viewing distance (cm)
 
@@ -51,8 +49,6 @@ backDisparity =  0; % background disparity (px)
 interTrialTime = 600;
 
 %% parameters
-
-pairDots = 1; % when set to 0 the dots in the different channels become unpaired
 
 % background params:
 
@@ -139,7 +135,7 @@ if sizeScaleEnable
     
 else
     
-    if disparitySizeCondition %#ok<UNRCH>
+    if disparitySizeCondition
         
         virtBugSize = @(t) virtBS1 * ones(size(t)); % .* viewD./ virtDm2 ;
         
@@ -156,9 +152,21 @@ radFunc = @(t) virtBugSize(t) * sf;
 
 %% disparity function
 
+%x = -10:1e-2:10; y = tansigAB(x, 10, -10); plot(x, y); return;
+
+%ezplot(tansig01, [-10 10]); return
+
+%d = @(dist) (-1).^heaviside(dist - bugR) * disparity;
+
+% d = @(dist, t) -disparityEnable * tansig((dist - radFunc(t)) * edgeSmoothness) * disparityMag(t); 
+% d = @(dist, t) -tansig((dist - radFunc(t)) * edgeSmoothness) * disparityMag(t); 
+%d = @(dist, t) tansig((dist - radFunc(t)) * edgeSmoothness) * disparityMag(t); 
+
+%d = @(dist, t) tansigAB((dist - radFunc(t)) * edgeSmoothness,  disparityMag(t) * disparityEnable, backDisparity);
+
 if previewDisparityFunc
 
-    dist = 0:200; %#ok<UNRCH>
+    dist = 0:200;
     
     d = dispFunc(dist, 0, radFunc, edgeSmoothness, disparityMag, disparityEnable, backDisparity);
     
@@ -169,7 +177,6 @@ if previewDisparityFunc
     return
 
 end
-
 %% body
 
 window = getWindow();
@@ -182,11 +189,11 @@ centerY = sH * bugY;
 
 if nargin < 4
     
-    xs = rand(n, 2) * sW;
+    xs = rand(n, 1) * sW;
     
-    ys = rand(n, 2) * sH;
+    ys = rand(n, 1) * sH;
     
-    thetas = rand(n, 2) * 360;
+    thetas = rand(n, 1) * 360;
     
 end
 
@@ -194,7 +201,7 @@ testRedBlue = 0;
 
 if testRedBlue
     
-    SetAnaglyphStereoParameters('RightGains', window, [1 0 0]); %#ok<UNRCH>
+    SetAnaglyphStereoParameters('RightGains', window, [1 0 0]);
     
     SetAnaglyphStereoParameters('LeftGains', window, [0 0 1]);
     
@@ -204,7 +211,7 @@ end
 
 flickSize = 50;
 
-flickerRect = [0 sH-flickSize flickSize sH]; %#ok<NASGU>
+flickerRect = [0 sH-flickSize flickSize sH];
 
 flicker = 0;
 
@@ -214,7 +221,7 @@ flicker = 0;
 
 if previewMotionFuncs
     
-    t = 0:1e-2:5; %#ok<UNRCH>
+    t = 0:1e-2:5;
     
     plot(t, [X(t); Y(t)]);
     
@@ -284,19 +291,17 @@ while 1
     
     k2 = disparityEnable * disparityMag(t);
     
-    flickerCol = flickerCols(sign(k2)+2, flicker+1); %#ok<NASGU>
+    flickerCol = flickerCols(sign(k2)+2, flicker+1);    
     
     % draw
     
-    randV = (rand(n, 1)>0.5); %#ok<NASGU>
+    randV = (rand(n, 1)>0.5);
     
     for channel = [0 1]
         
         Screen('SelectStereoDrawBuffer', window, channel);
         
         Screen(window, 'FillRect', [1 1 1] * backgroundBrightness, []);
-        
-        chanInd = ifelse(pairDots, 1, 1 + channel);
         
         if t>bugVisibleTime
             
@@ -309,16 +314,13 @@ while 1
             
         end
         
-        d = dispFunc(dist(:,chanInd), t, radFunc, edgeSmoothness, disparityMag, ...
-            disparityEnable, backDisparity);
+        d = dispFunc(dist, t, radFunc, edgeSmoothness, disparityMag, disparityEnable, backDisparity);
         
-        pos = [xs(:,chanInd)-d*(-1)^channel ys(:,chanInd)];
+        pos = [xs-d*(-1)^channel ys];
         
         if enaJitter
             
-            jitter = dispFunc(0, t, radFunc, edgeSmoothness, ...
-                disparityMag, disparityEnable, ...
-                backDisparity)/2; %#ok<UNRCH>
+            jitter = dispFunc(0, t, radFunc, edgeSmoothness, disparityMag, disparityEnable, backDisparity)/2;
             
             pos(:,1) = pos(:,1) + jitter .* (-1).^randV;
             
@@ -328,7 +330,7 @@ while 1
         
         if drawFlickerBox
             
-            Screen('FillRect', window, [1 1 1] * flickerEna * flickerCol, flickerRect); %#ok<UNRCH>
+            Screen('FillRect', window, [1 1 1] * flickerEna * flickerCol, flickerRect);
             
         end
         

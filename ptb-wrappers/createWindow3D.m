@@ -1,8 +1,8 @@
 % creates a PTB window
 
-function createWindow3D(Gamma)
+function createWindow3D(Gamma, multisample)
 
-if (nargin == 0) || (nargin == 1 && isstruct(Gamma))
+if (nargin == 0) || (nargin >0 && isstruct(Gamma))
     
     % this is most probably a call using the deprecated function signature
     % createWindow(consts)
@@ -23,9 +23,11 @@ if (nargin == 0) || (nargin == 1 && isstruct(Gamma))
     
     return;    
     
-elseif nargin ~= 1
+end
+
+if nargin<2
     
-    error('This function requires that you specify Gamma');
+    multisample = 0;
     
 end
     
@@ -69,7 +71,9 @@ PsychImaging('AddTask', 'General', 'NormalizedHighresColorRange');
 
 PsychImaging('AddTask', 'FinalFormatting', 'DisplayColorCorrection', 'SimpleGamma');
 
-window = PsychImaging('OpenWindow', consts.SCREEN_ID, consts.MEAN_LUM, [], [], [], 100);
+%window = PsychImaging('OpenWindow', consts.SCREEN_ID, consts.MEAN_LUM, [], [], [], 100);
+
+window = PsychImaging('OpenWindow', consts.SCREEN_ID, consts.MEAN_LUM, [], [], [], [], multisample);
 
 Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

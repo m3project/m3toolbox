@@ -161,7 +161,7 @@ while 1
     
     disp('Press (1-9) to select presentation pattern');
     
-    disp('Press (m) for monocular, (b) for binocular or (t) for two-bar mode');
+    disp('Press (m) for monocular, (b) for binocular or (hold t + 1,2,3,4 or 5) for two-bar mode');
     
     disp('Press (f) for flickering bars or (s) for static bars');
     
@@ -169,7 +169,9 @@ while 1
     
     disp('Press (c) to start continuous presentation');
     
-    disp('Press Space to start ...');
+    disp('During continuous mode, press (s) to end presentation');
+    
+    disp('Press Space or (c) to start ...');
     
     while ~cMode
         
@@ -205,13 +207,49 @@ while 1
             
         end
         
-        if keyCode(KbName('t')) && pmode ~= 2
+        if keyCode(KbName('t'))
             
-            pmode = 2;
+            numsPressed = intersect(find(keyCode), ('1':'5') + 0);
             
-            disp('switched to two-bar');
+            if ~isempty(numsPressed)
+                
+                num = min(numsPressed) - '0';
+                
+                new_pmode = -num;
+                
+                if pmode ~= new_pmode
+                    
+                    pmode = new_pmode;                    
+                    
+                    ss(sprintf('t (two-bar, bars: %i, %i)', -pmode, -pmode+1));
+                    
+                    continue;
+                    
+                end
+                
+            end
             
-            ss('t (two-bar)');
+        else
+             
+            numsPressed = intersect(find(keyCode), ('1':'9') + 0);
+            
+            if ~isempty(numsPressed)
+                
+                oldNumPressed = numPressed;
+                
+                numPressed = min(numsPressed) - '0';
+                
+                if numPressed ~= oldNumPressed
+                    
+                    fprintf('selected pattern %d\n', numPressed);
+                    
+                    str1 = sprintf('%d (pattern %d)', numPressed, numPressed);
+                    
+                    ss(str1);
+                    
+                end
+                
+            end
             
         end
         
@@ -255,25 +293,7 @@ while 1
             
         end          
         
-        numsPressed = intersect(find(keyCode), ('1':'9') + 0);
-        
-        if ~isempty(numsPressed)
-            
-            oldNumPressed = numPressed;
-            
-            numPressed = min(numsPressed) - '0';
-            
-            if numPressed ~= oldNumPressed
-                
-                fprintf('selected pattern %d\n', numPressed);
-                
-                str1 = sprintf('%d (pattern %d)', numPressed, numPressed);
-                
-                ss(str1);
-                
-            end
-            
-        end
+       
         
         if (keyCode(KbName('Space')))
             
@@ -312,11 +332,13 @@ while 1
     
     home
     
-    temp_arr = {'monocular', 'binocular', 'two-bar'};
+    map1 = createMap({0 1 -1 -2 -3 -4 -5}, {'monocular', 'binocular', ...
+        'two-bar (1,2)', 'two-bar (2,3)', 'two-bar (3,4)', ...
+        'two-bar (4,5)', 'two-bar (5,6)'});
     
-    fprintf('Selected mode : %s\n\n', temp_arr{pmode+1});
+    fprintf('Selected mode : %s\n\n', map1.get(pmode));
     
-    fprintf('Selected pattern : %i\n\n', numPressed);
+    ss(sprintf('Starting pattern %d', numPressed));
     
     paramSet = genParamSet(nbars, barCols, numPressed, pmode);    
     
@@ -455,8 +477,6 @@ while 1
         
         numPressed = numPressed + 1;
         
-        ss(sprintf('starting pattern %d', numPressed));
-        
         if numPressed > 9            
             
             numPressed = 1;
@@ -491,9 +511,27 @@ paramSet2 = createTrial(1:nbars, 1, barCols, 0.5);
 
 paramSet3 = createTrial(1, 1:nbars, 0.5, barCols);
 
-if pmode == 2
+if pmode<0
+    
+    b1 = -pmode;
+    b2 = b1+1;
+    
+    % thus:
+    % pmode = -1 -> 1,2
+    % pmode = -2 -> 2,3
+    % pmode = -3 -> 3,4
+    % pmode = -4 -> 4,5
+    % pmode = -5 -> 5,6
+    
+    conds = [b1 b2 0 0; b2 b1 0 0] + [0 0 1 1; 0 0 1 1] * barCols;
+    
+    paramSet = repmat(conds, [1e4/2 1]);    
+
+elseif pmode == 2
     
     % two bars
+    
+    % deprecated mode
     
     conds = [3 4 0 0; 4 3 0 0] + [0 0 1 1; 0 0 1 1] * barCols;
     
