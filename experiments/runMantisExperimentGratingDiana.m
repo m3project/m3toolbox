@@ -2,19 +2,19 @@ function runMantisExperimentGratingDiana()
 
 expt = struct;
 
-expt.genParamSetFun = @genParamSet;
-
-expt.runBeforeTrialFun = @runBeforeTrial;
-
-expt.runTrialFun = @runTrial;
-
-expt.runAfterTrialFun = @runAfterTrial;
+expt.runChecksFun = @runChecks;
 
 expt.runBeforeExptFun = @runBeforeExpt;
 
-expt.runChecksFun = @runChecks;
+expt.runBeforeTrialFun = @runBeforeTrial;
 
-expt.workDir = 'D:\mantisGratingDiana';
+expt.genParamSetFun = @genParamSet_VAR3;
+
+expt.runTrialFun = @runTrial_VAR3;
+
+expt.runAfterTrialFun = @runAfterTrial_VAR3;
+
+expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisGratingDiana';
 
 expt.name = 'Mantis Grating Diana';
 
@@ -24,13 +24,224 @@ expt.recordVideos = 1;
 
 expt.makeBackup = 1;
 
-expt.addTags = {'VAR2'};
+expt.addTags = {'VAR3'};
 
 runExperiment(expt);
 
 end
 
-function paramSet = genParamSet()
+%% VAR3
+
+function paramSet = genParamSet_VAR3()
+
+% each row of tab0 is sf (cpd), speed (deg/sec), sf (cppx)
+
+tab0 = [
+    0.05	    74      2/64
+    0.05		145     2/64
+    0.05		290     2/64
+    0.1         74      4/64
+    0.1         145     4/64
+    0.1         290     4/64
+    0.2     	74      8/64
+    0.2         145     8/64
+    0.2         290     8/64
+    ];
+
+dirs = [-1 1];
+
+bugSpeedPxSec = getSpeedPxSec(tab0(:, 2));
+
+bugSf = tab0(:, 3);
+
+conds = [bugSf bugSpeedPxSec];
+
+nconds = size(conds, 1);
+
+blocks = 5;
+
+pSet = createRandTrialBlocks(blocks, 1:nconds, dirs);
+
+% each row of paramSet is:
+% sf : cppx
+% speed : px/sec
+
+paramSet = [conds(pSet(:, 1), :) pSet(:, 2)];
+
+end
+
+function [exitCode, dump] = runTrial_VAR3(paramSetRow)
+
+disp('rendering the stimulus');
+
+sf = paramSetRow(1);
+
+speed = paramSetRow(2);
+
+dir = paramSetRow(3);
+
+square = @(x) sign(cos(x)); % square function
+
+args = struct('dir', dir, 'escapeEnabled', 0, 'gratingFunc', square);
+
+runGrating_ver2_wrapper(sf, speed, args);
+
+exitCode = 0; dump = [];
+
+end
+
+function runGrating_ver2_wrapper(sf, speed, args)
+
+% sf is in cppx
+% speed is in px/sec
+
+args.tf = sf * speed;
+args.sf = sf;
+
+runGrating_ver2(args);
+
+end
+
+function bugSpeedPxSec = getSpeedPxSec(bugSpeedDegSec)
+
+sr = 40; % px/cm
+
+viewD = 2.5; % viewing distance (cm)
+
+deg_per_px = range(px2deg(2, sr, viewD)) / 2; % averaged over two pixels
+
+bugSpeedPxSec = bugSpeedDegSec / deg_per_px;
+
+end
+
+%% supplementary funcs
+
+function resultRow = runAfterTrial_VAR3(varargin)
+
+resultRow = getDirectionJudgement();
+
+end
+
+function runBeforeTrial(~)
+
+KbName('UnifyKeyNames');
+
+disp('Press (k) to launch alignment stimulus or (Escape) to continue to trial ...');
+
+clearWindow([1 1 1] * 0.6, 0);
+
+% runAlignStim = (GetKbChar == 'k');
+
+runAlignStim = getAlignmentKey();
+
+if runAlignStim
+
+    runAlignmentStimulus_internal(0, 0, 0);
+
+end
+
+clearWindow([1 1 1] * 0.6, 0);
+
+end
+
+function y = getAlignmentKey()
+
+% checking for key presses
+
+while 1
+    
+    [~, ~, keyCode ] = KbCheck;
+    
+    if (keyCode(KbName('Escape')))
+        
+        y = 0; break;        
+        
+    end
+    
+    if (keyCode(KbName('k')))
+        
+        y = 1; break;       
+        
+    end
+    
+end
+
+
+end
+
+
+function runAlignmentStimulus_internal(enable3D, x, y)
+
+if nargin<1
+    enable3D = 0;
+end
+
+if nargin<3
+    x = 0;
+    y = 350;
+end
+
+% render alignment stimulus
+
+expt = struct;
+
+expt.interactiveMode = 1;
+
+expt.timeLimit = 0;
+
+expt.closeOnFinish = 0;
+
+expt.enable3D = enable3D;
+
+expt.disparity = 0;
+
+expt.M = 40;
+
+expt.R = 0.5;
+% 
+% expt.blackLum = 0;
+% 
+% expt.whiteLum = 128;
+
+expt.textured = 0;
+
+expt.camouflage = 0;
+
+expt.dynamicBackground = 0;
+
+expt.funcMotionX = @(t) 0;
+
+expt.stepDX = 0;
+
+expt.bugFrames = getBugFrames('fly');
+
+expt.motionFuncs = getMotionFuncs('swirl', x, y);
+
+expt.nominalSize = 0.5;
+
+expt.bugVisible = 1;
+
+expt.txtCount = 50;
+
+expt.bugVisible = 0;
+
+expt.timeLimit = 0;
+
+expt.interactiveMode = 1;
+
+expt.enable3D = enable3D;
+
+expt.enableChequers = 1;
+
+disp('alignment mode (interactive), press Escape when mantis is aligned ...');
+
+runAnimation2(expt);
+
+end
+
+%% Others
+
+function paramSet = genParamSet() %#ok<DEFNU>
 
 % Important: make sure Gamma value in runTrial is correct
 
@@ -74,19 +285,13 @@ function runBeforeExpt()
 
 % apply Gamma correction
 
-Gamma = 2.1942; % Dell monitor in Thomas's setup
+Gamma = 2.0;  % this is for the CSF (hp p1130 monitor) - I measured this with Diana on the 17nd of Nov 2015
 
 createWindow(Gamma);
 
 end
 
-function runBeforeTrial(varargin)
-
-runAlignmentStimulusNoBack();
-
-end
-
-function [exitCode, dump] = runTrial(paramSetRow)
+function [exitCode, dump] = runTrial(paramSetRow) %#ok<DEFNU>
 
 viewD = 7; % viewing distance (cm)
 
@@ -120,13 +325,13 @@ dump = [];
 
 end
 
-function resultRow = runAfterTrial(varargin)
+function resultRow = runAfterTrial(varargin) %#ok<DEFNU>
 
 resultRow = getObserverResponse();
 
 end
 
-function runAlignmentStimulusNoBack()
+function runAlignmentStimulusNoBack() %#ok<DEFNU>
 
 % coordinates of bug swirling center:
 

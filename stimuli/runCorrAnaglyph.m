@@ -8,6 +8,7 @@ Gamma = 2.127; % for DELL U2413
 
 LeftGains = [0 0.66 0];
 
+
 RightGains = [0 0 1];
 
 createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
@@ -56,7 +57,7 @@ interTrialTime = 0;
 
 jitter = 10; % px
 
-corrSetting =-1; % -1 = anti-correlated, 0 = random, +1 = correlated
+corrSetting =1; % -1 = anti-correlated, 0 = random, +1 = correlated
 
 %% parameters
 

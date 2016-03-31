@@ -82,7 +82,7 @@ if useAperture
     aperturePx = tand(apertureDeg/2) * viewD * 2 * screenReso;
     
     [W, ~] = getResolution();
-    
+   
     apertureStrip = genButterAperture(W, aperturePx, butterOrder);
     
     frames = size(ys, 1);
@@ -110,7 +110,7 @@ if ~makePlot
     frames = size(ys, 1);
     
     [scrWidthPx, ~] = getResolution();
-    
+
     ys = reshape(ys', [1 scrWidthPx frames]);
     
     ys = 0.5 + ys * 0.5;

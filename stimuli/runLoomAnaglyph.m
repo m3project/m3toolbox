@@ -1,7 +1,7 @@
 function dump = runLoomAnaglyph(expt)
 %% Initialization
 
-KbName('UnifyKeyNames');
+% KbName('UnifyKeyNames');
 
 % createWindow3DAnaglyph();
 
@@ -24,7 +24,7 @@ viewD = 10;% viewing distance (cm)
 
 bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm2 position
 
-disparityEnable = -1; % 1 for green lens on the left; -1 for green lens on the right)
+disparityEnable = 1; % 1 for green lens on the left; -1 for green lens on the right)
          
 makePlot = 0; % when set to 1, the script plots size and trajectory instead of rendering the stimulus
 
@@ -36,7 +36,7 @@ disparitySizeCondition = 0; % when set to 1, the bug size in the case of (dispar
 
 bugColor = [0 0 0]; % [0, 1]
 
-iod = 0.7; % mantis inter-ocular distance (cm)
+iod = 0.5; % mantis inter-ocular distance (cm)
 
 sf = 37.0370; % screen scaling factor (px/cm)
 
@@ -50,7 +50,7 @@ virtBS1= virtBS2 * virtDm2 / viewD;
 
 duration = 2.25; % duration of motion from distance 1 to 2 (seconds)
 
-bugY = 0.65; % vertical location of bug (0 to 1)
+bugY = 0.7; % vertical location of bug (0 to 1)
 
 bugJitter = 5; % bug jitter in pixels (0 to disable)
 

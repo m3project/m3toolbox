@@ -10,7 +10,7 @@
 %
 % Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk) - 5/5/2015
 
-function degs = px2deg(scrWidthPx, screenReso, viewD)
+function [degs, px] = px2deg(scrWidthPx, screenReso, viewD)
 
 isOdd = mod(scrWidthPx, 2) > 0;
 

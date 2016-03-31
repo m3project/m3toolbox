@@ -1,4 +1,4 @@
-function runMantisExperimentSpeedyBug()
+function runMantisExperimentSpeedyBug_VAR2()
 
 expt = struct;
 
@@ -6,31 +6,31 @@ expt.runBeforeExptFun = @runBeforeExpt;
 
 expt.runBeforeTrialFun = @runBeforeTrial;
 
-expt.genParamSetFun = @genParamSet_VAR1;
+expt.genParamSetFun = @genParamSet_VAR2;
 
-expt.runTrialFun = @runTrial_VAR1;
+expt.runTrialFun = @runTrial_VAR2;
 
-expt.runAfterTrialFun = @runAfterTrial_VAR1;
+expt.runAfterTrialFun = @runAfterTrial_VAR2;
 
 expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisSpeedyBug';
 
-expt.name = 'Mantis Speedy Bug (VAR1)';
+expt.name = 'Mantis Speedy Bug (VAR2)';
 
 expt.recordVideos = 1;
 
 expt.makeBackup = 1;
 
-expt.defName = 'Diana';
+expt.defName = 'Eugenia';
 
-expt.addTags = {'VAR1'};
+expt.addTags = {'VAR2'};
 
 runExperiment(expt);
 
 end
 
-%% VAR1
+%% VAR2
 
-function [exitCode, dump] = runTrial_VAR1(paramSetRow)
+function [exitCode, dump] = runTrial_VAR2(paramSetRow)
 
 disp('rendering the stimulus ...');
 
@@ -47,6 +47,7 @@ backType = paramSetRow(4);
 % bugType:
 % 0 : black bug, uniform luminance 0
 % 1 : gray  bug, uniform luminance 0.5
+% 3 : stripy bug, 8W
 % 4 : stripy bug, 2W
 % 5 : stripy bug, 4W
 
@@ -69,6 +70,10 @@ elseif bugType == 5
 elseif bugType == 4
     
     args.m = 2;
+    
+elseif bugType == 3
+    
+    args.m = 8;
     
 else
     
@@ -101,31 +106,31 @@ dump = [];
 end
 
 
-function resultRow = runAfterTrial_VAR1(varargin)
+function resultRow = runAfterTrial_VAR2(varargin)
 
 resultRow = runAfterTrial_PILOT5(varargin);
 
 end
 
-function paramSet = genParamSet_VAR1()
+function paramSet = genParamSet_VAR2()
 
 blocks = 2;
 
 dirs = [-1 1]; % direction
 
-bugType = [0 1 4 5];
+bugType = [0 1 3 4 5];
 
-bugSpeed = [74 145 290];
+bugSpeed = [37 74 145 290];
 
-backType = [0 1];
+backType = 1; % add other background types if needed, for example: [0 1]
 
 % bgType:
-% 0 : gray background with luminance of 0.5
 % 1 : 1/f background
 
 % bugType:
 % 0 : black bug, uniform luminance 0
 % 1 : gray  bug, uniform luminance 0.5
+% 3 : stripy bug, 8W
 % 4 : stripy bug, 2W
 % 5 : stripy bug, 4W
 

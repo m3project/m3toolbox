@@ -18,7 +18,7 @@ m1 = 25;
 
 n = 1;
 
-names = {'Lisa', 'Vivek', 'Ghaith', 'Diana', 'Jonothon', 'Steven'};
+names = {'Lisa', 'Vivek', 'Ghaith', 'Diana', 'Jonothon', 'Steven', 'Alice', 'Eugenia'};
 
 defNameInd = 1;
 

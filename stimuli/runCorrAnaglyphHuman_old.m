@@ -1,7 +1,5 @@
 % this script is an adaptation of runDotsAnglyph
 %
-% (10/2/2016) : add enaUncorrelated option
-%
 % Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk) - 13/1/2016
 
 function exitCode = runCorrAnaglyphHuman(expt)
@@ -49,8 +47,6 @@ interTrialTime = 0;
 jitter = 10; % px
 
 corrSetting = 1; % -1 = anti-correlated, 0 = random, +1 = correlated
-
-enaUncorrelated = 0; % 1 = uncorrelated (keep 0 for backward-compatibility)
 
 %% parameters
 
@@ -191,12 +187,11 @@ while 1
     
     if (i==1) || (enaDynamicBackground && mod(i, refreshCycle)==0)
         
-        xs0 = (1.2 * rand(n, 1, 2) - 0.1) * sW;
+        xs0 = (1.2 * rand(n, 1) - 0.1) * sW;
         
-        ys = (1.2 * rand(n, 1, 2) - 0.1) * sH;
+        ys = (1.2 * rand(n, 1) - 0.1) * sH;
             
-        cols0(:,:,1) = power(-1, rand(n, 1) > 0.5) * [1 1 1];
-        cols0(:,:,2) = power(-1, rand(n, 1) > 0.5) * [1 1 1];
+        cols0 = power(-1, rand(n, 1) > 0.5) * [1 1 1];
         
         % bflip0 is an hx3 matrix that holds rows of either [1 1 1] or [-1
         % -1 -1]. When random correlation is enabled (corrSetting=0) this
@@ -225,32 +220,27 @@ while 1
 
         tgtDots = round(((2*bugR)^2) / unitArea * effectiveDotDensity);
         
-        for channels = [0 1]
+        xst = rand2(tgtDots, 1) * bugR;
         
-            x1 = rand2(tgtDots, 1) * bugR;        
-            y1 = rand2(tgtDots, 1) * bugR;
-            
-            % remove dots outside target
-            
-            k1 = dst(x1, y1) < bugR;
-            
-            target.ch{channels+1} = struct('x', x1(k1), 'y', y1(k1));
-            
-            % add target dot luminance values
-            
-            nDots = size(x1(k1), 1);
+        yst = rand2(tgtDots, 1) * bugR;
         
-            target.ch{channels+1}.lum = power(-1, rand(nDots, 1) > 0.5) * [1 1 1];
-            
-        end       
+        % % remove dots outside target
+        
+        k = dst(xst, yst) < bugR;
+        
+        xst = xst(k);
+        
+        yst = yst(k);
+        
+        nDots = size(xst, 1);
+        
+        colst = power(-1, rand(nDots, 1) > 0.5) * [1 1 1];     
         
     end
     
     for channel = [0 1]
         
-        sl = ifelse(enaUncorrelated, channel+1, 1);
-                
-        xs = xs0(:, :, sl);
+        xs = xs0;
         
         Screen('SelectStereoDrawBuffer', window, channel);
         
@@ -285,19 +275,17 @@ while 1
         
         % take-out background dots that are inside the target
         
-        ys_sl = ys(:, :, sl);
+        k = dst(xs-(bugX+d), ys-bugY) > bugR;
         
-        k = dst(xs-(bugX+d), ys_sl-bugY) > bugR;        
-        
-        pos = [xs(k) ys_sl(k)];        
+        pos = [xs(k) ys(k)];        
         
         % add target dots to background
         
-        tgt_pos = [target.ch{sl}.x+bugX+d target.ch{sl}.y+bugY];
+        tgt_pos = [xst+bugX+d yst+bugY];
 
         pos = [pos; tgt_pos]; %#ok
         
-        cols = [cols0(k, :, sl); target.ch{sl}.lum];
+        cols = [cols0(k, :); colst];
         
         % apply dot correlation setting (by changing dot colors)
         

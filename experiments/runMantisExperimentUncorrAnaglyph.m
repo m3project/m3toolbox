@@ -30,7 +30,7 @@ end
 
 function paramSet = genParamSet()
 
-blocks = 5;
+blocks = 10;
 
 viewD = input('Enter distance between mantis and screen (cm): ');
 

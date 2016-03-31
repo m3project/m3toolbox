@@ -1,5 +1,7 @@
 function runMantisExperimentSlidingBars()
 
+usePILOT3 = 1;
+
 expt = struct;
 
 expt.genParamSetFun = @genParamSet_VAR1;
@@ -14,7 +16,7 @@ expt.runBeforeExptFun = @runBeforeExpt;
 
 expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisSlidingBars\';
 
-expt.name = 'Mantis Sliding Bars';
+expt.name = 'Mantis Sliding Bars (VAR2)';
 
 expt.recordVideos = 1;
 
@@ -23,6 +25,18 @@ expt.makeBackup = 1;
 expt.defName = 'Lisa';
 
 expt.addTags = {'VAR2'};
+
+if usePILOT3 == 1
+    
+    expt.genParamSetFun = @genParamSet_PILOT3;
+    
+    expt.runTrialFun = @runTrial_PILOT3;
+    
+    expt.addTags = {'PILOT3', 'RUN2'};
+    
+    expt.name = 'Mantis Sliding Bars (PILOT3)';
+    
+end
 
 expt.runAfterExptFun = @() closeWindow();
 

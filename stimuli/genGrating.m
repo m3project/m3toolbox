@@ -14,6 +14,8 @@ temporalFreq = 8; % Hz
 
 dir = 1; % direction
 
+gratingFunc = @cos;
+
 if nargin>0
     
     unpackStruct(args);
@@ -30,6 +32,6 @@ tv = (1:frames)/fps;
 
 [px, t] = meshgrid(pxv, tv);
 
-ys = cos(2*pi*(px*spatialFreq + t*temporalFreq*dir));
+ys = gratingFunc(2*pi*(px*spatialFreq + t*temporalFreq*dir));
 
 end
