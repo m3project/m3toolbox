@@ -12,7 +12,7 @@ expt.runAfterTrialFun = @runAfterTrial_VAR3;
 
 expt.runBeforeExptFun = @runBeforeExpt;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisTrackPattern\';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisTrackPattern\';
 
 expt.name = 'Mantis Track Pattern';
 

@@ -1,11 +1,11 @@
 % same as figure except that it doesn't move focus away from the current
-% window whent the figure is already created
+% window when the figure is already created
 %
 % also doesn't bring up the figure window if it's minimized
 %
 % Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk) - 5/8/2015
 
-function h = sfigure(h)
+function varagout = sfigure(h)
 
 if nargin > 0
     
@@ -24,5 +24,7 @@ else
     h = figure();
     
 end
+
+if nargout, varagout(1) = h; end
 
 end

@@ -1,9 +1,9 @@
 function exportSpreadsheet(dir1, colNames, incFilter, excFilter, ...
-    spreadsheetFile)
+    spreadsheetFile, pFun)
 
 if nargin < 2
     
-    dir1 = 'V:\readlab\Ghaith\m3\data\mantisTrackFrequency';
+    dir1 = 'x:\readlab\Ghaith\m3\data\mantisTrackFrequency';
     
     colNames = {'bugFreq', 'bugType', 'bugSize', 'Saccades', 'Peering', 'Strikes'};
     
@@ -20,6 +20,14 @@ end
 if nargin < 5
     
     spreadsheetFile = [tempname '.xlsx'];
+    
+end
+
+if nargin < 6
+   
+    % data preprocessing function
+    
+    pFun = @(x) x;
     
 end
 
@@ -57,9 +65,11 @@ for k=1:m
     
     includeFilter = [incFilter {animalName}];
     
-    [pSet, rSet] = loadDirData(dir1, includeFilter,{}, 0, 1);
+    [pSet, rSet] = loadDirData(dir1, includeFilter, excFilter, 0, 1);
     
     A = [pSet rSet];
+    
+    A = pFun(A); % preprocess data
     
     if isempty(A)
         

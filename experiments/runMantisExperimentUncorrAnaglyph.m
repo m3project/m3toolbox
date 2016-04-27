@@ -14,7 +14,7 @@ expt.runTrialFun = @runTrial;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisUncorrAnaglyph\';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisUncorrAnaglyph\';
 
 expt.name = 'Mantis Camouflaged Uncorr Anaglyph';
 

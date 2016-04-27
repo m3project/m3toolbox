@@ -1,6 +1,6 @@
 function analyzeStaircaseChannels
 
-dir1 = 'V:\readlab\Ghaith\m3\data\mantisMaskingStaircase';
+dir1 = 'x:\readlab\Ghaith\m3\data\mantisMaskingStaircase';
 
 % dir1 = 'D:\staircase VAR1';
 

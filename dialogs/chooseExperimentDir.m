@@ -4,7 +4,7 @@ if nargin<2
     
     exptName = 'Mantis Dmax';
     
-    exptFolder = 'V:\readlab\Ghaith\m3\data\mantisDX\';
+    exptFolder = 'x:\readlab\Ghaith\m3\data\mantisDX\';
     
 end
 

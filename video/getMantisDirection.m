@@ -6,7 +6,7 @@ if nargin < 1
     
     home
     
-    videoFile = 'V:\readlab\Ghaith\m3\data\mantisVideoCapture\F10 28-04-2014 15.17 (3) (GHAITH)\trial1.mp4';
+    videoFile = 'x:\readlab\Ghaith\m3\data\mantisVideoCapture\F10 28-04-2014 15.17 (3) (GHAITH)\trial1.mp4';
     
     makePlot = 1;
     

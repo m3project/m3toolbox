@@ -14,7 +14,7 @@ expt.runAfterTrialFun = @runAfterTrial_PILOT3;
 
 expt.runBeforeExptFun = @runBeforeExpt;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisSlidingBars\';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisSlidingBars\';
 
 expt.name = 'Mantis Sliding Bars (VAR2)';
 

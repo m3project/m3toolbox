@@ -10,7 +10,7 @@ expt.makeBackup = 1;
 
 expt.defName = 'Jimmy';
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisMaskingStaircase\';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisMaskingStaircase\';
 
 expt.name = 'Mantis Masking Staircase';
 

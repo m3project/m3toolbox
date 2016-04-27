@@ -10,7 +10,7 @@ expt.runTrialFun = @runTrial;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
-%expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisGrating\';
+%expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisGrating\';
 
 expt.workDir = 'c:\mantisGratingThomasGrid2\';
 

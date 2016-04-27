@@ -26,7 +26,7 @@ expt.runTrialFun = @runTrial;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisSizeConstancyControl\';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisSizeConstancyControl\';
 
 expt.name = 'Mantis Swirl Size Disparity';
 

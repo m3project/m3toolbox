@@ -12,7 +12,7 @@ expt.runTrialFun = @runTrial_VAR1;
 
 expt.runAfterTrialFun = @runAfterTrial_VAR1;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisSpeedyBug';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisSpeedyBug';
 
 expt.name = 'Mantis Speedy Bug (VAR1)';
 

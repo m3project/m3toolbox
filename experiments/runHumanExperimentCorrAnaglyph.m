@@ -14,7 +14,7 @@ expt.runAfterTrialFun = @runAfterTrial;
 
 expt.runAfterExptFun = @(varargin) [];
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\humanCorrAnaglyph\';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\humanCorrAnaglyph\';
 
 expt.name = 'Human Camouflaged Corr Anaglyph';
 

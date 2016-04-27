@@ -12,7 +12,7 @@ expt.runTrialFun = @runTrial_PILOT1;
 
 expt.runAfterTrialFun = @runAfterTrial_PILOT1;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisTrackFrequency\';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisTrackFrequency\';
 
 expt.name = 'Mantis Track Frequency';
 

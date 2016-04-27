@@ -1,17 +1,17 @@
-function runMantisExperimentGratingAperture()
+
+function runMantisExperimentGratingApertureWarped()
 
 expt = struct;
 
-expt.genParamSetFun = @genParamSet_VARC;
+expt.genParamSetFun = @genParamSet_VARD;
+
+expt.runTrialFun = @runTrial_VARD;
 
 expt.runBeforeTrialFun = @runBeforeTrial;
 
-expt.runTrialFun = @runTrial_VARC;
-
 expt.runAfterTrialFun = @runAfterTrial;
 
-expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisGratingAperture\';
-
+expt.workDir = 'X:\readlab\Ghaith\m3\data\mantisGratingAperture\'; % ADJUSTED BY STEVEN 25-04-16 due to change of V drive.
 expt.name = 'Mantis Grating Aperture';
 
 expt.defName = 'Steven';
@@ -20,7 +20,7 @@ expt.recordVideos = 1;
 
 expt.makeBackup = 1;
 
-expt.addTags = {'VARC'};
+expt.addTags = {'VARD'};
 
 expt.runBeforeExptFun = @runBeforeExpt;
 
@@ -30,7 +30,66 @@ runExperiment(expt);
 
 end
 
-function [exitCode, dump] = runTrial_VARC(paramSetRow)
+%% VARD
+
+function [exitCode, dump] = runTrial_VARD(paramSetRow)
+
+% this function is basically the same as runTrial_VARB() except that it
+% renders warped gratings
+
+disp('rendering the stimulus');
+
+signalFreq = 0.1; % cpd
+
+gratingSizeDegs = paramSetRow(1);
+
+region = paramSetRow(2);
+
+contrast = paramSetRow(3);
+
+dir = paramSetRow(4);
+
+if region == 0
+    
+    % central
+    
+    apertureDeg = gratingSizeDegs;
+    
+    flipAperture = 0;
+    
+else
+    
+    % peripheral
+    
+    apertureDeg = 141.4 - gratingSizeDegs;
+    
+    flipAperture = 1;
+    
+end
+
+args = struct('duration', 5, 'apertureDeg', apertureDeg, ...
+    'dir', dir, ...
+    'flipAperture', flipAperture, ...
+    'signalFreq', signalFreq, 'contrast', contrast, ...
+    'useAperture', 1);
+
+runGratingWarped(args);
+
+exitCode = 0;
+
+dump = [];
+
+end
+
+function paramSet = genParamSet_VARD()
+
+paramSet = genParamSet_VARC();
+
+end
+
+%% VARC
+
+function [exitCode, dump] = runTrial_VARC(paramSetRow) %#ok<DEFNU>
 
 % 6/1/2016
 
@@ -38,6 +97,27 @@ function [exitCode, dump] = runTrial_VARC(paramSetRow)
 
 end
 
+function paramSet = genParamSet_VARC()
+
+% 6/1/2016 - replaced contrast level 0.01 with 0.2
+
+% Important: make sure Gamma value in runTrial is correct
+
+blocks = 3;
+
+gratingSizeDegs = (1:5) * 28.28;
+
+region = [0 1]; % 0 is central, 1 is peripheral
+
+contrast = [0.05 0.2 1];
+
+dirs = [-1 1];
+
+paramSet = createRandTrialBlocks(blocks, gratingSizeDegs, region, contrast, dirs);
+
+end
+
+%% VARB
 
 function [exitCode, dump] = runTrial_VARB(paramSetRow)
 
@@ -82,27 +162,6 @@ dump = [];
 
 end
 
-
-function paramSet = genParamSet_VARC()
-
-% 6/1/2016 - replaced contrast level 0.01 with 0.2
-
-% Important: make sure Gamma value in runTrial is correct
-
-blocks = 3;
-
-gratingSizeDegs = (1:5) * 28.28;
-
-region = [0 1]; % 0 is central, 1 is peripheral
-
-contrast = [0.05 0.2 1];
-
-dirs = [-1 1];
-
-paramSet = createRandTrialBlocks(blocks, gratingSizeDegs, region, contrast, dirs);
-
-end
-
 function paramSet = genParamSet_VARB() %#ok<DEFNU>
 
 % Important: make sure Gamma value in runTrial is correct
@@ -120,6 +179,8 @@ dirs = [-1 1];
 paramSet = createRandTrialBlocks(blocks, gratingSizeDegs, region, contrast, dirs);
 
 end
+
+%% General
 
 function checkResolution()
 

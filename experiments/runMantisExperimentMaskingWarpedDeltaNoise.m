@@ -14,7 +14,7 @@ expt.runBeforeExptFun = @runBeforeExpt;
 
 expt.runChecksFun = @runChecks;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisGratingWarpedDeltaNoise\';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisGratingWarpedDeltaNoise\';
 
 expt.name = 'Mantis Masking Warped Delta Noise';
 

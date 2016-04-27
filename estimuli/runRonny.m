@@ -4,7 +4,7 @@ home;
 
 %% settings
 
-%rootExptsPath = 'V:\readlab\Ronny\runRonny Experiments';
+%rootExptsPath = 'x:\readlab\Ronny\runRonny Experiments';
 rootExptsPath = 'D:\experiment_logfiles';
 
 dStr = lower(datestr(now,'yyyy-mm-dd-HHMM.SS'));

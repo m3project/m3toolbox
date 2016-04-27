@@ -10,7 +10,7 @@ expt.runTrialFun = @runTrial;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisCrosstalkGreen\';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisCrosstalkGreen\';
 
 expt.name = 'Mantis Crosstalk Green';
 
@@ -53,13 +53,13 @@ expt.bugColor = paramSetRow(1);
 expt.enableChannels = paramSetRow(2);
 
 % note: the results in 
-% V:\readlab\Ghaith\m3\data\mantisCrosstalk\
+% x:\readlab\Ghaith\m3\data\mantisCrosstalk\
 % are based on the stimulus:
 
 %[dump] = runLoom(expt);
 
 % the results in:
-% V:\readlab\Ghaith\m3\data\mantisCrosstalkGreen\
+% x:\readlab\Ghaith\m3\data\mantisCrosstalkGreen\
 % are based on the stimulus:
 
 [dump] = runLoomGreen(expt);

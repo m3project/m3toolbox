@@ -39,9 +39,9 @@ preTrialDelay = 0; % seconds
 
 unitArea = 100*100; % px
 
-r = 60; % dot radius
+r = 20; % dot radius
 
-dotDensity = 3; % number of dots in unit area
+dotDensity = 55; % number of dots in unit area
 
 n = round((1920*1680) / unitArea * dotDensity); % number of dots  
 

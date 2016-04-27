@@ -10,7 +10,7 @@ expt.runTrialFun = @runTrial2;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisVideoCapture\';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisVideoCapture\';
 
 expt.name = 'Mantis Video Capture (Dummy Experiment)';
 

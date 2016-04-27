@@ -6,13 +6,13 @@ expt.runBeforeExptFun = @runBeforeExpt;
 
 expt.runBeforeTrialFun = @runBeforeTrial;
 
-expt.genParamSetFun = @genParamSet_VAR1;
+expt.genParamSetFun = @genParamSet_VAR2;
 
 expt.runTrialFun = @runTrial_VAR1;
 
 expt.runAfterTrialFun = @runAfterTrial_VAR1;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisContrastBug';
+expt.workDir = 'X:\readlab\Ghaith\m3\data\mantisContrastBug'; % corrected by Diana on 25/04/16 
 
 expt.name = 'Mantis Contrast Bug';
 
@@ -22,15 +22,31 @@ expt.makeBackup = 1;
 
 expt.defName = 'Alice';
 
-expt.addTags = {'VAR1'}; % add a tag here to indicate changes in condition
+expt.addTags = {'VAR2'}; % add a tag here to indicate changes in condition
 
 runExperiment(expt);
 
 end
 
+%% VAR2
+
+% VAR2 was corrected by Ghaith on 14/4/2016 (2am)
+
+function paramSet = genParamSet_VAR2()
+
+blocks = 3;
+
+dirs = [-1 1]; % direction
+
+bugLum = [0 0.05:0.05:0.5]; % bug luminance conditions,  Diana changed this on the 13/04/16
+
+paramSet = createRandTrialBlocks(blocks, dirs, bugLum);
+
+end
+
 %% VAR1
 
-function paramSet = genParamSet_VAR1()
+function paramSet = genParamSet_VAR1() %#ok<DEFNU>
 
 blocks = 3;
 

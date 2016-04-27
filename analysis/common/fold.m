@@ -3,7 +3,7 @@
 %
 % Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk) - 22/7/2015
 
-function y = fold(A, groupCols, groupFun)
+function varargout = fold(A, groupCols, groupFun)
 
 if nargin == 0
    
@@ -19,7 +19,7 @@ n = size(A, 1);
 
 groups = unique(A(:, groupCols), 'rows');
 
-y = [];
+if nargout, y = []; end
 
 for i=1:size(groups, 1)
     
@@ -29,8 +29,18 @@ for i=1:size(groups, 1)
     
     B = A(k, :);
     
-    y(end+1, :) = [g groupFun(B)]; %#ok
+    if nargout
+    
+        y(end+1, :) = [g groupFun(B)]; %#ok
+        
+    else
+        
+        groupFun(B);
+        
+    end
     
 end
+
+if nargout, varargout{1} = y; end
 
 end

@@ -85,15 +85,15 @@ if useAperture
    
     apertureStrip = genButterAperture(W, aperturePx, butterOrder);
     
-    frames = size(ys, 1);
-    
-    aperture = repmat(apertureStrip, [frames 1]);    
-    
     if flipAperture
         
         apertureStrip = 1 - apertureStrip;
         
     end
+    
+    frames = size(ys, 1);
+    
+    aperture = repmat(apertureStrip, [frames 1]);    
     
     ys = ys .* aperture;
     

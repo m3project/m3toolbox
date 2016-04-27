@@ -12,7 +12,7 @@ expt.runTrialFun = @runTrial_VAR2;
 
 expt.runAfterTrialFun = @runAfterTrial_VAR2;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisTrackOptomotor\';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisTrackOptomotor\';
 
 expt.name = 'Mantis Tracking Optomotor';
 

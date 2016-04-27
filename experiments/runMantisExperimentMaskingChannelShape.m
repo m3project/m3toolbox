@@ -14,7 +14,7 @@ expt.runBeforeExptFun = @runBeforeExpt;
 
 expt.runChecksFun = @runChecks;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisMaskingChannelShape\';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisMaskingChannelShape\';
 
 expt.name = 'Mantis Masking Channel Shape';
 

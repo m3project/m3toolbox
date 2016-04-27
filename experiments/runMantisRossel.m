@@ -8,7 +8,7 @@ expt.runBeforeTrialFun = @runBeforeTrial;
 
 expt.runTrialFun = @runTrial;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisRossel';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisRossel';
 
 expt.name = 'Rossel''s Experiment';
 

@@ -14,7 +14,7 @@ expt.runTrialFun = @runTrial_VAR3;
 
 expt.runAfterTrialFun = @runAfterTrial_VAR3;
 
-expt.workDir = 'V:\readlab\Ghaith\m3\data\mantisGratingDiana';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisGratingDiana';
 
 expt.name = 'Mantis Grating Diana';
 
