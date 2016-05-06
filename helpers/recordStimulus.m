@@ -27,23 +27,38 @@ if isFirstCall
 
     outputVideoFile = arg1;
     
-    parentDirs = fileparts(arg1);
-    
-    if ~exist(parentDirs, 'file')
-    
-        mkdir(parentDirs);
+    if ~isempty(outputVideoFile)
+        
+        parentDirs = fileparts(arg1);
+        
+        if ~exist(parentDirs, 'file')
+            
+            mkdir(parentDirs);
+            
+        end
+        
+        writerObj = VideoWriter(outputVideoFile);
+        
+        writerObj.FrameRate = 60;
+        
+        open(writerObj);
+        
+        recording.writerObj = writerObj;
+        
+        recording.frame = 1;
+        
+    else
+        
+        % when passing an empty string during the first call, the returned
+        % object is []
+        % this is a mechanism to conveniently disable recording
+        % functionality in a stimulus script by setting video file name to
+        % an empty string
+        
+        recording = [];
         
     end
-    
-    writerObj = VideoWriter(outputVideoFile);
-    
-    writerObj.FrameRate = 60;
-    
-    open(writerObj);
-    
-    recording.writerObj = writerObj;
-    
-    recording.frame = 1;
+        
 
 elseif nargout == 0
     
@@ -53,7 +68,11 @@ elseif nargout == 0
     
     recording = arg1;
     
-    close(recording.writerObj);
+    if ~isempty(recording)
+    
+        close(recording.writerObj);
+        
+    end
     
 else
     
@@ -61,11 +80,15 @@ else
     
     recording = arg1;
     
-    window = getWindow();
-    
-    imageArray = Screen(window, 'GetImage');
-    
-    writeVideo(recording.writerObj, imageArray);
+    if ~isempty(recording)
+        
+        window = getWindow();
+        
+        imageArray = Screen(window, 'GetImage');
+        
+        writeVideo(recording.writerObj, imageArray);
+        
+    end
     
 end
 

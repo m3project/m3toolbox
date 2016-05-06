@@ -1,11 +1,10 @@
-
-function runMantisExperimentGratingApertureWarped()
+function runMantisExperimentGratingApertureWarped_ver2()
 
 expt = struct;
 
-expt.genParamSetFun = @genParamSet_VARD;
+expt.genParamSetFun = @genParamSet_VARE;
 
-expt.runTrialFun = @runTrial_VARD;
+expt.runTrialFun = @runTrial_VARE;
 
 expt.runBeforeTrialFun = @runBeforeTrial;
 
@@ -21,7 +20,7 @@ expt.recordVideos = 1;
 
 expt.makeBackup = 1;
 
-expt.addTags = {'VARD'};
+expt.addTags = {'VARE'};
 
 expt.runBeforeExptFun = @runBeforeExpt;
 
@@ -31,9 +30,84 @@ runExperiment(expt);
 
 end
 
+%% VARE
+
+function [exitCode, dump] = runTrial_VARE(paramSetRow)
+
+% this function is the same as runTrial_VARD that signalFreq was changed to
+% 0.02 cpd (lower end of mantis CSF)
+
+disp('rendering the stimulus');
+
+signalFreq = 0.02; % cpd
+signalFreq = 0.01;
+gratingSizeDegs = paramSetRow(1);
+
+region = paramSetRow(2);
+
+contrast = paramSetRow(3);
+
+dir = paramSetRow(4);
+
+if region == 0
+    
+    % central
+    
+    apertureDeg = gratingSizeDegs;
+    
+    flipAperture = 0;
+    
+else
+    
+    % peripheral
+    
+    apertureDeg = 141.4 - gratingSizeDegs;
+    
+    flipAperture = 1;
+    
+end
+
+args = struct('duration', 5, 'apertureDeg', apertureDeg, ...
+    'dir', dir, ...
+    'flipAperture', flipAperture, ...
+    'signalFreq', signalFreq, 'contrast', contrast, ...
+    'useAperture', 1, 'escapeEnabled', 0);
+
+runGratingWarped(args);
+
+exitCode = 0;
+
+dump = [];
+
+end
+
+function paramSet = genParamSet_VARE()
+
+% Important: make sure Gamma value in runTrial is correct
+
+blocks = 3;
+
+gratingSizeDegs = (1:3)/3 * 141.4;
+
+region = [0 1]; % 0 is central, 1 is peripheral
+
+contrast = [0.05 0.2 1];
+
+dirs = [-1 1];
+
+paramSet = createRandTrialBlocks(blocks, gratingSizeDegs, region, contrast, dirs);
+
+% remove condition: grating extent 141.4 deg at periphery
+
+k = (paramSet(:, 1) == 141.4) & (paramSet(:, 2) == 1);
+
+paramSet = paramSet(~k, :);
+
+end
+
 %% VARD
 
-function [exitCode, dump] = runTrial_VARD(paramSetRow)
+function [exitCode, dump] = runTrial_VARD(paramSetRow) %#ok<DEFNU>
 
 % this function is basically the same as runTrial_VARB() except that it
 % renders warped gratings
@@ -82,7 +156,7 @@ dump = [];
 
 end
 
-function paramSet = genParamSet_VARD()
+function paramSet = genParamSet_VARD() %#ok<DEFNU>
 
 paramSet = genParamSet_VARC();
 

@@ -369,7 +369,7 @@ exitCode = 0;
 
 fbox = createFlickerBox(150, 55);
 
-fbox.pattern = 0.5 + 0.5 * sequence;
+fbox.pattern = crop(0.1 + 0.9 * sequence, 0, 1);
 
 n = length(sequence);
 

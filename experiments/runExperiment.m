@@ -226,7 +226,15 @@ for i=firstTrial:trialCount
     
     % run trial code:
     
-    [exitCode, dump] = runTrialFun(paramSetRow);
+    if nargout(runTrialFun) == 2
+    
+        [exitCode, dump] = runTrialFun(paramSetRow);
+        
+    else
+        
+        exitCode = 0; dump = [];
+        
+    end
     
     dumps{i} = dump;
     

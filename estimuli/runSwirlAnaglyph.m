@@ -52,7 +52,7 @@ previewMotionFunc = 0; % set to 1 to see a figure of the swirl function versus t
 
 cx = 960; % center in x coords (px) (screen center in behavioral expt)
 
-cy = 710; % center in y coords (px) (screen center in behavioral expt)
+cy = 745;% modif on 13/03/2016 von 710; % center in y coords (px) (screen center in behavioral expt)
 
 iod = 0.8; % 0.5 mantis inter-ocular distance (cm)
 

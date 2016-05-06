@@ -1,3 +1,5 @@
+% what logspace() should have been
+
 function y = logspace2(a, b, n)
 
 c = b/a;
