@@ -1,4 +1,4 @@
-function runMantisExperimentSpeedyBug()
+function runMantisExperimentSpeedyBug_VAR3()
 
 expt = struct;
 
@@ -6,31 +6,73 @@ expt.runBeforeExptFun = @runBeforeExpt;
 
 expt.runBeforeTrialFun = @runBeforeTrial;
 
-expt.genParamSetFun = @genParamSet_VAR1;
+expt.genParamSetFun = @genParamSet_VAR3;
 
-expt.runTrialFun = @runTrial_VAR1;
+expt.runTrialFun = @runTrial_VAR3;
 
-expt.runAfterTrialFun = @runAfterTrial_VAR1;
+expt.runAfterTrialFun = @runAfterTrial_VAR3;
 
-expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisSpeedyBug';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisSpeedyBugVAR3';
 
-expt.name = 'Mantis Speedy Bug (VAR1)';
+expt.name = 'Mantis Speedy Bug (VAR3)';
 
 expt.recordVideos = 1;
 
 expt.makeBackup = 1;
 
-expt.defName = 'Diana';
+expt.defName = 'Joe';
 
-expt.addTags = {'VAR1'};
+expt.addTags = {'VAR3'};
 
 runExperiment(expt);
 
 end
 
+%% VAR3
+
+function paramSet = genParamSet_VAR3()
+
+blocks = 6;
+
+dirs = [-1 1]; % direction
+
+bugSpeed = [74 145 290];
+
+paramSet = createRandTrialBlocks(blocks, dirs, bugSpeed);
+
+end
+
+function resultRow = runAfterTrial_VAR3(varargin)
+
+resultRow = runAfterTrial_PILOT5(varargin);
+
+end
+
+function runTrial_VAR3(paramSetRow)
+
+disp('rendering the stimulus ...');
+
+bugDelay = 15; % seconds (before bug moves across the screen)
+
+args = struct('dir', paramSetRow(1), ...
+    'bugDelay', bugDelay, 'escapeEnabled', 0, ...
+    'backBaseLum', 0.5, 'bugSpeed', paramSetRow(2));
+
+args.m = 0;
+
+args.bugBaseLum = 0;
+
+args.useNatBack = 0;
+
+args.sr = 40;
+
+runBugPatternDianaNat(args);
+
+end
+
 %% VAR1
 
-function [exitCode, dump] = runTrial_VAR1(paramSetRow)
+function [exitCode, dump] = runTrial_VAR1(paramSetRow) %#ok<DEFNU>
 
 disp('rendering the stimulus ...');
 
@@ -101,13 +143,13 @@ dump = [];
 end
 
 
-function resultRow = runAfterTrial_VAR1(varargin)
+function resultRow = runAfterTrial_VAR1(varargin) %#ok<DEFNU>
 
 resultRow = runAfterTrial_PILOT5(varargin);
 
 end
 
-function paramSet = genParamSet_VAR1()
+function paramSet = genParamSet_VAR1() %#ok<DEFNU>
 
 blocks = 2;
 

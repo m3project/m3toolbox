@@ -40,7 +40,7 @@ function [exitCode, dump] = runTrial_VARE(paramSetRow)
 disp('rendering the stimulus');
 
 signalFreq = 0.02; % cpd
-signalFreq = 0.01;
+
 gratingSizeDegs = paramSetRow(1);
 
 region = paramSetRow(2);

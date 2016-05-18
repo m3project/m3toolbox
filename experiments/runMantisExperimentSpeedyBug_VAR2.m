@@ -620,7 +620,7 @@ dump = [];
 
 end
 
-function resultRow = runAfterTrial_PILOT7(varargin)
+function resultRow = runAfterTrial_PILOT7(varargin) %#ok<DEFNU>
 
 resultRow = runAfterTrial_PILOT5(varargin);
 

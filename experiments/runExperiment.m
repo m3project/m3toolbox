@@ -108,6 +108,8 @@ if recordVideos
 
     previewRecordingCam();
     
+    drawnow
+    
 end
 
 % pre-experiment preparation:
@@ -231,6 +233,8 @@ for i=firstTrial:trialCount
         [exitCode, dump] = runTrialFun(paramSetRow);
         
     else
+        
+        runTrialFun(paramSetRow);
         
         exitCode = 0; dump = [];
         
