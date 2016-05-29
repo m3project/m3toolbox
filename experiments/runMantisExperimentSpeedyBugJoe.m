@@ -1,20 +1,20 @@
-function runMantisExperimentSpeedyBug_VAR3()
+function runMantisExperimentSpeedyBugJoe()
 
 expt = struct;
 
 expt.runBeforeExptFun = @runBeforeExpt;
 
-expt.runBeforeTrialFun = @runBeforeTrial;
+expt.runBeforeTrialFun = @runBeforeTrial_VAR4;
 
-expt.genParamSetFun = @genParamSet_VAR3;
+expt.genParamSetFun = @genParamSet_VAR4;
 
-expt.runTrialFun = @runTrial_VAR3;
+expt.runTrialFun = @runTrial_VAR4;
 
-expt.runAfterTrialFun = @runAfterTrial_VAR3;
+expt.runAfterTrialFun = @runAfterTrial_VAR4;
 
-expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisSpeedyBugVAR3';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisSpeedyBugJoe';
 
-expt.name = 'Mantis Speedy Bug (VAR3)';
+expt.name = 'Mantis Speedy Bug (VAR4)';
 
 expt.recordVideos = 1;
 
@@ -22,15 +22,99 @@ expt.makeBackup = 1;
 
 expt.defName = 'Joe';
 
-expt.addTags = {'VAR3'};
+expt.addTags = {'VAR4'};
 
 runExperiment(expt);
 
 end
 
+%% VAR4
+
+function paramSet = genParamSet_VAR4()
+
+blocks = 6;
+
+dirs = [-1 1]; % direction
+
+bugSpeed = [74 145];
+
+wind = [0 1];
+
+paramSet = createRandTrialBlocks(blocks, dirs, bugSpeed, wind);
+
+end
+
+function runBeforeTrial_VAR4(paramSetRow)
+
+runBeforeTrial(); % alignment stim
+
+% TODO: need to modify runExperiment to pass trial params here
+
+wind = paramSetRow(3);
+
+fprintf(2, '\n\n\nWIND = %d\n\n\n\n', wind);
+
+fprintf('Press Enter to continue\n\n')
+
+input('', 's'); % wait for Enter
+
+waitDialog(5 * 60); % wait for 5 minutes
+
+input('Press Enter once the fan is started ...', 's');
+
+waitDialog(20); % wait for 20 seconds
+
+end
+
+function runTrial_VAR4(paramSetRow)
+
+disp('rendering the stimulus ...');
+
+bugDelay = 15; % seconds (before bug moves across the screen)
+
+args = struct('dir', paramSetRow(1), ...
+    'bugDelay', bugDelay, 'escapeEnabled', 0, ...
+    'backBaseLum', 0.5, 'bugSpeed', paramSetRow(2));
+
+args.m = 0;
+
+args.bugBaseLum = 0;
+
+args.useNatBack = 0;
+
+args.sr = 40;
+
+runBugPatternDianaNat(args);
+
+WaitSecs(30);
+
+end
+
+function resultRow = runAfterTrial_VAR4(varargin)
+
+checkPositive = @(str) str2double(str) >= 0;
+
+checkSwaying = @(str) ismember(str2double(str), 1:4);
+
+checkBinary = @(str) (str2double(str) >= 0) && (str2double(str) <= 1);
+
+msgWay = 'Was the mantis swaying? (1=big, 2=little, 3=none, 4=undecided): ';
+
+swaying     = getNumber(msgWay, checkSwaying);
+
+numSaccades = getNumber('Number of saccades/sways      : ', checkPositive);
+
+tracking    = getNumber('Tracking   (0=no, 1=yes)      : ', checkBinary);
+
+strike      = getNumber('Strike     (0=no, 1=yes)      : ', checkBinary);
+
+resultRow = [swaying numSaccades tracking strike];
+
+end
+
 %% VAR3
 
-function paramSet = genParamSet_VAR3()
+function paramSet = genParamSet_VAR3() %#ok<DEFNU>
 
 blocks = 6;
 
@@ -42,13 +126,13 @@ paramSet = createRandTrialBlocks(blocks, dirs, bugSpeed);
 
 end
 
-function resultRow = runAfterTrial_VAR3(varargin)
+function resultRow = runAfterTrial_VAR3(varargin) %#ok<DEFNU>
 
 resultRow = runAfterTrial_PILOT5(varargin);
 
 end
 
-function runTrial_VAR3(paramSetRow)
+function runTrial_VAR3(paramSetRow) %#ok<DEFNU>
 
 disp('rendering the stimulus ...');
 

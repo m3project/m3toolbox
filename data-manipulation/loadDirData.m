@@ -5,8 +5,8 @@
 %
 % metaSet contains subject ids
 
-function [paramSet, resultSet, metaSet] = loadDirData(dir, include, ...
-    exclude, allowIncomplete, mustIncludeAll)
+function [paramSet, resultSet, metaSet, uniqueSubjects] = loadDirData( ...
+    dir, include, exclude, allowIncomplete, mustIncludeAll)
 
 if nargin < 4
     
