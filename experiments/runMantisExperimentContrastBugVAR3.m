@@ -1,11 +1,3 @@
-% we still need to iron out few issues in runTrial_VAR3
-%
-% the following condition (for one) does not render correctly:
-%
-% [0.2 1 0] (i.e. mean lum bug = 0.2, natural bug, uniform background)
-%
-% Ghaith (26/5/2016)
-
 function runMantisExperimentContrastBugVAR3()
 
 expt = struct;
@@ -53,8 +45,6 @@ backUseNat = [0 1]; % 0 = uniform, 1 = natural (1/f)
 paramSet = createRandTrialBlocks(...
     blocks, dirs, bugLum, bugUseNat, backUseNat);
 
-paramSet = createTrial(1, bugLum, bugUseNat, backUseNat);
-
 % filter out conditions with 0 mean luminance and natural texture
 
 k = (paramSet(:, 2) == 0) & (paramSet(:, 3) == 1);
@@ -87,7 +77,7 @@ if paramSetRow(3) == 0
     
 elseif paramSetRow(3) == 1
     
-    args.m = -1; % natural (1/f) bug
+    args.m = -2; % natural (1/f) bug
     
 end
 
@@ -123,7 +113,7 @@ end
 
 % VAR2 was corrected by Ghaith on 14/4/2016 (2am)
 
-function paramSet = genParamSet_VAR2()
+function paramSet = genParamSet_VAR2() %#ok<DEFNU>
 
 blocks = 3;
 
@@ -149,7 +139,7 @@ paramSet = createRandTrialBlocks(blocks, dirs, bugLum);
 
 end
 
-function [exitCode, dump] = runTrial_VAR1(paramSetRow)
+function [exitCode, dump] = runTrial_VAR1(paramSetRow) %#ok<DEFNU>
 
 disp('rendering the stimulus ...');
 

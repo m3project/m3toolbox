@@ -32,7 +32,7 @@ end
 
 function paramSet = genParamSet_VAR4()
 
-blocks = 6;
+blocks = 1;
 
 dirs = [-1 1]; % direction
 
@@ -46,17 +46,11 @@ end
 
 function runBeforeTrial_VAR4(paramSetRow)
 
-runBeforeTrial(); % alignment stim
-
-% TODO: need to modify runExperiment to pass trial params here
-
 wind = paramSetRow(3);
 
 fprintf(2, '\n\n\nWIND = %d\n\n\n\n', wind);
 
-fprintf('Press Enter to continue\n\n')
-
-input('', 's'); % wait for Enter
+runBeforeTrial(); % alignment stim
 
 waitDialog(5 * 60); % wait for 5 minutes
 

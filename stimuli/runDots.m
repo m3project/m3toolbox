@@ -1,282 +1,287 @@
-function runDots(expt)
+% this is a major refactoring of runDotsAnagylph
+%
+% to remove code sections that were carried over from previous experiments
+% but are no longer needed, plus introduces new flags to make it easier
+% to render new stimulus variations for future experiments
 
-%closeWindow();
+% Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk) - 1/6/2016
 
-KbName('UnifyKeyNames');
+function varargout = runDots(args, dotInfo)
 
-%% parameters
+% parameters
 
-n = 5000; % number of dots
+% dot params: -------------------------------------------------------------
 
-m = 1000; % number of bug dots
+n = 10000; % number of dots
 
-colormode = 1; % (0) white, (1) grayscale, (otherwise) colored
+r = 20; % diameter
 
-speed = 10; % speed of background dots
+v = 2  ; % velocity
 
-r = 20; % radius of dots
+pairDots = 1; % when set to 0, dots in different channels become unpaired
 
-swim = 1; % (0) move in straight line, (1) swim
+dotBrightness = 0.0;
 
-swimInterval = 0.1; % don't care
+% bug params: -------------------------------------------------------------
 
-swimAngleMax = 45; % don't care
+bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm position
 
-disparity = 20; % disparity in pixels (could be negative)
+virtDm = 2.5; % virtual distance from mantis (cm)
 
-bugSpeed = 200; % horizontal bug speed
+bugY = 0.65;
 
-bugSize = 100; % bug size
+edgeSmoothness = 0.8; % this determines how "hard/soft" the bug borders are
 
-padding = r/2; % don't care
+motionR0 = 800; % initial swirl radius (px)
 
-bugY = 0.75; % vertical position of bug relative to screen (in the range 0 to 1)*
+rotFreq = 2; % swirl rotation frequency (Hz)
 
-bugOscillation = 100; % vertical oscillation extent in pixels (peak-to-peak)*
+% timing params: ----------------------------------------------------------
 
-dir = -1; % direction of bug travel (1=right, -1=left)
+preTrialDelay = 5; % delay before bug appears (seconds)
 
-duration = 8; % duration of stimulus in seconds
+motionDuration = 5; % duration of swirl (seconds)
 
-bugStillTime = 2; % how long (in seconds) does the bug stay at the centre of the screen before moving
+finalPresentationTime = 2; % bug visible after swirl (seconds)
 
-%% body
+interTrialTime = 600; % delay after bug disappears (seconds)
+
+% screen params: ----------------------------------------------------------
+
+Gamma = 2.127; % for DELL U2413
+
+sf = 37.0370; % screen scaling factor (px/cm) for Dell U2413
+
+LeftGains = [0 0.66 0];
+
+RightGains = [0 0 1];
+
+% mantis params: ----------------------------------------------------------
+
+iod = 0.7 ; % inter-ocular distance (cm)
+
+viewD = 10; % viewing distance (cm)
+
+% control flags: ----------------------------------------------------------
+
+previewDisparityFunc = 0;
+
+previewMotionFuncs = 0;
+
+enableKeyboard = 1;
+
+useRedBlue = 0;
+
+%% Unsorted parameters
+
+disparityEnable =  1; % -1 ,0 or +1
+
+bgDisp =  0; % background disparity (px)
+
+bgLum = 0.5; % backgrounf luminnance
+
+%% parameter overrides
 
 if nargin>0
     
-    unpackStruct(expt);
+    unpackStruct(args);
     
 end
 
-createWindow3D();
+if nargin && (isfield(args, 'virtDm1') || isfield(args, 'virtDm1'))
+    
+    error('this stimulus no longer supports these parameters');
+        
+end
 
-window = getWindow();
+%% timing calculations
+
+bugVisibleTime = motionDuration + finalPresentationTime; % duration of bug visibility(seconds)
+
+totalTime = motionDuration + finalPresentationTime + interTrialTime;
+
+%% bug size calculations
+
+% disparity:
+
+if virtDm>viewD; error('virmDm should not be larger than viewD!'); end
+
+disparityMag = calDisp(virtDm, viewD, iod) * sf;
+
+% size:
+
+virtBugSize = bugSize .* viewD./ virtDm;
+
+% radius:
+
+radFunc = virtBugSize * sf;
+
+%% disparity function
+
+tansig01 = @(x) (tansig(x)+1)/2;
+
+tansigAB = @(x, a, b) tansig01(x) * (b-a) + a';
+
+dispFun = @(dist) tansigAB((dist - radFunc) * edgeSmoothness, ...
+    disparityMag * disparityEnable, bgDisp);
+
+if previewDisparityFunc
+    
+    dist = 0:200; %#ok<UNRCH>
+    
+    plot(dist, dispFun(dist));
+    
+    xlabel('Distance from Bug (px)'); ylabel('Disparity (px)');
+    
+    return
+    
+end
+
+%% motion function
 
 [sW, sH] = getResolution();
 
-xs = rand(n, 1) * sW;
-ys = rand(n, 1) * sH/2;
+centerX = sW * 0.5;
 
-bugxs = rand(m, 1) * bugSize;
-bugys = rand(m, 1) * bugSize;
+centerY = sH * bugY;
 
-colMax = 255;
+[X, Y] = getSwirl(centerX, centerY, motionDuration, motionR0, rotFreq);
 
-if colormode == 0
+if previewMotionFuncs
     
-    cols = ones(n, 3) * colMax;
+    t = 0:1e-2:5; %#ok<UNRCH>
     
-elseif colormode == 1
+    plot(t, [X(t); Y(t)]);
     
-    cols = repmat(rand(n, 1), 1, 3) * colMax;
+    xlabel('Time (sec)');
     
-else
+    legend('X', 'Y');
     
-    cols = rand(n, 3) * colMax;
+    return
     
 end
 
-cols = uint8(cols);
+%% create Window
 
-angles = rand(n, 1) * 2 * pi;
+if useRedBlue
+    
+    RightGains = [1 0 0]; %#ok<UNRCH>
+    
+    LeftGains = [0 0 1];
+    
+end
 
-startTime = GetSecs();
+createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
 
-lastt = startTime;
+window = getWindow();
 
-lastSwim = 0;
+%% initial dot positions and velocities
 
-swirlActive = 1;
+if nargin == 2
+    
+    unpackStruct(dotInfo);
 
-swirlT = 0;
+else
+    
+    xs = rand(n, 2) * sW;
+    
+    ys = rand(n, 2) * sH;
+    
+    thetas = rand(n, 2) * 360;
+    
+end
 
-[swirlX, swirlY] = getSwirl(sW/2, sH/2 * bugY);
+%% rendering loop
 
-t3 = 0;
+KbName('UnifyKeyNames');
 
-pos = @(x) x * (sign(x)+1)/2; % return x if x>0 and zero otherwise
+startTime = GetSecs() + preTrialDelay;
 
-while (1)
+while 1
     
     t = GetSecs() - startTime;
     
-    dt = t - lastt;
+    if t>totalTime; break; end
     
-    lastt = t;
+    bugVisible =  t>0 && t<bugVisibleTime;
     
-    if swim && (t - lastSwim)>swimInterval
-        
-        angleChange = (rand(n, 1)-0.5) * 2 * swimAngleMax * (pi/180);
-        
-        angles = angles + angleChange;
-        
-        lastSwim = t;
-        
-    end
+    bugX = ifelse(bugVisible, X(t), inf);
+    bugY = ifelse(bugVisible, Y(t), inf);
     
-    angles = mod(angles, 2*pi);
+    % update positions
     
-    dxs = speed * cos(angles);
-    dys = speed * sin(angles);
+    xs = xs + v * cosd(thetas);    
+    ys = ys + v * sind(thetas);
     
-    xs = mod(xs + dxs * dt, sW);
-    ys = mod(ys + dys * dt, sH/2);
+    % reposition dots moving off the screen
     
-    % bouncing off the right edge:
+    xs(xs > sW+r) = -r;
+    ys(ys > sH+r) = -r;
     
-    headingRight = (angles<pi/2) | (angles>1.5*pi);
+    xs(xs < -r) = sW + r;    
+    ys(ys < -r) = sH + r;
     
-    inBounceZone = (xs > sW - padding);
+    % calculate dot distances from bug
     
-    toBounce = inBounceZone & headingRight;
+    dist = sqrt((xs - bugX).^2 + (ys - bugY).^2);
     
-    angles(toBounce) = pi - angles(toBounce);
-    
-    % bouncing off the left edge:
-    
-    headingLeft = (angles>pi/2) & (angles<1.5*pi);
-    
-    inBounceZone = (xs < padding);
-    
-    toBounce = inBounceZone & headingLeft;
-    
-    angles(toBounce) = pi - angles(toBounce);
-    
-    % bouncing off the top edge:
-    
-    headingUp = (angles>pi) & (angles<2*pi);
-    
-    inBounceZone = (ys < padding/2);
-    
-    toBounce = inBounceZone & headingUp;
-    
-    angles(toBounce) = 2*pi - angles(toBounce);
-    
-    % bouncing off the bottom edge:
-    
-    headingDown = (angles>0) & (angles<pi);
-    
-    inBounceZone = (ys > sH/2 - padding/2);
-    
-    toBounce = inBounceZone & headingDown;
-    
-    angles(toBounce) = 2*pi - angles(toBounce);
-    
-    if swirlActive
-        
-        absBugX = swirlX(t - t3);
-        absBugY = swirlY(t - t3) + sin(2*pi*(t-t3)*10) * bugOscillation/2;
-        
-    else
-        
-        t2 = t - swirlT;
-        
-        
-        %if dir == 1
-        
-            absBugX = sW/2 + dir * pos(t2-bugStillTime) * bugSpeed;
-        
-        %else
-            
-%            absBugX = sW - t2 * bugSpeed;
-            
-%        end
-        
-        absBugY = bugY * sH/2 + sin(2*pi*t2*10)*bugOscillation/2;
-        
-    end
-    
-    xs(end-m+1:end) = 0 + absBugX + bugxs;
-    
-    ys(end-m+1:end) = absBugY + bugys/2 - bugSize/4;
-    
-    rects = [xs ys xs+r ys+r/2];
-    
-    cols2 = cols;
-    
-    if swirlActive
-        
-        cols2(n-m:end, :) = 1;
-        
-    end
+    % draw
     
     for channel = [0 1]
         
+        % calculate dot positions:
+        
+        chanInd = ifelse(pairDots, 1, 1 + channel);
+        
+        d = dispFun(dist(:, chanInd));
+        
+        XS = xs(:, chanInd) - d*(-1)^channel;
+        
+        YS = ys(:, chanInd);
+        
+        pos = [XS YS];
+        
+        % draw:
+        
         Screen('SelectStereoDrawBuffer', window, channel);
         
-        k1 = 1:n-m;
+        Screen(window, 'FillRect', [1 1 1] * bgLum, []);
         
-        k2 = n-m+1:n;
-        
-        rects(k1, [1 3]) = rects(k1, [1 3]) + (0) * channel;
-        
-        rects(k2, [1 3]) = rects(k2, [1 3]) + disparity * (1-swirlActive) * channel;
-        
-        %Screen(window, 'FillOval', cols', rects');
-        
-        Screen(window, 'DrawDots', rects(:, [1 2])', r, cols2',[],2); % [,color] [,center] [,dot_type]);
-        
+        Screen(window, 'DrawDots', pos', r, [1 1 1] * dotBrightness, [], 2);
         
     end
     
     Screen(window, 'Flip');
     
-    % checking for key presses
-    
-    [~, ~, keyCode ] = KbCheck;
-    
-    if (keyCode(KbName('End')) && swirlActive)
+    if enableKeyboard
         
-        swirlActive = 0;
+        % handle key presses
         
-        swirlT = t;
+        [~, ~, keyCode] = KbCheck;
         
-        disp('Rendering the disparity stimulus ... ');
+        if (keyCode(KbName('Space'))); startTime = GetSecs(); end
         
-    end    
-    
-    if (keyCode(KbName('Escape')))
+        if keyCode(KbName('Escape')); break; end
         
-        break;
-        
-    end  
-    
-    if (keyCode(KbName('s')))
-        
-        t3 = t;
-        
-    end  
-    
-    if swirlActive == 0 && t-swirlT>duration
-        
-        break;
+        if keyCode(KbName('END')); break; end
         
     end
     
-    
 end
 
-end
+dotInfo = struct('xs', xs, 'ys', ys, 'thetas', thetas);
 
-function [X, Y] = getSwirl(centerX, centerY)
-
-theta1 = @(t) (t * 2 * pi);
-
-theta2 = @(t) (min(4, t) * 2 * pi);
-
-motionR = @(t) 400 * (cos(theta2(t) * 0.1)+1);
-
-v = 0.5;
-
-X = @(t) centerX + cos(theta1(t) * v) * motionR(t);
-Y = @(t) centerY + sin(theta1(t) * v) * motionR(t)/2;
-
-% t1 = @(t) t;
-%
-% X = X(t1(t));
-% Y = Y(t1(t));
-
-%XY      = @(t) [X(t1(t)) Y(t1(t))];
+if nargout; varargout{1} = dotInfo; end
 
 end
 
+function [X, Y] = getSwirl(centerX, centerY, motionDuration, motionR0, rotFreq)
+
+theta2 = @(t) min(t * pi / motionDuration, pi);
+
+motionR = @(t) motionR0/2 * (1+cos(theta2(t)));
+
+X = @(t) centerX + cos(t * 2 * pi * rotFreq) .* motionR(t);
+Y = @(t) centerY + sin(t * 2 * pi * rotFreq) .* motionR(t);
+
+end

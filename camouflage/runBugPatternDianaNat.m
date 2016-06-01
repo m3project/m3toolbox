@@ -72,6 +72,14 @@ elseif m == -1
 
     bugPattern = scaleBugLum(bugPattern); %#ok
     
+elseif m == -2
+    
+    % bug is natural background
+    
+    bugPattern = genNaturalPattern(struct('W', H, 'H', W));
+    
+    bugPattern = scaleBugLum(bugPattern, bugBaseLum); %#ok
+    
 else
     
     % striped bug
@@ -125,7 +133,33 @@ runCamoPattern(args2);
 end
 
 
-function pattern = scaleBugLum(pattern)
+function pattern = scaleBugLum(pattern, meanLum)
+
+if nargin<2; meanLum = 0.5; end
+
+% first, make the levels of pattern as large as possible within the
+% interval [0, 1] with meanLum = 0.5
+
+pattern = scaleBugLum_old(pattern);
+
+% now calculate upper and lower overhead
+
+l = meanLum;
+
+u = 1 - meanLum;
+
+t = min(l, u);
+
+U = meanLum + t;
+
+L = meanLum - t;
+
+pattern = scaleLumLevels(pattern, L, U);
+
+end
+
+
+function pattern = scaleBugLum_old(pattern)
 
 % change mean to 0.5
 

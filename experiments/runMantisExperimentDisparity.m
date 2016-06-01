@@ -60,7 +60,7 @@ expt.dir = paramSetRow(1);
 
 expt.disparity = paramSetRow(2);
 
-runDots(expt);
+runDotsJudith(expt);
 
 exitCode = 0;
 

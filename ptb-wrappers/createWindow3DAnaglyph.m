@@ -1,6 +1,6 @@
 % creates a PTB window
 
-function createWindow3DAnaglyph(Gamma, LeftGains, RightGains)
+function createWindow3DAnaglyph(Gamma, LeftGains, RightGains, rect)
 
 if (nargin == 0) || (nargin == 1 && isstruct(Gamma))
     
@@ -23,9 +23,19 @@ if (nargin == 0) || (nargin == 1 && isstruct(Gamma))
     
     return;
     
-elseif nargin ~= 3
+elseif ~ismember(nargin, [3 4]);
     
-    error('This function requires that you specifiy Gamma, LeftGains and RightGains');
+    error('incompatible call');
+    
+end
+
+if nargin < 4; rect = []; end
+
+if isequal(getenv('computername'), 'READLAB14')
+    
+    [sW, sH] = getResolution();
+    
+    rect = [-sW 0 -1 sH];
     
 end
 
@@ -73,7 +83,7 @@ PsychImaging('AddTask', 'FinalFormatting', 'DisplayColorCorrection', 'SimpleGamm
 
 %PsychImaging('AddTask', 'RightView', 'DisplayColorCorrection', 'AnaglyphStereo')
 
-window = PsychImaging('OpenWindow', consts.SCREEN_ID, consts.MEAN_LUM, [], [], [], 6);
+window = PsychImaging('OpenWindow', consts.SCREEN_ID, consts.MEAN_LUM, rect, [], [], 6);
 
 Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
