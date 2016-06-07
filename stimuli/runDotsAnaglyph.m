@@ -32,9 +32,9 @@ preTrialDelay = 5; % seconds
 
 % dot params: 
 
-n = 10000; % number of dots  
+n = 1000; % number of dots  
 
-r = 20; % radius
+r = 60; % radius
 
 v = 2  ; % velocity
 

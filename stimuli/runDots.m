@@ -6,9 +6,13 @@
 
 % Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk) - 1/6/2016
 
-function varargout = runDots(args, dotInfo)
+function varargout = runDots(args)
 
 % parameters
+
+videoFile = ''; % leave empty to disable recording
+
+recordingFrameRate = 60;
 
 % dot params: -------------------------------------------------------------
 
@@ -20,21 +24,21 @@ v = 2  ; % velocity
 
 pairDots = 1; % when set to 0, dots in different channels become unpaired
 
-dotBrightness = 0.0;
-
 % bug params: -------------------------------------------------------------
 
-bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm position
+bugRadius = 0.5; % bug radius (cm) as perceived by the mantis at virtDm position
 
 virtDm = 2.5; % virtual distance from mantis (cm)
 
 bugY = 0.65;
 
-edgeSmoothness = 0.8; % this determines how "hard/soft" the bug borders are
-
 motionR0 = 800; % initial swirl radius (px)
 
 rotFreq = 2; % swirl rotation frequency (Hz)
+
+dispFun1 = @getDotDisp;
+
+lumFun1 = @getDotLum;
 
 % timing params: ----------------------------------------------------------
 
@@ -64,8 +68,6 @@ viewD = 10; % viewing distance (cm)
 
 % control flags: ----------------------------------------------------------
 
-previewDisparityFunc = 0;
-
 previewMotionFuncs = 0;
 
 enableKeyboard = 1;
@@ -74,19 +76,15 @@ useRedBlue = 0;
 
 %% Unsorted parameters
 
-disparityEnable =  1; % -1 ,0 or +1
-
-bgDisp =  0; % background disparity (px)
-
 bgLum = 0.5; % backgrounf luminnance
+
+dotInfo = [];
+
+renderChannels = [0 1];
 
 %% parameter overrides
 
-if nargin>0
-    
-    unpackStruct(args);
-    
-end
+if nargin>0; unpackStruct(args); end
 
 if nargin && (isfield(args, 'virtDm1') || isfield(args, 'virtDm1'))
     
@@ -106,36 +104,11 @@ totalTime = motionDuration + finalPresentationTime + interTrialTime;
 
 if virtDm>viewD; error('virmDm should not be larger than viewD!'); end
 
-disparityMag = calDisp(virtDm, viewD, iod) * sf;
-
-% size:
-
-virtBugSize = bugSize .* viewD./ virtDm;
+D = calDisp(virtDm, viewD, iod) * sf; % disparity in pixels
 
 % radius:
 
-radFunc = virtBugSize * sf;
-
-%% disparity function
-
-tansig01 = @(x) (tansig(x)+1)/2;
-
-tansigAB = @(x, a, b) tansig01(x) * (b-a) + a';
-
-dispFun = @(dist) tansigAB((dist - radFunc) * edgeSmoothness, ...
-    disparityMag * disparityEnable, bgDisp);
-
-if previewDisparityFunc
-    
-    dist = 0:200; %#ok<UNRCH>
-    
-    plot(dist, dispFun(dist));
-    
-    xlabel('Distance from Bug (px)'); ylabel('Disparity (px)');
-    
-    return
-    
-end
+virtBugRadiusPx = bugRadius .* viewD./ virtDm * sf;
 
 %% motion function
 
@@ -177,9 +150,11 @@ window = getWindow();
 
 %% initial dot positions and velocities
 
-if nargin == 2
+if ~isempty(dotInfo)
     
     unpackStruct(dotInfo);
+    
+    n = size(xs, 1); %#ok<NODEF>
 
 else
     
@@ -189,17 +164,33 @@ else
     
     thetas = rand(n, 2) * 360;
     
+    G = randb(n, 10); % random matrix to select arbitrary dot subsets
+    
 end
 
 %% rendering loop
 
 KbName('UnifyKeyNames');
 
-startTime = GetSecs() + preTrialDelay;
+t0 = GetSecs();
+
+recording = recordStimulus(videoFile);
+
+endRecording = @() recordStimulus(recording);
+
+obj1 = onCleanup(endRecording);
+
+i = 0;
 
 while 1
     
-    t = GetSecs() - startTime;
+    i = i + 1;
+    
+    tReal = GetSecs() - t0 - preTrialDelay;
+    
+    tFrames = i / recordingFrameRate - preTrialDelay;
+    
+    t = ifelse(isempty(recording), tReal, tFrames);
     
     if t>totalTime; break; end
     
@@ -221,25 +212,21 @@ while 1
     xs(xs < -r) = sW + r;    
     ys(ys < -r) = sH + r;
     
-    % calculate dot distances from bug
-    
-    dist = sqrt((xs - bugX).^2 + (ys - bugY).^2);
-    
     % draw
     
-    for channel = [0 1]
+    for channel = renderChannels
         
         % calculate dot positions:
         
-        chanInd = ifelse(pairDots, 1, 1 + channel);
+        ch = ifelse(pairDots, 1, 1 + channel);
         
-        d = dispFun(dist(:, chanInd));
+        XS = xs(:, ch);
+        YS = ys(:, ch);
         
-        XS = xs(:, chanInd) - d*(-1)^channel;
+        XSD = XS + ...
+            dispFun1(channel, XS, YS, bugX, bugY, virtBugRadiusPx, G, D);
         
-        YS = ys(:, chanInd);
-        
-        pos = [XS YS];
+        pos = [XSD YS];
         
         % draw:
         
@@ -247,11 +234,19 @@ while 1
         
         Screen(window, 'FillRect', [1 1 1] * bgLum, []);
         
-        Screen(window, 'DrawDots', pos', r, [1 1 1] * dotBrightness, [], 2);
+        dotLum = lumFun1(channel, XS, YS, bugX, bugY, virtBugRadiusPx, G, D);
+        
+        Screen(window, 'DrawDots', pos', r,  (dotLum * [1 1 1])' , [], 2);
+        
+        %rect = [bugX bugY bugX bugY] + [-1 -1 1 1] * virtBugRadiusPx;
+        
+        %Screen(window, 'FrameOval', [1 1 1], rect , 2);
         
     end
     
     Screen(window, 'Flip');
+    
+    recording = recordStimulus(recording);
     
     if enableKeyboard
         
@@ -259,7 +254,7 @@ while 1
         
         [~, ~, keyCode] = KbCheck;
         
-        if (keyCode(KbName('Space'))); startTime = GetSecs(); end
+        if (keyCode(KbName('Space'))); t0 = GetSecs(); end
         
         if keyCode(KbName('Escape')); break; end
         
@@ -269,7 +264,7 @@ while 1
     
 end
 
-dotInfo = struct('xs', xs, 'ys', ys, 'thetas', thetas);
+dotInfo = struct('xs', xs, 'ys', ys, 'thetas', thetas, 'G', G);
 
 if nargout; varargout{1} = dotInfo; end
 
@@ -283,5 +278,34 @@ motionR = @(t) motionR0/2 * (1+cos(theta2(t)));
 
 X = @(t) centerX + cos(t * 2 * pi * rotFreq) .* motionR(t);
 Y = @(t) centerY + sin(t * 2 * pi * rotFreq) .* motionR(t);
+
+end
+
+function disp = getDotDisp(ch, x, y, bugX, bugY, bugRad, G, D)
+
+% ch    : channel
+% x     : vector of dot x coordinates
+% y     : vector of dot y coordinates
+% bugX  : x coordinate of bug
+% bugY  : y coordinate of bug
+% bugR  : radius of bug (px)
+% G     : Nx5 matrix of random 0/1 values with equal probs, see below
+% D     : disparity magnitude (px)
+
+% `G` is used to select subsets of the dots
+% The value in G are randomized but unique per stimulus presentation. Thus
+% to select a random 50% of dots, use x(G(:,1))
+
+inBug = sqrt((x - bugX).^2 + (y - bugY).^2) < bugRad;
+
+inG1 = G(:, 1);
+
+disp = x*0 + inBug * D/2 .* inG1 * (-1)^ch; % for now
+
+end
+
+function lum = getDotLum(ch, x, y, bugX, bugY, bugRad, G, D) %#ok<INUSL,INUSD>
+
+lum = x*0;
 
 end

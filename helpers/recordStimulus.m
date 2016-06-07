@@ -3,14 +3,14 @@
 % it is used as follows
 %
 % - First, call the script passing a video file name as a parameter (e.g.
-% recording = recordingStimulus('d:\stim.avi'). This will initialize the
+% recording = recordStimulus('d:\stim.avi'). This will initialize the
 % recording object
 %
 % - Then, after each screen flip, call:
-% recording = recordingStimulus(recording) making sure to include the
+% recording = recordStimulus(recording) making sure to include the
 % output argument. This will record a frame
 %
-% - Finally, to end the recording simply call recordingStimulus(recording)
+% - Finally, to end the recording simply call recordStimulus(recording)
 % without an output argument. This will close the recording object
 %
 % Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk) - 16/12/2015

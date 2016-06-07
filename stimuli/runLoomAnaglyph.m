@@ -19,12 +19,15 @@ window = getWindow();
 
 %% Stimulus Settings
 
+flickerBoxShift = [100 -200]; % relative to bottom left corner
+
+flickerBoxDelay = 2; % seconds
 
 viewD = 10;% viewing distance (cm)
 
 bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm2 position
 
-disparityEnable = -1; % 1 for green lens on the left; -1 for green lens on the right)
+disparityEnable = 1; % 1 for green lens on the left; -1 for green lens on the right)
          
 makePlot = 0; % when set to 1, the script plots size and trajectory instead of rendering the stimulus
 
@@ -36,17 +39,13 @@ disparitySizeCondition = 0; % when set to 1, the bug size in the case of (dispar
 
 bugColor = [0 0 0]; % [0, 1]
 
-iod = 0.5; % mantis inter-ocular distance (cm)
+iod = 0.7; % mantis inter-ocular distance (cm)
 
 sf = 37.0370; % screen scaling factor (px/cm)
 
 virtDm1 = 2.5; % virtual distance 1 from mantis (cm)
 
 virtDm2 = 2.5; % virtual distance 2 from mantis (cm)
-
-virtBS2 = viewD / virtDm2 * bugSize;
-
-virtBS1= virtBS2 * virtDm2 / viewD;
 
 duration = 2.25; % duration of motion from distance 1 to 2 (seconds)
 
@@ -69,6 +68,21 @@ if nargin>0
 end
 
 dump = packWorkspace();
+
+%% flicker box
+
+fbox = createFlickerBox(100, 100);
+
+fbox.internal.rect = fbox.internal.rect + [1 0 1 0] * flickerBoxShift(1) + ...
+    [0 1 0 1] * flickerBoxShift(2);
+
+fbox.pattern = 1;
+
+%% calculations
+
+virtBS2 = viewD / virtDm2 * bugSize;
+
+virtBS1= virtBS2 * virtDm2 / viewD;
 
 %% functions:
 
@@ -190,6 +204,8 @@ while 1
         
     end
     
+    fbox.visible = t > flickerBoxDelay;
+    
     jt =  rand(1, 2) * bugJitter;  
     
     bugHeight = r;
@@ -207,6 +223,8 @@ while 1
         
         Screen('FillOval', window, bugColor(2), rectL');
         
+        drawFlickerBox(window, fbox);
+        
     end
     
     if ismember(enableChannels, [0 -1])
@@ -215,7 +233,11 @@ while 1
         
         Screen('FillOval', window, bugColor(3), rectR');
         
+        fbox = drawFlickerBox(window, fbox);
+        
     end
+    
+    
     
     Screen('Flip', window);
     
