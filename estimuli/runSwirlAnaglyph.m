@@ -36,6 +36,8 @@ window = getWindow();
 
 [~, sH] = getResolution();
 
+HideCursor; f1 = @() ShowCursor; obj2 = onCleanup(f1);
+
 %% Stimulus Settings
 
 % parameters particularly relevant to Ronny:

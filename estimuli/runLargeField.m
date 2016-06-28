@@ -30,6 +30,8 @@ window = getWindow();
 
 [sW, sH] = getResolution();
 
+HideCursor; f1 = @() ShowCursor; obj2 = onCleanup(f1);
+
 %% parameters
 
 bugColor = 0;

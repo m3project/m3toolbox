@@ -48,6 +48,8 @@ w = getWindow();
 
 moving = 0;
 
+HideCursor; f1 = @() ShowCursor; obj2 = onCleanup(f1);
+
 %% constants
 
 disp_max = 20;

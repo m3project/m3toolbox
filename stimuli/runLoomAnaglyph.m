@@ -1,4 +1,9 @@
 function dump = runLoomAnaglyph(expt)
+
+% Jeff's parameters
+
+flickerBoxShift = [1500 0]; % relative to bottom left corner
+
 %% Initialization
 
 % KbName('UnifyKeyNames');
@@ -19,9 +24,7 @@ window = getWindow();
 
 %% Stimulus Settings
 
-flickerBoxShift = [100 -200]; % relative to bottom left corner
-
-flickerBoxDelay = 2; % seconds
+flickerBoxDelay = 6; % seconds (Jeff: I changed it to turn on after the stimulus is over. Hope it is ok.)
 
 viewD = 10;% viewing distance (cm)
 

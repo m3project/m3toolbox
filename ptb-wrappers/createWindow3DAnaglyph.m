@@ -31,15 +31,19 @@ end
 
 if nargin < 4; rect = []; end
 
+consts = getConstants();
+
 if isequal(getenv('computername'), 'READLAB14')
     
     [sW, sH] = getResolution();
     
-    rect = [-sW 0 -1 sH];
+    consts.NO_TESTS = 2;
+    
+    PsychDebugWindowConfiguration(1,50);
+    
+%     rect = [-sW 0 -1 sH];
     
 end
-
-consts = getConstants();
 
 % set PTB message verbosity depending on constant SILENT_PTB
 

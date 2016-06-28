@@ -17,3 +17,6 @@ else
     dy=1;
 end
 F = ifft2(shiftx(shifty(fftshift(FT.* exp(2*pi*i*x(1).* fx2 + 2*pi*i*y(1).*fy2)),sy),sx))/dx/dy;
+
+end
+

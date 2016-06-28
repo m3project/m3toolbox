@@ -20,15 +20,23 @@ expt.makeBackup = 1;
 
 expt.defName = 'Vivek';
 
-expt.addTags = {'SMALL'};
+isLarge = getDotSize();
+
+expt.addTags = {ifelse(isLarge, 'LARGE', 'SMALL')};
 
 runExperiment(expt);
 
 end
 
-function paramSet = genParamSet()
+function isLarge = getDotSize()
 
 isLarge = 0; % 0 or 1
+
+end
+
+function paramSet = genParamSet()
+
+isLarge = getDotSize();
 
 blocks = 5;
 
@@ -47,7 +55,7 @@ function runBeforeTrial(paramSetRow)
 args = struct('mode', 'bruce', ...
     'enableKeyboard', 0, 'preTrialDelay', 0, ...
     'interTrialTime', 0, 'motionDuration', 0, ...
-    'finalPresentationTime', 60, 'bugY', -0.5);
+    'finalPresentationTime', 60);
 
 % dotInfo is made global to pereserve dot position and velocity information
 % across trials
@@ -89,7 +97,6 @@ isLarge = paramSetRow(4);
 args.n = ifelse(isLarge, 1e3, 1e4); % number of dots  
 
 args.r = ifelse(isLarge, 60, 20); % radius
-
 
 global dotInfo;
 

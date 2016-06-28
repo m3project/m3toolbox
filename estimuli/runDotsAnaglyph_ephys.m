@@ -30,6 +30,8 @@ RightGains = [0 0 1];
 
 createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
 
+HideCursor; f1 = @() ShowCursor; obj2 = onCleanup(f1);
+
 %% swirling motion parameters
 
 bugY = 0.5; % y-coord of swirling center (0 to 1)

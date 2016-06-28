@@ -8,6 +8,8 @@
 
 function varargout = runDots(args)
 
+%inDebug();
+
 % parameters
 
 videoFile = ''; % leave empty to disable recording
@@ -73,6 +75,8 @@ previewMotionFuncs = 0;
 enableKeyboard = 1;
 
 useRedBlue = 0;
+
+plotTarget = [];
 
 %% Unsorted parameters
 
@@ -238,12 +242,36 @@ while 1
         
         Screen(window, 'DrawDots', pos', r,  (dotLum * [1 1 1])' , [], 2);
         
-        %rect = [bugX bugY bugX bugY] + [-1 -1 1 1] * virtBugRadiusPx;
+        bugRect = [bugX bugY bugX bugY] + [-1 -1 1 1] * virtBugRadiusPx;
         
-        %Screen(window, 'FrameOval', [1 1 1], rect , 2);
+        rectL = bugRect + [1 0 1 0] * D/2;
+        rectR = bugRect + [1 0 1 0] * -D/2;
+        
+        rectL2 = bugRect + [1 0 1 0] * D;
+        rectR2 = bugRect + [1 0 1 0] * -D;
+        
+        if ismember(0, plotTarget)
+            
+            Screen(window, 'FrameOval', [1 1 1] * 0, bugRect , 4);
+            
+        end
+        
+        if ismember(-1, plotTarget)
+            
+            Screen(window, 'FrameOval', [1 1 1] * 0, rectL , 2);
+%             Screen(window, 'FrameOval', [1 1 1] * 0, rectL2 , 1);
+            
+        end
+        
+        if ismember(1, plotTarget)  
+            
+            Screen(window, 'FrameOval', [1 1 1] * 0, rectR , 2); 
+%             Screen(window, 'FrameOval', [1 1 1] * 0, rectR2 , 1); 
+            
+        end
         
     end
-    
+
     Screen(window, 'Flip');
     
     recording = recordStimulus(recording);
@@ -259,6 +287,18 @@ while 1
         if keyCode(KbName('Escape')); break; end
         
         if keyCode(KbName('END')); break; end
+        
+        if keyCode(KbName('RightArrow')); 
+            
+            v = abs(v);
+            
+        end
+        
+        if keyCode(KbName('LeftArrow')); 
+            
+            v = -abs(v);
+            
+        end
         
     end
     

@@ -17,6 +17,8 @@
 
 function recording = recordStimulus(arg1)
 
+cropVideo = 1;
+
 isFirstCall = ischar(arg1);
 
 if isFirstCall
@@ -84,7 +86,24 @@ else
         
         window = getWindow();
         
-        imageArray = Screen(window, 'GetImage');
+        rect = [];
+        
+        if cropVideo
+            
+            cx = 1920/2;
+            cy = 1200/2;
+            
+            x0 = cx - cx/2;
+            x1 = cx + cx/2;
+            
+            y0 = cy - cy/2;
+            y1 = cy + cy/2;
+            
+            rect = [x0 y0 x1 y1];
+            
+        end
+            
+        imageArray = Screen(window, 'GetImage', rect);        
         
         writeVideo(recording.writerObj, imageArray);
         

@@ -25,6 +25,8 @@ sequence = [
 
 tswitch = 2; % seconds
 
+HideCursor; f1 = @() ShowCursor; obj2 = onCleanup(f1);
+
 %% body
 
 n = size(sequence, 1);

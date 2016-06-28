@@ -9,6 +9,8 @@ Gamma = 2.188; % for DELL U2413
 
 createWindow(Gamma);
 
+HideCursor; f1 = @() ShowCursor; obj2 = onCleanup(f1);
+
 sobj = initSerial();
 
 ss = @(str) sendSerial(sobj, str);
@@ -31,7 +33,7 @@ window = getWindow();
 
 startTime = GetSecs();
 
-conds = {'off', 'on'};
+conds = {'Dark', 'Bright'};
 
 prevFlash = 0;
 

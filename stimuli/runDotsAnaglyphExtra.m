@@ -1,51 +1,103 @@
-% this is similar to runDotsAnaglyph but relies on a more generic RDS
+ % this is similar to runDotsAnaglyph but relies on a more generic RDS
 % stimulus and can render a larger variety of stimuli
 %
 % Ghaith Tarawneh (ghaith.tarawneh@ncl.ac.uk) - 2/6/2016
 
 function varargout = runDotsAnaglyphExtra(args)
 
-% parameters
+% inDebug();
 
-mode = 'debug';
+%% Vivek parameters
 
-staticCorr = 1;
+% any parameters in this section can be set by Vivek
 
-crossed = 1 ; % 1 for corssed, 0 for uncrossed
+mode = 'iovd-debug'; % Vivek can change this to fiddle
+
+staticCorr = 0;
+
+crossed = 1;
+% 1 for crossed, 0 for uncrossed (with blue filter on left eye)
+% 0 for crossed, 1 for uncrossed (with green filter on left eye)
+    
+iovd = 1;
+
+rightVar = 1;
+% when iovd = 0, rightVar refers to direction of dot jump
+% when iovd = 1, rightVar refers to direction of initial offset
+
+bugY = 0.7; %#ok<NASGU>
+
+v = 0; %#ok<NASGU>
+
+n = 1e4; %#ok<NASGU>
+
+r = 20; %#ok<NASGU>
+
+% lumFun1 = @getLumBlack; %#ok<NASGU> % use this to make all dots black
+
+lumFun1 = @getLumBlackWhite; %#ok<NASGU> % use this to make dots black
+% and white 
+bugRadius = .5; %#ok<NASGU>
+
+%% load overrides
+
+if nargin; unpackStruct(args); end
+
+%% pack parameters plus overrides
+
+args = packWorkspace();
+
+args.pairDots = staticCorr;
 
 %% prepare arguments
 
-if nargin; unpackStruct(args); else args = struct; end
-
 if isequal(mode, 'debug')
-    
-    args = setDots(args, 0, 0); % numbers are : isLarge, slowMode
-    
-    args = setFineDots(args);
-    
-%     args = setDebug(args); 
-    
+
     args.dispFun1 = @(ch, x, y, bugX, bugY, bugRad, G, D) ...
         getDispBruce(ch, x, y, bugX, bugY, bugRad, G, D, crossed);
-    
-    args.lumFun1 = @getLumBruce;
-    
-    args.bugY = 0.65;
-    
-    args.v = 0;
-    
-    %args.lumFun1 = @getLumBlack; % use this to make all dots black
-    
-%     args.virtDm = 7;
-    
-%     args.bugRadius = 1.5;
     
 elseif isequal(mode, 'bruce')
     
     args.dispFun1 = @(ch, x, y, bugX, bugY, bugRad, G, D) ...
         getDispBruce(ch, x, y, bugX, bugY, bugRad, G, D, crossed);
     
-    args.lumFun1 = @getLumBruce;
+    args.lumFun1 = @getLumBlackWhite;
+    
+elseif isequal(mode, 'iovd-debug')
+    
+    args.dispFun1 = @(ch, x, y, bugX, bugY, bugRad, G, D) ...
+        getDispKineticIOVD ...
+        (ch, x, y, bugX, bugY, bugRad, G, D, iovd, crossed, rightVar);
+    
+elseif isequal(mode, 'iovd-recording')
+    
+    args = setDebug(args);
+    
+    args.dispFun1 = @(ch, x, y, bugX, bugY, bugRad, G, D) ...
+        getDispKineticIOVD ...
+        (ch, x, y, bugX, bugY, bugRad, G, D, iovd, crossed, rightVar);
+    
+    args.lumFun1 = @getLumBlack;
+    
+    args.plotTarget = [0 -1 1];
+    
+    args.finalPresentationTime = 30;
+    
+    args.interTrialTime = 0;
+    
+    args.n = 200;
+    
+    args.v = 0.2;
+    
+    args.enableKeyboard = 0;
+    
+    args.pairDots = 0; % this is staticCorr
+    
+elseif isequal(mode, 'iovd')
+    
+    args.dispFun1 = @(ch, x, y, bugX, bugY, bugRad, G, D) ...
+        getDispKineticIOVD ...
+        (ch, x, y, bugX, bugY, bugRad, G, D, iovd, crossed, rightVar);
     
 else
     
@@ -54,8 +106,6 @@ else
 end
 
 %% render
-
-args.pairDots = staticCorr;
 
 dotInfo = runDots(args);
 
@@ -88,8 +138,7 @@ end
 % patch but is scrambled at the level of individual dots): in the crossed
 % condition, for example, L dots move R and R dots move L
 
-function disp = getDispBruce ...
-    (ch, x, y, bugX, bugY, bugRad, G, D, crossed)
+function disp = getDispBruce (ch, x, y, bugX, bugY, bugRad, G, D, crossed)
 
 edgeSmoothness = 0.8; % same as in runDotsAnaglyph
 
@@ -112,22 +161,122 @@ disp = dispFun(adist) .* selGroup * dispSign * dispSign2;
 
 end
 
-function lum = getLumBruce(~, ~, ~, ~, ~, ~, G, ~)
-
-lum = G(:, 3);
-
-end
-
-function lum = getLumBlack(~, ~, ~, ~, ~, ~, G, ~)
-
-lum = G(:, 3) * 0;
-
-end
-
 %% Jump Op/Same
 
 % Jump Op = Kinetic + IOVD
 % Jumo Same = Kinetic (only)
+
+function disp = getDispKineticIOVD (ch, x, y, bugX, bugY, bugRad, ~, D, iovd, crossed, rightVar)
+
+% NOTE:
+% when iovd = 0, rightVar refers to direction of dot jump
+% when iovd = 1, rightVar refers to direction of initial offset
+
+edgeSmoothness = 0.8; % same as in runDotsAnaglyph
+
+dispFun = @(adist) tansigAB(adist * edgeSmoothness, D, 0);
+
+xtgt = 0; % dummy variable
+
+jumpL = nan; %#ok<NASGU>
+jumpR = nan; %#ok<NASGU>
+xtgtL = nan; %#ok<NASGU>
+xtgtR = nan; %#ok<NASGU>
+
+% the below logic is a direct translation of Jenny's email
+% (Tue 31/05/2016 20:42)
+
+if iovd
+    
+    if crossed
+        
+        if rightVar == 1    
+            xtgtL = xtgt+1/2;
+            xtgtR = xtgt+1/2;
+            jumpL = +1/2;
+            jumpR = -1/2;            
+        else
+            xtgtL = xtgt-1/2;
+            xtgtR = xtgt-1/2;
+            jumpL = +1/2;
+            jumpR = -1/2;            
+        end
+        
+    else
+        
+        if rightVar == 1           
+            xtgtL = xtgt+1/2;
+			xtgtR = xtgt+1/2;
+			jumpL = -1/2;
+			jumpR = +1/2;            
+        else            
+            % Vivek and I confirmed that the below two lines (based on the
+            % document emailed by Jenny) are incorrect:
+            % xtgtL = xtgt+1/2; % INCORRECT
+			% xtgtR = xtgt+1/2; % INCORRECT
+            % We showed this to Jenny and she agreed this was incorrect            
+            xtgtL = xtgt-1/2;
+			xtgtR = xtgt-1/2;
+			jumpL = -1/2;
+			jumpR = +1/2;            
+        end
+        
+    end
+        
+else
+        
+    if crossed
+        
+        if rightVar == 1            
+			xtgtL = xtgt+1/2;
+			xtgtR = xtgt-1/2;
+			jumpL = +1/2;
+			jumpR = +1/2;            
+        else            
+			xtgtL = xtgt+1/2;
+			xtgtR = xtgt-1/2;
+			jumpL = -1/2;
+			jumpR = -1/2;            
+        end
+        
+    else
+        
+        if rightVar == 1
+            xtgtL = xtgt-1/2;
+			xtgtR = xtgt+1/2;
+			jumpL = +1/2;
+			jumpR = +1/2;
+        else
+			xtgtL = xtgt-1/2;
+			xtgtR = xtgt+1/2;
+			jumpL = -1/2;
+			jumpR = -1/2;
+        end
+        
+    end
+   
+end
+
+if any(isnan([jumpL jumpR xtgtL xtgtR]))
+    
+    error('stimulus parameters not properly defined')
+    
+end
+
+isLeftChannel = (ch == 0);
+
+bugOffset = ifelse(isLeftChannel, xtgtL, xtgtR) * D;
+
+dispSign = ifelse(isLeftChannel, jumpL, jumpR);
+
+% now that when staticCorr=0 then G(:, 1) will refer to different dots in
+% each channel (because dots themselves don't have correspondants)
+
+adist = sqrt((x - (bugX + bugOffset)).^2 + (y - bugY).^2) - bugRad;
+
+disp = dispFun(adist) * dispSign;
+
+end
 
 %% helper functions
 
@@ -145,7 +294,7 @@ args.bugY = 0.5;
 
 end
 
-function args = setDots(args, isLarge, slowMode)
+function args = setDots(args, isLarge, slowMode) %#ok<DEFNU>
 
 args.n = ifelse(isLarge, 1e3, 1e4); % number of dots  
 
@@ -155,7 +304,7 @@ args.v = ifelse(slowMode, 0.1, 2);
 
 end
 
-function args = setFineDots(args)
+function args = setFineDots(args) %#ok<DEFNU>
 
 args.n = 5e3;
 
@@ -165,7 +314,7 @@ end
 
 %% adapted from runDotAnaglyh
 
-function disp = getDispDotAnaglyph(ch, x, y, bugX, bugY, bugRad, ~, D)
+function disp = getDispDotAnaglyph(ch, x, y, bugX, bugY, bugRad, ~, D) %#ok<DEFNU>
 
 edgeSmoothness = 0.8; % same as in runDotsAnaglyph
 
@@ -183,10 +332,22 @@ function y = tansig01(x)
 
 y = (tansig(x)+1)/2;
 
-end
+end  
 
 function y = tansigAB(x, a, b)
 
 y = tansig01(x) * (b-a) + a';
+
+end
+
+function lum = getLumBlackWhite(~, ~, ~, ~, ~, ~, G, ~)
+
+lum = G(:, 3);
+
+end
+
+function lum = getLumBlack(~, ~, ~, ~, ~, ~, G, ~)
+
+lum = G(:, 3) * 0;
 
 end

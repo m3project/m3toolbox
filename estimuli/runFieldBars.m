@@ -24,6 +24,8 @@ window = getWindow();
 
 fps = getFrameRate();
 
+HideCursor; f1 = @() ShowCursor; obj2 = onCleanup(f1);
+
 %% parameters
 
 cModeDelay = 4; % number of seconds between patterns

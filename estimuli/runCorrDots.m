@@ -51,6 +51,8 @@ window = getWindow();
 
 [W, H] = getResolution();
 
+HideCursor; f1 = @() ShowCursor; obj2 = onCleanup(f1);
+
 %% variables
 
 % old settings:
