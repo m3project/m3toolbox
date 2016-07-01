@@ -13,7 +13,7 @@ function varargout = runDotsAnaglyphExtra(args)
 
 mode = 'iovd-debug'; % Vivek can change this to fiddle
 
-staticCorr = 0;
+staticCorr = 1;
 
 crossed = 1;
 % 1 for crossed, 0 for uncrossed (with blue filter on left eye)
@@ -27,7 +27,7 @@ rightVar = 1;
 
 bugY = 0.7; %#ok<NASGU>
 
-v = 0; %#ok<NASGU>
+v = 2; %#ok<NASGU>
 
 n = 1e4; %#ok<NASGU>
 

@@ -1,7 +1,13 @@
 function inDebug()
 
-isREADLAB14 = isequal(getenv('computername'), 'READLAB14');
+pc = getenv('computername');
 
-assert(isREADLAB14, 'Ghaith is working on this stimulus');
+if ~isequal(pc, 'READLAB14')
+    
+     msgbox('The toolbox is under maintenance. This shouldn''t take long but if you need to run an experiment now please email me.', 'Message from Ghaith');
+     
+     error('toolbox under maintenance');
+     
+end
 
 end

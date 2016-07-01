@@ -1,6 +1,6 @@
 function runExperiment(expt)
 
-%checkGhaithComputer();
+checkGhaithComputer();
 
 obj1 = onCleanup(@cleanup);
 
@@ -42,9 +42,7 @@ if nargin>0
     
 end
 
-pc = getenv('computername');
-
-if isequal(pc, 'READLAB14') || isequal(pc, 'READLAB12')
+if strcmp(getenv('computername'), 'READLAB14')
     
     recordVideos = 0;
     
@@ -52,7 +50,7 @@ if isequal(pc, 'READLAB14') || isequal(pc, 'READLAB12')
     
     runChecksFun = @runChecks;
     
-    warning('running on Ghaith/Vivek''s desktop machine: backup, video recording and hardware check all disabled');
+    warning('running on Ghaith''s desktop machine: backup, video recording and hardware check all disabled');
     
 end
 
@@ -214,17 +212,15 @@ for i=firstTrial:trialCount
     
     % run before-trial code:
     
-%     if nargout(runBeforeTrialFun)
+    if nargout(runBeforeTrialFun)
     
-%         beforeTrialData = runBeforeTrialFun(paramSetRow);
+        beforeTrialData = runBeforeTrialFun(paramSetRow);
         
-%     else
+    else
         
-%         beforeTrialData = [];
+        beforeTrialData = [];
         
-%     end
-
-    runBeforeTrialFun(paramSetRow);
+    end
     
     if recordVideos
         
@@ -278,19 +274,19 @@ for i=firstTrial:trialCount
     
     % run after-trial code:
     
-%     if nargin(runAfterTrialFun) == 2
+    if nargin(runAfterTrialFun) == 2
     
-%         resultRow = runAfterTrialFun(paramSetRow, beforeTrialData);
+        resultRow = runAfterTrialFun(paramSetRow, beforeTrialData);
         
-%     elseif nargin(runAfterExptFun) == 1
+    elseif nargin(runAfterExptFun) == 1
         
         resultRow = runAfterTrialFun(paramSetRow);
         
-%     else
+    else
         
-%         error('runAfterTrialFun must take either 1 or 2 parameters');
+        error('runAfterTrialFun must take either 1 or 2 parameters');
         
-%     end
+    end
     
     resultSet(i, :) = resultRow; %#ok
     
