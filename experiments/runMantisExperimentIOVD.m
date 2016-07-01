@@ -92,6 +92,8 @@ args.crossed = paramSetRow(2);
 
 args.rightVar = paramSetRow(3);
 
+args.viewD = paramSetRow(4);
+
 isLarge = paramSetRow(5);
 
 args.n = ifelse(isLarge, 1e3, 1e4); % number of dots  
@@ -118,6 +120,8 @@ args.iovd = paramSetRow(1);
 args.crossed = paramSetRow(2);
 
 args.rightVar = paramSetRow(3);
+
+args.viewD = paramSetRow(4);
 
 isLarge = paramSetRow(5);
 

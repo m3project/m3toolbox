@@ -82,11 +82,9 @@ args = struct( ...
 % dotInfo is made global to pereserve dot position and velocity information
 % across trials
 
-% args.iovd = paramSetRow(1);
-
 args.crossed = paramSetRow(1);
 
-% args.rightVar = paramSetRow(3);
+args.viewD = paramSetRow(2);
 
 isLarge = paramSetRow(3);
 
@@ -96,8 +94,6 @@ args.r = ifelse(isLarge, 60, 20); % radius
 
 global dotInfo;
 
-% if ~isempty(dotInfo); args.dotInfo = dotInfo; end
-    
 dotInfo = runDotsAnaglyphExtra(args);
     
 end
@@ -109,11 +105,9 @@ disp('rendering the stimulus ...');
 args = struct('enableKeyboard', 0, ...
     'interTrialTime', 1, 'preTrialDelay', 0);
 
-% args.iovd = paramSetRow(1);
-
 args.crossed = paramSetRow(1);
 
-% args.rightVar = paramSetRow(3);
+args.viewD = paramSetRow(2);
 
 isLarge = paramSetRow(3);
 
