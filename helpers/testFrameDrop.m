@@ -1,6 +1,6 @@
 function testFrameDrop
 
-createWindow(1);
+createWindow();
 
 window = getWindow();
 

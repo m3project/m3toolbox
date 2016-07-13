@@ -92,6 +92,8 @@ enableChannels = 0; % 0 = both, -1=only left, +1=only right
 
 enableCyclingMode = 0;
 
+videoFile = 'd:\stim.avi';
+
 %% print keyboard shortcuts
 
 shortcuts = {
@@ -271,9 +273,25 @@ while 1
     
     t = 0;
     
+    i = 0;
+    
+    recording = recordStimulus(videoFile);
+    
     while t < totalTime
         
-        t = GetSecs() - startTime;
+        if isempty(recording)
+            
+            t = GetSecs() - startTime;
+            
+        else
+            
+            fps = 60;
+            
+            t = i / fps;
+            
+            i = i + 1;
+            
+        end
         
         r = radFunc(0);
         
@@ -334,6 +352,8 @@ while 1
         
         Screen('Flip', window);
         
+        recording = recordStimulus(recording);
+        
         [~, ~, keyCode] = KbCheck;
         
         exitCode = checkEscapeKeys(keyCode);
@@ -341,6 +361,8 @@ while 1
         if exitCode, return, end
         
     end
+    
+    recordStimulus(recording);
     
     %% cycling mode delay loop
     

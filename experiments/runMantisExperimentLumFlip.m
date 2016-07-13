@@ -16,7 +16,7 @@
 %
 % Ghaith & Vivek (13/6/2016)
 
-function runMantisExperimentIOVD()
+function runMantisExperimentLumFlip()
 
 expt = struct;
 
@@ -28,9 +28,9 @@ expt.runTrialFun = @runTrial;
 
 expt.runAfterTrialFun = @runAfterTrial;
 
-expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisIOVD\';
+expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisLumFlip\';
 
-expt.name = 'Mantis IOVD';
+expt.name = 'Mantis Lum Flip';
 
 expt.recordVideos = 1;
 
@@ -62,23 +62,19 @@ function paramSet = genParamSet()
 
 isLarge = getDotSize();
 
-blocks = 4;
+blocks = 10;
 
 viewD = input('Enter distance between mantis and screen (cm): ');
 
-iovd = [0 1];
-
 crossed = [0 1];
 
-rightVar = [0 1];
-
-paramSet = createRandTrialBlocks(blocks, iovd, crossed, rightVar, viewD, isLarge);
+paramSet = createRandTrialBlocks(blocks, crossed, viewD, isLarge);
 
 end
 
 function runBeforeTrial(paramSetRow)
 
-args = struct('mode', 'iovd', ...
+args = struct('mode', 'lum-flip', ...
     'enableKeyboard', 0, 'preTrialDelay', 0, ...
     'interTrialTime', 60, 'motionDuration', 0, ...
     'finalPresentationTime', 0);
@@ -86,15 +82,11 @@ args = struct('mode', 'iovd', ...
 % dotInfo is made global to pereserve dot position and velocity information
 % across trials
 
-args.iovd = paramSetRow(1);
+args.crossed = paramSetRow(1);
 
-args.crossed = paramSetRow(2);
+args.viewD = paramSetRow(2);
 
-args.rightVar = paramSetRow(3);
-
-args.viewD = paramSetRow(4);
-
-isLarge = paramSetRow(5);
+isLarge = paramSetRow(3);
 
 args.n = ifelse(isLarge, 1e3, 1e4); % number of dots  
 
@@ -112,18 +104,14 @@ function runTrial(paramSetRow)
 
 disp('rendering the stimulus ...');
 
-args = struct('mode', 'iovd', 'enableKeyboard', 0, ...
+args = struct('mode', 'lum-flip', 'enableKeyboard', 0, ...
     'interTrialTime', 1, 'preTrialDelay', 0);
 
-args.iovd = paramSetRow(1);
+args.crossed = paramSetRow(1);
 
-args.crossed = paramSetRow(2);
+args.viewD = paramSetRow(2);
 
-args.rightVar = paramSetRow(3);
-
-args.viewD = paramSetRow(4);
-
-isLarge = paramSetRow(5);
+isLarge = paramSetRow(3);
 
 args.n = ifelse(isLarge, 1e3, 1e4); % number of dots  
 

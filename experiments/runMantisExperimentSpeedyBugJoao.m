@@ -1,6 +1,6 @@
 function runMantisExperimentSpeedyBugJoao()
 
-warning('Make sure Gamma setting is correct');
+warning('Make sure Gamma setting is correct for any contrast-depending variants of this experiment');
 
 expt = struct;
 
@@ -8,11 +8,11 @@ expt.runBeforeExptFun = @runBeforeExpt;
 
 expt.runBeforeTrialFun = @runBeforeTrial;
 
-expt.genParamSetFun = @genParamSet_VAR3;
+expt.genParamSetFun = @genParamSet_VAR5;
 
-expt.runTrialFun = @runTrial_VAR3;
+expt.runTrialFun = @runTrial_VAR5;
 
-expt.runAfterTrialFun = @runAfterTrial_VAR3;
+expt.runAfterTrialFun = @runAfterTrial_VAR5;
 
 expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisSpeedyBugJoao';
 
@@ -24,15 +24,15 @@ expt.makeBackup = 1;
 
 expt.defName = 'Joao';
 
-expt.addTags = {'VAR4'};
+expt.addTags = {'VAR5'};
 
 runExperiment(expt);
 
 end
 
-%% VAR3
+%% VAR5
 
-function paramSet = genParamSet_VAR3()
+function paramSet = genParamSet_VAR5()
 
 blocks = 8;
 
@@ -44,7 +44,61 @@ paramSet = createRandTrialBlocks(blocks, dirs, bugSpeed);
 
 end
 
-function resultRow = runAfterTrial_VAR3(varargin)
+function resultRow = runAfterTrial_VAR5(varargin)
+
+checkPositive = @(str) str2double(str) >= 0;
+
+checkBinary = @(str) (str2double(str) >= 0) && (str2double(str) <= 1);
+
+numSaccades = getNumber('Number of saccades            : ', checkPositive);
+
+strikes      = getNumber('Number of strikes            : ', checkPositive);
+
+reaching    = getNumber('Reaching (1 = yes, 0 = no)    : ', checkBinary);
+
+resultRow = [numSaccades strikes reaching];
+
+end
+
+function runTrial_VAR5(paramSetRow)
+
+disp('rendering the stimulus ...');
+
+fprintf('\nBug Speed = %d deg/sec\n\n', paramSetRow(2));
+
+bugDelay = 15; % seconds (before bug moves across the screen)
+
+args = struct('dir', paramSetRow(1), ...
+    'bugDelay', bugDelay, 'escapeEnabled', 0, ...
+    'backBaseLum', 0.5, 'bugSpeed', paramSetRow(2));
+
+args.m = 0;
+
+args.bugBaseLum = 0;
+
+args.useNatBack = 0;
+
+args.sr = 40;
+
+runBugPatternDianaNat(args);
+
+end
+
+%% VAR3
+
+function paramSet = genParamSet_VAR3() %#ok<DEFNU>
+
+blocks = 8;
+
+dirs = [-1 1]; % direction
+
+bugSpeed = [74 145];
+
+paramSet = createRandTrialBlocks(blocks, dirs, bugSpeed);
+
+end
+
+function resultRow = runAfterTrial_VAR3(varargin) %#ok<DEFNU>
 
 checkPositive = @(str) str2double(str) >= 0;
 
@@ -60,9 +114,11 @@ resultRow = [numSaccades strikes];
 
 end
 
-function runTrial_VAR3(paramSetRow)
+function runTrial_VAR3(paramSetRow) %#ok<DEFNU>
 
 disp('rendering the stimulus ...');
+
+fprintf('\nBug Speed = %d deg/sec\n\n', paramSetRow(2));
 
 bugDelay = 15; % seconds (before bug moves across the screen)
 

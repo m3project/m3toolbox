@@ -17,7 +17,7 @@
 
 function recording = recordStimulus(arg1)
 
-cropVideo = 1;
+cropVideo = 0;
 
 isFirstCall = ischar(arg1);
 

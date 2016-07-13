@@ -58,6 +58,8 @@ barFlickerFramePeriod = 3; % how often the bars flicker (in frames) when flicker
 
 barFlickerEnabled = 0; % starting (initial) value of the setting
 
+% videoFile = ''; % leave blank to disable recording
+
 if nargin == 1
     
     if ischar(varargin{1})
@@ -346,6 +348,8 @@ while 1
     
     % start presenting
     
+    recording = recordStimulus(videoFile);
+    
     for i=1:size(paramSet, 1)
         
         p = paramSet(i, :);
@@ -401,6 +405,8 @@ while 1
             
             Screen(window, 'Flip');
             
+            recording = recordStimulus(recording);
+            
             k = checkEscapeKeys();
             
             if k
@@ -447,6 +453,8 @@ while 1
             
             Screen(window, 'Flip');
             
+            recording = recordStimulus(recording);
+            
             k = checkEscapeKeys();
             
             if checkS() && cMode
@@ -472,6 +480,8 @@ while 1
     end
     
     ss('end of pattern');
+    
+    recordStimulus(recording);
     
     if cMode
         

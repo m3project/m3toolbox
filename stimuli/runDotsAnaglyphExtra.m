@@ -11,13 +11,13 @@ function varargout = runDotsAnaglyphExtra(args)
 
 % any parameters in this section can be set by Vivek
 
-mode = 'iovd-debug'; % Vivek can change this to fiddle
+mode = 'lum-flip'; % Vivek can change this to fiddle
 
-staticCorr = 1;
+staticCorr = 0;
 
 crossed = 1;
-% 1 for crossed, 0 for uncrossed (with blue filter on left eye)
-% 0 for crossed, 1 for uncrossed (with green filter on left eye)
+% 1 for crossed, 0 for uncrossed (with blue filter on left eye, for an upside-down mantis)
+% 0 for crossed, 1 for uncrossed (with green filter on left eye, for an upside-down mantis)
     
 iovd = 1;
 
@@ -27,7 +27,7 @@ rightVar = 1;
 
 bugY = 0.7; %#ok<NASGU>
 
-v = 2; %#ok<NASGU>
+v = 0; %#ok<NASGU>
 
 n = 1e4; %#ok<NASGU>
 
@@ -63,11 +63,27 @@ elseif isequal(mode, 'bruce')
     
     args.lumFun1 = @getLumBlackWhite;
     
+elseif isequal(mode, 'bruce-test')
+    
+    args.dispFun1 = @(ch, x, y, bugX, bugY, bugRad, G, D) ...
+        getDispBruce(ch, x, y, bugX, bugY, bugRad, G, D, crossed);
+    
+    args.lumFun1 = @getLumBlack;
+    
 elseif isequal(mode, 'iovd-debug')
     
     args.dispFun1 = @(ch, x, y, bugX, bugY, bugRad, G, D) ...
         getDispKineticIOVD ...
         (ch, x, y, bugX, bugY, bugRad, G, D, iovd, crossed, rightVar);
+    
+    
+elseif isequal(mode, 'iovd-test')
+    
+    args.dispFun1 = @(ch, x, y, bugX, bugY, bugRad, G, D) ...
+        getDispKineticIOVD ...
+        (ch, x, y, bugX, bugY, bugRad, G, D, iovd, crossed, rightVar);
+    
+    args.lumFun1 = @getLumBlack;
     
 elseif isequal(mode, 'iovd-recording')
     
@@ -92,6 +108,13 @@ elseif isequal(mode, 'iovd-recording')
     args.enableKeyboard = 0;
     
     args.pairDots = 0; % this is staticCorr
+    
+elseif isequal(mode, 'lum-flip')
+    
+    args.dispFun1 = @getNoDotShift;  
+    
+    args.lumFun1 = @(ch, x, y, bugX, bugY, bugRad, G, D) ...
+        getLumFlip(ch, x, y, bugX, bugY, bugRad, G, D, crossed);
     
 elseif isequal(mode, 'iovd')
     
@@ -349,5 +372,35 @@ end
 function lum = getLumBlack(~, ~, ~, ~, ~, ~, G, ~)
 
 lum = G(:, 3) * 0;
+
+end
+
+%% lum flip
+
+function disp = getNoDotShift(~, x, varargin)
+
+disp = x * 0;
+
+end
+
+function lum = getLumFlip(ch, x, y, bugX, bugY, bugRad, G, D, crossed)
+
+edgeSmoothness = 0.8; % same as in runDotsAnaglyph
+
+dispFun = @(adist) tansigAB(adist * edgeSmoothness, D, 0);
+
+dispSign = (-1)^ch;
+
+dispSign2 = ifelse(crossed, 1, -1);
+
+shiftX = dispSign * dispSign2 * D/2;
+
+adist = sqrt((x - bugX + shiftX).^2 + (y - bugY).^2) - bugRad;
+
+k = dispFun(adist) > 0.5;
+
+lum = G(:, 3); % * 0 + 0;
+
+lum(k) = 1 - lum(k);
 
 end
