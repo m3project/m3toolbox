@@ -30,7 +30,7 @@ viewD = 10;% viewing distance (cm)
 
 bugSize = 1; % bug size (cm) as perceived by the mantis at virtDm2 position
 
-disparityEnable = 1; % 1 for green lens on the left; -1 for green lens on the right)
+disparityEnable = -1; % 1 for green lens on the left; -1 for green lens on the right)
          
 makePlot = 0; % when set to 1, the script plots size and trajectory instead of rendering the stimulus
 

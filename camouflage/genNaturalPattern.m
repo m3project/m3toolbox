@@ -58,7 +58,7 @@ if makePlot
         
     end
     
-    pattern = [];
+%     pattern = [];
     
 end
 
