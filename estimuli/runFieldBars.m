@@ -58,7 +58,7 @@ barFlickerFramePeriod = 3; % how often the bars flicker (in frames) when flicker
 
 barFlickerEnabled = 0; % starting (initial) value of the setting
 
-% videoFile = ''; % leave blank to disable recording
+videoFile = ''; % leave blank to disable recording
 
 if nargin == 1
     
@@ -350,6 +350,24 @@ while 1
     
     recording = recordStimulus(videoFile);
     
+    if ~isempty(videoFile)
+        
+        % add 5 sec initial delay (assuming fps=60);
+        
+        Screen(window, 'flip');
+        
+        for i=1:60*5
+            
+            recording = recordStimulus(recording);
+            
+        end
+        
+        % make flicker box invisible
+        
+        fbox.visible = 0;
+        
+    end
+    
     for i=1:size(paramSet, 1)
         
         p = paramSet(i, :);
@@ -475,13 +493,25 @@ while 1
             
         end
         
+        if ~isempty(videoFile)
+            
+            recordingTime = 15; % sec
+            
+            if ((tOn + tOff) * i) >= recordingTime
+                
+                recordStimulus(recording);
+                
+                return
+                
+            end
+            
+        end
+        
         % end of draw off
         
     end
     
     ss('end of pattern');
-    
-    recordStimulus(recording);
     
     if cMode
         

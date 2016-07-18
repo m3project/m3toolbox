@@ -92,7 +92,7 @@ enableChannels = 0; % 0 = both, -1=only left, +1=only right
 
 enableCyclingMode = 0;
 
-videoFile = 'd:\stim.avi';
+videoFile = '';
 
 %% print keyboard shortcuts
 
@@ -164,6 +164,18 @@ end
 %% flicker box
 
 flickerRect = [0 sH-55 150 sH];
+
+if ~isempty(videoFile)
+    
+    % video recording fix: hide flicker box
+
+    flickerRect = flickerRect - 5000;
+    
+    % also center bug vertically
+    
+    cy = sH / 2;
+    
+end
 
 flicker = 0;
 
@@ -263,6 +275,22 @@ while 1
     
     %% rendering loop
     
+    fps = 60; % for recording 
+    
+    recording = recordStimulus(videoFile);
+    
+    if ~isempty(recording)
+        
+        % 5 second delay 
+        
+        for i=1:fps*5
+            
+            recording = recordStimulus(recording);
+            
+        end
+        
+    end
+    
     dispStr = ifelse(disparityEnable==1, '+', '-');
     
     ss(sprintf('started swirl (%s disp)', dispStr));
@@ -273,9 +301,7 @@ while 1
     
     t = 0;
     
-    i = 0;
-    
-    recording = recordStimulus(videoFile);
+    i = 0;    
     
     while t < totalTime
         
@@ -285,9 +311,7 @@ while 1
             
         else
             
-            fps = 60;
-            
-            t = i / fps;
+            t = i/fps;
             
             i = i + 1;
             
