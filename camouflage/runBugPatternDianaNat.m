@@ -32,6 +32,10 @@ bugLumAmp = 0.5;
 
 useNatBack = 1;
 
+videoFile = '';
+
+%% load overrides
+
 if nargin>0
     
     unpackStruct(args);
@@ -126,7 +130,8 @@ getPosX = @(t) pos0 + dir * bugSpeedPxSec * t;
 
 getBugPosition = @(t) [getPosX(t) sH/2]; %#ok
 
-args2 = packWorkspace('bugPattern', 'getBugPosition', 'escapeEnabled', 'duration', 'backPattern');
+args2 = packWorkspace('bugPattern', 'getBugPosition', ...
+    'escapeEnabled', 'duration', 'backPattern', 'videoFile');
 
 runCamoPattern(args2);
 

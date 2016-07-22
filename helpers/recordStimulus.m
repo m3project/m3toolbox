@@ -88,16 +88,19 @@ else
         
         rect = [];
         
+        pW = 0.75;
+        pH = 0.25;
+        
         if cropVideo
             
             cx = 1920/2;
             cy = 1200/2;
             
-            x0 = cx - cx/2;
-            x1 = cx + cx/2;
+            x0 = cx - cx * pW;
+            x1 = cx + cx * pW;
             
-            y0 = cy - cy/2;
-            y1 = cy + cy/2;
+            y0 = cy - cy * pH;
+            y1 = cy + cy * pH;
             
             rect = [x0 y0 x1 y1];
             

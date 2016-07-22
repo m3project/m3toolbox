@@ -1,5 +1,7 @@
 function runCamoPattern(args)
 
+% parameters
+
 duration = inf;
 
 backPattern = 0.5 * ones(500, 500);
@@ -12,11 +14,17 @@ escapeEnabled = 1;
 
 tileMode = 1; % 0 = stretch, 1 = tile
 
+videoFile = '';
+
+%% load overides
+
 if nargin>0
     
     unpackStruct(args);
     
 end
+
+%% body
 
 S = 1; % scaling factor
 
@@ -66,13 +74,29 @@ cleanFunc1 = @() Screen('Close', texIDs);
 
 obj1 = onCleanup(cleanFunc1);
 
+recording = recordStimulus(videoFile);
+
+j = 0;
+
+fps = 60; % for recording
+
 % render loop
 
 while exitCode == 0
     
     for i=1:frames
         
-        t = GetSecs() - startTime;        
+        if isempty(recording)
+            
+            t = GetSecs() - startTime;            
+            
+        else
+        
+            t = j/fps;
+            
+            j = j + 1;            
+            
+        end            
         
         Screen(window, 'FillRect', [1 1 1] * 255/2);
         
@@ -116,7 +140,9 @@ while exitCode == 0
         
         end
         
-        Screen(window, 'Flip');        
+        Screen(window, 'Flip');
+        
+        recording = recordStimulus(recording);
         
         % checking for key presses
         
@@ -130,7 +156,7 @@ while exitCode == 0
                 
         end
         
-        if GetSecs() - startTime > duration
+        if t > duration
             
             exitCode = 1;
             
@@ -141,6 +167,8 @@ while exitCode == 0
     end
     
 end
+
+recordStimulus(recording);
 
 end
 
