@@ -1,18 +1,16 @@
 function runMantisExperimentSpeedyBugJoao()
 
-warning('Make sure Gamma setting is correct for any contrast-depending variants of this experiment');
-
 expt = struct;
 
 expt.runBeforeExptFun = @runBeforeExpt;
 
 expt.runBeforeTrialFun = @runBeforeTrial;
 
-expt.genParamSetFun = @genParamSet_VAR5;
+expt.genParamSetFun = @genParamSet_VAR7;
 
-expt.runTrialFun = @runTrial_VAR5;
+expt.runTrialFun = @runTrial_VAR7;
 
-expt.runAfterTrialFun = @runAfterTrial_VAR5;
+expt.runAfterTrialFun = @runAfterTrial_VAR7;
 
 expt.workDir = 'x:\readlab\Ghaith\m3\data\mantisSpeedyBugJoao';
 
@@ -24,15 +22,195 @@ expt.makeBackup = 1;
 
 expt.defName = 'Joao';
 
-expt.addTags = {'VAR5'};
+expt.addTags = {'VAR7'};
 
 runExperiment(expt);
 
 end
 
+%% VAR7 
+
+% (same as VAR6 but switch small and large bug luminance levels)
+
+function paramSet = genParamSet_VAR7()
+
+blocks = 8;
+
+dirs = [-1 1]; % direction
+
+bugType = [0 1];
+
+% There are two bug types:
+% 
+% - type 0 (small): width = 1 cm and base lum = 0 (black)
+% - type 1 (large): width = 2 cm and base lum = 0.3
+% 
+% both have speed of 145 deg/sec, a width/height ratio of 64/30 (same as
+% VAR5)
+
+paramSet = createRandTrialBlocks(blocks, dirs, bugType);
+
+end
+
+
+function runTrial_VAR7(paramSetRow)
+
+disp('rendering the stimulus ...');
+
+bugType = paramSetRow(2);
+
+sr = 40; % screen density (px/cm)
+
+bugRatio = 64/30; % width/height ratio
+
+bugSpeed = 145;
+
+if bugType == 0
+    
+    % small bug
+    
+    bugWidthCm = 1;
+    
+    bugBaseLum = 0.2;
+    
+    strType = 'Small Bug';
+    
+else
+    
+    % large bug
+    
+    bugWidthCm = 2;
+    
+    bugBaseLum = 0;
+    
+    strType = 'Large Bug';
+    
+end
+
+fprintf('\nBug Type = %s\n\n', strType);
+
+W = round(bugWidthCm * sr);
+
+H = round(bugWidthCm / bugRatio* sr);
+
+% big bug has 0.3 mean luminance
+% small bug has 0.5 mean luminance
+
+bugDelay = 12; % seconds (before bug moves across the screen)
+
+args = struct('dir', paramSetRow(1), ...
+    'bugDelay', bugDelay, 'escapeEnabled', 0, ...
+    'backBaseLum', 0.5, 'bugSpeed', bugSpeed, ...
+    'W', W, 'H', H, 'bugBaseLum', bugBaseLum);
+
+args.m = 0;
+
+args.useNatBack = 0;
+
+args.sr = sr;
+
+runBugPatternDianaNat(args);
+
+end
+
+function resultRow = runAfterTrial_VAR7(varargin)
+
+resultRow = runAfterTrial_VAR5(varargin);
+
+end
+
+%% VAR6
+
+function paramSet = genParamSet_VAR6() %#ok<DEFNU>
+
+blocks = 8;
+
+dirs = [-1 1]; % direction
+
+bugType = [0 1];
+
+% There are two bug types:
+% 
+% - type 0 (small): width = 1 cm and base lum = 0 (black)
+% - type 1 (large): width = 2 cm and base lum = 0.3
+% 
+% both have speed of 145 deg/sec, a width/height ratio of 64/30 (same as
+% VAR5)
+
+paramSet = createRandTrialBlocks(blocks, dirs, bugType);
+
+end
+
+
+function runTrial_VAR6(paramSetRow) %#ok<DEFNU>
+
+disp('rendering the stimulus ...');
+
+bugType = paramSetRow(2);
+
+sr = 40; % screen density (px/cm)
+
+bugRatio = 64/30; % width/height ratio
+
+bugSpeed = 145;
+
+if bugType == 0
+    
+    % small bug
+    
+    bugWidthCm = 1;
+    
+    bugBaseLum = 0;
+    
+    strType = 'Small Bug';
+    
+else
+    
+    % large bug
+    
+    bugWidthCm = 2;
+    
+    bugBaseLum = 0.2;
+    
+    strType = 'Large Bug';
+    
+end
+
+fprintf('\nBug Type = %s\n\n', strType);
+
+W = round(bugWidthCm * sr);
+
+H = round(bugWidthCm / bugRatio* sr);
+
+% big bug has 0.3 mean luminance
+% small bug has 0.5 mean luminance
+
+bugDelay = 12; % seconds (before bug moves across the screen)
+
+args = struct('dir', paramSetRow(1), ...
+    'bugDelay', bugDelay, 'escapeEnabled', 0, ...
+    'backBaseLum', 0.5, 'bugSpeed', bugSpeed, ...
+    'W', W, 'H', H, 'bugBaseLum', bugBaseLum);
+
+args.m = 0;
+
+args.useNatBack = 0;
+
+args.sr = sr;
+
+runBugPatternDianaNat(args);
+
+end
+
+function resultRow = runAfterTrial_VAR6(varargin) %#ok<DEFNU>
+
+resultRow = runAfterTrial_VAR5(varargin);
+
+end
+
 %% VAR5
 
-function paramSet = genParamSet_VAR5()
+function paramSet = genParamSet_VAR5() %#ok<DEFNU>
 
 blocks = 8;
 
@@ -60,7 +238,7 @@ resultRow = [numSaccades strikes reaching];
 
 end
 
-function runTrial_VAR5(paramSetRow)
+function runTrial_VAR5(paramSetRow) %#ok<DEFNU>
 
 disp('rendering the stimulus ...');
 
@@ -148,7 +326,9 @@ function runBeforeExpt()
 
 % Gamma = 1.7; % this is for the CSF (hp p1130 monitor) - I measured this with Diana on the 2nd of Nov 2015
 
-Gamma = 2.0;  % this is for the CSF (hp p1130 monitor) - I measured this with Diana on the 17nd of Nov 2015
+%Gamma = 2.0;  % this is for the CSF (hp p1130 monitor) - I measured this with Diana on the 17nd of Nov 2015
+
+Gamma = 2.66; %  this is for Phillips 107b3 (measured with Joao on 2nd August 2016)
 
 createWindow(Gamma);
 
