@@ -70,9 +70,9 @@ crossed = [0 1];
 
 conds = [1 2 3 3 4 4 5 5];
 
-% paramSet = createRandTrialBlocks(blocks, conds, crossed, viewD, isLarge);
+paramSet = createRandTrialBlocks(blocks, conds, crossed, viewD, isLarge);
 
-paramSet = createTrial(conds, 1, viewD, isLarge);
+% paramSet = createTrial(conds, 1, viewD, isLarge);
 
 end
 
@@ -155,7 +155,7 @@ else
     
 end
 
-args = struct('bugY', 0.5, 'renderChannels', [0 1], 'v', 0, ...
+args = struct('bugY', 0.7, 'renderChannels', [0 1], 'v', 0, ...
     'vTargetDots', 2, 'pairDots', 1, ...
     'preTrialDelay', delayBefore, 'motionDuration', 0, ...
     'finalPresentationTime', finalPresentationTime, ...
