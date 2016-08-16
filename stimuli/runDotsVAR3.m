@@ -8,7 +8,7 @@
 
 function varargout = runDotsVAR3(args)
 
-%inDebug();
+% inDebug();
 
 % parameters
 
@@ -121,7 +121,8 @@ centerX = sW * 0.5;
 
 centerY = sH * bugY;
 
-[X, Y] = getAppear(centerX, centerY);
+%[X, Y] = getAppear(centerX, centerY);
+[X, Y] = getSwirl(centerX, centerY, motionDuration);
 
 if previewMotionFuncs
     
@@ -339,15 +340,24 @@ while 1
     
 end
 
-dotInfo = struct('xs', xs, 'ys', ys, 'thetas', thetas, 'G', G);
+dotInfo = struct('xs', xs, 'ys', ys, 'thetas', thetas, ...
+    'G', G, 'vs', vs, 'dotLum', dotLum);
 
 if nargout; varargout{1} = dotInfo; end
 
 end
 
-function [X, Y] = getAppear(centerX, centerY)
+function [X, Y] = getSwirl(centerX, centerY, motionDuration)
 
-X = @(t) centerX + (t<0) * 1e3;
-Y = @(t) centerY + (t<0) * 1e3;
+motionR0 = 800; % initial swirl radius (px)
+
+rotFreq = 2; % swirl rotation frequency (Hz)
+
+theta2 = @(t) min(t * pi / motionDuration, pi);
+
+motionR = @(t) motionR0/2 * (1+cos(theta2(t)));
+
+X = @(t) centerX + cos(t * 2 * pi * rotFreq) .* motionR(t);
+Y = @(t) centerY + sin(t * 2 * pi * rotFreq) .* motionR(t);
 
 end
