@@ -24,7 +24,7 @@ runAfterExptFun     = @runAfterExpt;
 
 runChecksFun        = @runChecks;
 
-recordVideos        = 0;
+recordVideos        = 1;
 
 makeBackup          = 1;
 

@@ -72,7 +72,11 @@ PsychImaging('PrepareConfiguration');
 
 PsychImaging('AddTask', 'FinalFormatting', 'DisplayColorCorrection', 'SimpleGamma');
 
-enable10Bit();
+if IsWindows
+
+    enable10Bit();
+    
+end
 
 window = PsychImaging('OpenWindow', consts.SCREEN_ID, consts.MEAN_LUM, ...
     [], [], [], consts.STEREO_MODE, 0);

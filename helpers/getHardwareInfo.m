@@ -4,22 +4,30 @@
 %
 function hardwareInfo = getHardwareInfo()
 
-computer = getWMIC('wmic computersystem list full');
+    if isunix
+        
+        hardwareInfo = struct();
+        
+    else
+        
+        computer = getWMIC('wmic computersystem list full');
 
-cpu = getWMIC('wmic cpu list full');
+        cpu = getWMIC('wmic cpu list full');
 
-screens = getScreens();
+        screens = getScreens();
 
-product = getWMIC('wmic csproduct list full');
+        product = getWMIC('wmic csproduct list full');
 
-[~, gpu] = system('wmic path Win32_VideoController get');
+        [~, gpu] = system('wmic path Win32_VideoController get');
 
-gpu = strtrim(gpu);
+        gpu = strtrim(gpu);
 
-getConstParams = getConstants();
+        getConstParams = getConstants();
 
-hardwareInfo = packWorkspace();
-
+        hardwareInfo = packWorkspace();
+        
+    end
+    
 end
 
 function screens = getScreens()

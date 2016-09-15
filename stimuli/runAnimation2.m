@@ -481,18 +481,7 @@ while (1)
         
         [~, ~, keyCode ] = KbCheck;
         
-        if keyCode(KbName('Control')) && 0
-            
-            highR = tileSide * 20;
-            
-            bc = bugCenter + [0 tileSide];
-            
-            Screen(window, 'FrameOval', [1 0 0 1], [bc-highR bc+highR] , 2);
-            
-            Screen(window, 'FillOval',  [0.9 0 0 0.3], [bc-highR bc+highR]);
-            
-        end
-        
+
         % draw bug tiles:
         
         f = mod(floor(motionFuncs.F(t)), fCount) + 1; % frame number
