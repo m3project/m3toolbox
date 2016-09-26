@@ -29,27 +29,23 @@ for i=1:size(groups, 1)
     
     B = A(k, :);
     
-    if nargout
-        
-        nf = nargin(groupFun);
-        
-        if nf == 1
+    nf = nargin(groupFun);
     
-            y(end+1, :) = [g groupFun(B)]; %#ok
-            
-        elseif nf == 2
-            
-            y(end+1, :) = [g groupFun(B, i)]; %#ok
-            
-        else
-            
-            error('groupFun has an incorrect number of input arguments');
-            
-        end
+    if ~ismember(nf, [1 2])
+        
+        error('groupFun has an incorrect number of input arguments');
+        
+    end
+    
+    if nargout
+
+        result = ifelse(nf == 1, groupFun(B), groupFun(B, i));
+                
+        y(end+1, :) = result; %#ok<AGROW>
         
     else
         
-        groupFun(B);
+        if nf == 1; groupFun(B); else groupFun(B, i); end
         
     end
     
