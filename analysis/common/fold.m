@@ -30,8 +30,22 @@ for i=1:size(groups, 1)
     B = A(k, :);
     
     if nargout
+        
+        nf = nargin(groupFun);
+        
+        if nf == 1
     
-        y(end+1, :) = [g groupFun(B)]; %#ok
+            y(end+1, :) = [g groupFun(B)]; %#ok
+            
+        elseif nf == 2
+            
+            y(end+1, :) = [g groupFun(B, i)]; %#ok
+            
+        else
+            
+            error('groupFun has an incorrect number of input arguments');
+            
+        end
         
     else
         
