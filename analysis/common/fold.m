@@ -38,10 +38,18 @@ for i=1:size(groups, 1)
     end
     
     if nargout
+        
+       if nf == 1
+            
+            result = groupFun(B);
+            
+        else
+            
+            result = groupFun(B, i);
 
-        result = ifelse(nf == 1, groupFun(B), groupFun(B, i));
+        end
                 
-        y(end+1, :) = result; %#ok<AGROW>
+        y(end+1, :) = [g result]; %#ok<AGROW>
         
     else
         
