@@ -8,7 +8,6 @@ Gamma = 2.127; % for DELL U2413
 
 LeftGains = [0 0.66 0];
 
-
 RightGains = [0 0 1];
 
 createWindow3DAnaglyph(Gamma, LeftGains, RightGains);
@@ -39,9 +38,9 @@ preTrialDelay = 0; % seconds
 
 unitArea = 100*100; % px
 
-r = 20; % dot radius
+r = 60; % dot radius
 
-dotDensity = 55; % number of dots in unit area
+dotDensity = 3; % number of dots in unit area
 
 n = round((1920*1680) / unitArea * dotDensity); % number of dots  
 
@@ -58,6 +57,8 @@ interTrialTime = 0;
 jitter = 10; % px
 
 corrSetting =1; % -1 = anti-correlated, 0 = random, +1 = correlated
+
+videoFile = '';
 
 %% parameters
 
@@ -194,6 +195,8 @@ rng(randomSeed);
 
 startTime = GetSecs() + preTrialDelay;
 
+recording = recordStimulus(videoFile);
+
 i = 0;
 
 t2 = 0;
@@ -202,7 +205,15 @@ while 1
     
     i = i + 1;
     
-    t = GetSecs() - startTime;
+    if isempty(recording);
+        
+        t = GetSecs() - startTime;
+        
+    else
+        
+        t = i/60;
+        
+    end
     
     if t>totalTime
         
@@ -346,6 +357,8 @@ while 1
     
     Screen(window, 'Flip');
     
+    recording = recordStimulus(recording);
+    
     if enableKeyboard
         
         % handle key presses
@@ -379,6 +392,8 @@ while 1
     end
     
 end
+
+recordStimulus(recording);
 
 end
 

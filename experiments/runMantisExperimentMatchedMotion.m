@@ -54,7 +54,7 @@ end
 
 function isLarge = getDotSize()
 
-isLarge = 1; % 0 or 1
+isLarge = 0; % 0 or 1
 
 end
 
