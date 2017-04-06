@@ -59,6 +59,8 @@ viewD = 7; % viewing distance (cm)
 
 screenReso = 40; % monitor resolution (px/cm)
 
+videoFile = '';
+
 dir = 1; %#ok
 
 if nargin>0
@@ -116,7 +118,8 @@ if ~makePlot
     ys = 0.5 + ys * 0.5;
     
     runCamoPattern(struct('backPattern', ys, 'tileMode', 0, ...
-        'duration', duration, 'escapeEnabled', escapeEnabled));
+        'duration', duration, 'escapeEnabled', escapeEnabled, ...
+        'videoFile', videoFile));
     
 end
 
