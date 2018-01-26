@@ -2,17 +2,24 @@ function finishEyelinkRecording(edfFile, outputFile)
 
 % Finish recording, grabbing edfFile from eyelink and saving it as
 % outputFile.
+%
+% Note: if edfFile and outputFile are not both supplied, recording is
+% terminated but the recorded file is discarded.
 
 Eyelink('StopRecording');
 
 Eyelink('CloseFile');
 
-Eyelink('ReceiveFile');
+if nargin == 2
 
-assert(exist(edfFile, 'file') == 2); % check that file exists
+    Eyelink('ReceiveFile');
 
-copyfile(edfFile, outputFile);
+    assert(exist(edfFile, 'file') == 2); % check that file exists
 
-delete(edfFile);
+    copyfile(edfFile, outputFile);
+
+    delete(edfFile);
+
+end
 
 end
