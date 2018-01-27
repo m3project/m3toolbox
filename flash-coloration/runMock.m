@@ -2,16 +2,24 @@ function runMock()
 
 createWindow();
 
-openEyelink();
+recordGaze = 0;
 
-file = startEyelinkRecording();
+if recordGaze
+
+    openEyelink();
+
+    file = startEyelinkRecording();
+
+    obj1 = onCleanup(@closeEyelink);
+
+end
 
 while 1
-    
+
     exitCode = runMockBug();
-    
+
     if exitCode; break; end
-            
+
 end
 
 if exitCode == 2; sca; end
@@ -40,13 +48,13 @@ clc
 % bugX = randi([M sW-M]);
 
 if isequal(bugDir, 0)
-    
+
     bugX = randi([M sW/2]);
-    
+
 else
-    
+
     bugX = randi([sW/2 sW-M]);
-    
+
 end
 
 bugY = randi([M sH-M]);
@@ -80,9 +88,9 @@ function waitClick()
 buttons = 1;
 
 while any(buttons)
-    
+
     [~, ~, buttons] = GetMouse();
-    
+
 end
 
 % Now wait until any button is pressed.
@@ -90,9 +98,9 @@ end
 buttons = 0;
 
 while ~any(buttons)
-    
+
     [~, ~, buttons] = GetMouse();
-    
+
 end
 
 end
