@@ -44,15 +44,17 @@ end
 
 pc = getenv('computername');
 
-if isequal(pc, 'READLAB14') || isequal(pc, 'READLAB12')
-    
+dev_computers = {'READLAB14', 'READLAB12', 'EEE16-055'};
+
+if ismember(pc, dev_computers)
+
     recordVideos = 0;
     
     makeBackup = 0;
     
-    runChecksFun = @runChecks;
+    runChecksFun = @runChecks; % override user runChecksFun with local dummy
     
-    warning('running on Ghaith/Vivek''s desktop machine: backup, video recording and hardware check all disabled');
+    warning('running on dev machine: backup, video recording and hardware checks are all disabled');
     
 end
 
