@@ -2,13 +2,13 @@ function runMantisExperimentMasking()
 
 expt = struct;
 
-expt.genParamSetFun = @genParamSet_VAR2;
+expt.genParamSetFun = @genParamSet_VAR1;
 
-expt.runBeforeTrialFun = @runBeforeTrial_VAR2;
+expt.runBeforeTrialFun = @runBeforeTrial_VAR1;
 
-expt.runTrialFun = @runTrial_VAR2;
+expt.runTrialFun = @runTrial_VAR1;
 
-expt.runAfterTrialFun = @runAfterTrial_VAR2;
+expt.runAfterTrialFun = @runAfterTrial_VAR1;
 
 expt.runBeforeExptFun = @runBeforeExptFun_VAR2;
 
@@ -22,7 +22,7 @@ expt.recordVideos = 1;
 
 expt.makeBackup = 1;
 
-expt.addTags = {'VAR2', 'HIERODULA', 'SUB'};
+expt.addTags = {'VAR1', 'HIERODULA', 'SUB'};
 
 runExperiment(expt);
 
