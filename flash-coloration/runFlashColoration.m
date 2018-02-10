@@ -1,4 +1,4 @@
-function exitCode = runFlashColoration(args)
+function [exitCode, clickPoints] = runFlashColoration(args)
 
 % parameters
 
@@ -116,6 +116,15 @@ bugWingPattern = genFlashColorationBug(struct( ...
 
 %% render
 
+clickPoints = []; % holds click (x, y, t) coordinates
+
+bugPosPoints = []; % holds bug (x, y, t) coordinates
+
+% Note: in clickPoints and bugPosPoints, t=0 corresponds to the start of
+% bug motion
+
+[~, ~, old_buttons] = GetMouse(window); % old button state (for comparison)
+
 [h, w, ~] = size(bugBodyPattern);
 
 makeTexture = @(pat) Screen('MakeTexture', window, pat * 255);
@@ -163,6 +172,16 @@ while 1
         t = ifelse(isempty(recording), tReal, tFrames);
 
         t = max(t - preMotionDelay, 0);
+
+        [mx, my, buttons] = GetMouse(window);
+
+        if buttons(1) && ~old_buttons(1)
+
+            fprintf('Click at %f, %d, %d\n', t, mx, my);
+
+        end
+
+        old_buttons = buttons;
 
     else
 
