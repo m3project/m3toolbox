@@ -14,6 +14,8 @@ if recordGaze
 
 end
 
+obj2 = onCleanup(@commandwindow);
+
 while 1
 
     exitCode = runMockBug();
@@ -77,7 +79,27 @@ exitCode = runFlashColoration(struct( ...
 
 if exitCode; return; end
 
-waitClick();
+waitKey('Space');
+
+end
+
+function waitKey(key)
+
+% Wait until key is pressed.
+
+while (1)
+
+    drawnow
+
+    [~, ~, keyCode ] = KbCheck;
+
+    if (keyCode(KbName(key)))
+
+        break;
+
+    end
+
+end
 
 end
 
