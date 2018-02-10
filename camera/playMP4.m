@@ -18,7 +18,13 @@ end
 
 % Size a figure based on the video's width and height.
 hf = gcf;
-%set(hf, 'position', [150 150 vidWidth vidHeight])
+
+currentPosition = get(hf, 'position');
+
+x = currentPosition(1);
+y = currentPosition(2);
+
+set(hf, 'position', [x y vidWidth vidHeight])
 
 % Play back the movie once at the video's frame rate.
 movie(hf, mov, 1, xyloObj.FrameRate);
