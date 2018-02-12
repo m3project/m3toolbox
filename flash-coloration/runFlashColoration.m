@@ -10,15 +10,13 @@ bodyLateral = 2/3; % relative size of bug body part (1 = equilateral)
 
 wingLateral = 1; % relative size of bug wing part (1 = equilateral)
 
-wing = [1 0 0]; % nan (same as bug), scalar (lum) or RGB triplet
-% wing = nan;
+wing = nan; % inf (same as bug), nan (1/f), scalar (lum) or RGB triplet
+
 bugAngle = randi(360); % bug orientation angle in degrees (0 = leftwards)
 
-initDisplacement = randi([400 700]); % initial bug displacement from final position (px)
+motionDistance = randi([200 600]); % distance travelled (px)
 
 bugSpeed = 500; % bug speed (px/sec)
-
-bugFinalPosition = [randi([100 400]) randi([200 1000])]; % final position of bug *center*
 
 videoFile = ''; % leave empty to disable recording
 
@@ -28,6 +26,8 @@ postMotionDelay = 0; % seconds
 
 preMotionDelay = 0; % seconds
 
+drawDebugLines = 1; % draw lines across the screen for debugging
+
 % bugBody:
 %
 % nan         : 1/f pattern
@@ -35,7 +35,7 @@ preMotionDelay = 0; % seconds
 % vector      : RGB triplet
 % 'background': cut from background at final position
 
-bugBody = nan;
+bugBody = [1 0 0];
 
 % motionTrigger
 %
@@ -45,6 +45,26 @@ bugBody = nan;
 motionTrigger = 'buff';
 
 bufferRadius = 100; % pixels
+
+% isBodyVisible
+%
+% Determine when body part is visible.
+%
+% t             : time after motion trigger is fired (seconds)
+% inMotion      : 1 if bug currently moving, 0 otherwise
+% motionEnabled : 1 if trigger fired, 0 otherwise
+
+isBodyVisible = @(t, inMotion, motionEnabled) inMotion;
+
+% bugInitialPosition
+%
+% Position of bug *center*
+%
+% Calculate the default value such that the bug travels towards screen
+% center.
+
+bugInitialPos = round([1920 1200]/2 - ...
+    [cosd(bugAngle) -sind(bugAngle)] * motionDistance);
 
 %%
 
@@ -59,6 +79,8 @@ end
 iseven = @(x) mod(x, 2) == 0;
 
 assert(iseven(bugDimension));
+
+assert(motionDistance >= 0, 'motionDistance is negative');
 
 %% create window
 
@@ -102,12 +124,10 @@ bugBodyPattern = genFlashColorationBug(struct( ...
 % overflows bug pattern. This correction is applied when wing content is
 % not the same as bug pattern.
 
-wingSameBugPattern = isnan(wing);
-
-wingHeightCorrection = ifelse(wingSameBugPattern, 0, 1);
+wingSameBugPattern = isinf(wing);
 
 bugWingPattern = genFlashColorationBug(struct( ...
-    'bugHeight', bugHeight - wingHeightCorrection, ...
+    'bugHeight', bugHeight, ...
     'id', nan, ...
     'bugLateral', wingLateral, ...
     'bugBodyContent', ifelse(wingSameBugPattern, bugBodyContent, wing), ...
@@ -136,16 +156,16 @@ wing_txt = makeTexture(bugWingPattern);
 vx = bugSpeed * cosd(bugAngle); % velocity x component (px/sec)
 vy = bugSpeed * sind(bugAngle); % velocity y component (px/sec)
 
-dx = initDisplacement * cosd(bugAngle); % init disp in x direction (px)
-dy = initDisplacement * sind(bugAngle); % init disp in y direction (px)
+% These assertions check whether the bug is within screen at all times.
+% They are disabled for now since some experiments require the bug to go
+% off-screen.
+%
+% assert((bugFinalPosition(1) + dx) > 0);
+% assert((bugFinalPosition(2) + dy) > 0);
+% assert((bugFinalPosition(1) + dx) < sW);
+% assert((bugFinalPosition(2) + dy) < sH);
 
-assert((bugFinalPosition(1) + dx) > 0);
-assert((bugFinalPosition(2) + dy) > 0);
-
-assert((bugFinalPosition(1) + dx) < sW);
-assert((bugFinalPosition(2) + dy) < sH);
-
-duration = initDisplacement / bugSpeed; % movement duration (seconds)
+duration = motionDistance / bugSpeed; % movement duration (seconds)
 
 recording = recordStimulus(videoFile);
 
@@ -199,9 +219,7 @@ while 1
 
             [mx, my] = GetMouse(window);
 
-            bugInitialPosition = bugFinalPosition + [dx dy];
-
-            mouseDiff = [mx my] - bugInitialPosition;
+            mouseDiff = [mx my] - bugInitialPos;
 
             mouseDist = sqrt(sum(mouseDiff .^ 2));
 
@@ -220,10 +238,13 @@ while 1
 
     end
 
-    % calculate relative displacement from final position
+    % calculate relative displacement from initial position
 
-    xr = ifelse(t < duration, dx - vx * t, 0);
-    yr = ifelse(t < duration, dy - vy * t, 0);
+    xr = ifelse(t < duration, vx * t, vx * duration);
+    yr = ifelse(t < duration, vy * t, vy * duration) * -1;
+
+    % note: when calculating yr, multiply by -1 because the positive
+    % direction of bugAngle y-axis points opposite to screen y-axis.
 
     inMotion = (t > 0) && (t < duration);
 
@@ -234,8 +255,10 @@ while 1
 
     bugRect = [0 0 w h];
 
-    bugPos = bugRect + bugFinalPosition([1 2 1 2]) + ...
-        [xr yr xr yr] - [1 1 1 1] * bugDimension/2;
+    bugPos = bugRect ...
+        + bugInitialPos([1 2 1 2]) ...
+        + [xr yr xr yr] ...
+        - [1 1 1 1] * bugDimension/2;
 
     % draw textures
 
@@ -243,13 +266,21 @@ while 1
 
     Screen('DrawTexture', window, back_txt);
 
-    if inMotion
+    Screen('DrawTexture', window, wing_txt, bugRect, bugPos, 0);
 
-        Screen('DrawTexture', window, wing_txt, bugRect, bugPos, 0);
+    if drawDebugLines
+
+        Screen('DrawLine', window, [1 0 0], 0, sH/2, sW, sH/2, 1);
+
+        Screen('DrawLine', window, [1 0 0], sW/2, 0, sW/2, sH, 1);
 
     end
 
-    Screen('DrawTexture', window, bug_txt, bugRect, bugPos, 0);
+    if isBodyVisible(t, inMotion, motionEnabled)
+
+        Screen('DrawTexture', window, bug_txt, bugRect, bugPos, 0);
+
+    end
 
     Screen('Flip', window);
 
@@ -284,7 +315,5 @@ while 1
     end
 
 end
-
-exitCode = 0;
 
 end
