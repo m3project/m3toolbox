@@ -134,11 +134,11 @@ y = y - cy;
 
 % convert to polar coordinates
 
-[r, theta] = car2pol(x, y);
+[r, theta] = car2pol(y, x);
 
-theta = theta + alpha;
+theta = theta - alpha;
 
-[x, y] = pol2car(r, theta);
+[y, x] = pol2car(r, -theta);
 
 p1 = [x(1) y(1)];
 p2 = [x(2) y(2)];
