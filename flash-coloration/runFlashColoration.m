@@ -65,6 +65,12 @@ isBodyVisible = @(t, inMotion, motionTriggered) inMotion;
 bugInitialPos = round([1920 1200]/2 - ...
     [cosd(bugAngle) -sind(bugAngle)] * motionDistance);
 
+% Event callbacks:
+
+onStart = @() []; % called immediately before rendering loop
+
+onTrigger = @() []; % called when motion trigger is fired
+
 %%
 
 if nargin
@@ -188,6 +194,8 @@ triggerTime = nan; % time when motion trigger is fired
 % triggerTime : relative to t0
 % tm          : relative to t0
 
+onStart();
+
 while 1
 
     % Determine time
@@ -208,8 +216,6 @@ while 1
 
         if buttons(1) && ~old_buttons(1)
 
-            fprintf('Click at %f, %d, %d\n', t, mx, my);
-
             clickPoints(end+1, :) = [t mx my]; %#ok<AGROW>
 
         end
@@ -226,6 +232,8 @@ while 1
 
             motionTriggered = 1;
 
+            onTrigger();
+
         elseif isequal(motionTrigger, 'buff')
 
             [mx, my] = GetMouse(window);
@@ -239,6 +247,8 @@ while 1
                 triggerTime = GetSecs() - t0;
 
                 motionTriggered = 1;
+
+                onTrigger();
 
             end
 

@@ -1,34 +1,8 @@
-function runMock()
+function exitCode = runMock()
 
-createWindow();
+    condition = 1;
 
-recordGaze = 0;
-
-if recordGaze
-
-    openEyelink();
-
-    file = startEyelinkRecording();
-
-    obj1 = onCleanup(@closeEyelink);
-
-end
-
-runCondition();
-
-% while 1
-
-%     exitCode = runMockBug();
-
-%     if exitCode; break; end
-
-% end
-
-% if exitCode == 2; sca; end
-
-end
-
-function exitCode = runCondition()
+    recordGaze = 0;
 
     [sW, sH] = getResolution();
 
@@ -43,6 +17,28 @@ function exitCode = runCondition()
     margin = bugHeight;
 
     x1 = margin; x2 = sW - margin; % lower/upper limits of bug end position (px)
+
+    %% Eyelink
+
+    if recordGaze
+
+        openEyelink();
+
+        file = startEyelinkRecording();
+
+        obj1 = onCleanup(@closeEyelink);
+
+        onStart = @() tagEyelink('Start');
+
+        onTrigger = @() tagEyelink('Trigger');
+
+    else
+
+        onStart = @() disp('Stimulus started ...');
+
+        onTrigger = @() disp('Motion triggered ...');
+
+    end
 
     %% Sanity checks
 
@@ -61,8 +57,6 @@ function exitCode = runCondition()
     % isBodyVisible: lambda specifying when is the colored body part visible
     %
     % postMotionDelay: delay after end of motion (seconds)
-
-    condition = 3;
 
     staticBugPostMotion = 1; % TODO: check with Diana
 
@@ -228,15 +222,17 @@ function exitCode = runCondition()
 
     [exitCode, triggerTime, clickPoints, bugPosPoints] = ...
         runFlashColoration(struct( ...
-            'bugAngle', ifelse(bugDir, 0, 180), ...
-            'motionDistance', motionDistance, ...
-            'bugInitialPos', [bugStart bugY], ...
-            'bodyLateral', 0.5, ...
             'wing', nan, ...
+            'onStart', onStart, ...
+            'bugBody', [1 0 0], ...
             'bugSpeed', bugSpeed, ...
+            'bugAngle', ifelse(bugDir, 0, 180), ...
+            'onTrigger', onTrigger, ...
+            'bodyLateral', 0.5, ...
+            'bugInitialPos', [bugStart bugY], ...
             'isBodyVisible', isBodyVisible, ...
-            'postMotionDelay', postMotionDelay, ...
-            'bugBody', [1 0 0] ...
+            'motionDistance', motionDistance, ...
+            'postMotionDelay', postMotionDelay ...
         ));
 
 end
