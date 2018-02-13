@@ -177,7 +177,7 @@ t = 0;
 
 % initial motionEnabled is false, unless motionTrigger equals 'auto'
 
-motionEnabled = motionTrigger == 'auto';
+motionEnabled = isequal(motionTrigger, 'auto');
 
 while 1
 
