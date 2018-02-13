@@ -62,9 +62,20 @@ function exitCode = runCondition()
     %
     % postMotionDelay: delay after end of motion (seconds)
 
-    condition = 10;
+    condition = 3;
 
     staticBugPostMotion = 1; % TODO: check with Diana
+
+    % Travelled distances are expressed with respect to distanceUnit.
+
+    % The side length of an equilateral triangle (a) and its height (h) are
+    % related by h = a sin(60)
+    %
+    % Source: http://mathworld.wolfram.com/EquilateralTriangle.html
+
+    bugSideLength = bugHeight / sind(60);
+
+    distanceUnit = round(bugSideLength); % TODO: check with Diana: side or height?
 
     if condition == 1
 
@@ -97,7 +108,7 @@ function exitCode = runCondition()
         postMotionDelay = 0;
 
         [bugLeft, bugRight] = ...
-            getMotionLimitsBothInside(x1, x2, distance * bugHeight);
+            getMotionLimitsBothInside(x1, x2, distance * distanceUnit);
 
     elseif condition == 4
 
@@ -110,7 +121,7 @@ function exitCode = runCondition()
         postMotionDelay = 0;
 
         [bugLeft, bugRight] = ...
-            getMotionLimitsBothInside(x1, x2, distance * bugHeight);
+            getMotionLimitsBothInside(x1, x2, distance * distanceUnit);
 
     elseif condition == 5
 
@@ -123,7 +134,7 @@ function exitCode = runCondition()
         postMotionDelay = 0;
 
         [bugLeft, bugRight] = ...
-            getMotionLimitsBothInside(x1, x2, distance * bugHeight);
+            getMotionLimitsBothInside(x1, x2, distance * distanceUnit);
 
     elseif condition == 6
 
@@ -136,7 +147,7 @@ function exitCode = runCondition()
         postMotionDelay = 0;
 
         [bugLeft, bugRight] = ...
-            getMotionLimitsBothInside(x1, x2, distance * bugHeight);
+            getMotionLimitsBothInside(x1, x2, distance * distanceUnit);
 
     elseif condition == 7
 
@@ -144,7 +155,7 @@ function exitCode = runCondition()
 
         distance = 6;
 
-        bodyDistance = (distance - 2) * bugHeight;
+        bodyDistance = (distance - 2) * distanceUnit;
 
         bodyVisibleDuration = bodyDistance / bugSpeed;
 
@@ -154,7 +165,7 @@ function exitCode = runCondition()
         postMotionDelay = 0;
 
         [bugLeft, bugRight] = ...
-            getMotionLimitsBothInside(x1, x2, distance * bugHeight);
+            getMotionLimitsBothInside(x1, x2, distance * distanceUnit);
 
     elseif condition == 8
 
@@ -163,7 +174,7 @@ function exitCode = runCondition()
 
         distance = 12;
 
-        bodyDistance = (distance - 2) * bugHeight;
+        bodyDistance = (distance - 2) * distanceUnit;
 
         bodyVisibleDuration = bodyDistance / bugSpeed;
 
@@ -173,34 +184,32 @@ function exitCode = runCondition()
         postMotionDelay = 0;
 
         [bugLeft, bugRight] = ...
-            getMotionLimitsBothInside(x1, x2, distance * bugHeight);
+            getMotionLimitsBothInside(x1, x2, distance * distanceUnit);
 
     elseif condition == 9
 
         % D1 (moving bug, moves until outside screen, cryptic all the way)
 
-        distance = (sW + bugHeight) / bugHeight;
-
         isBodyVisible = @(varargin) false;
 
         postMotionDelay = 0;
 
-        [bugLeft, bugRight] = ...
-            getMotionLimits(x1, x2, distance * bugHeight);
+        bugLeft = randi([x1 x2]);
+
+        bugRight = sW + bugHeight; % end position is off screen
 
     elseif condition == 10
 
         % D2 (moving bug, moves until outside screen, flash colored all the
         % way)
 
-        distance = (sW + bugHeight) / bugHeight;
-
         isBodyVisible = @(t, inMotion, motionTriggered) inMotion;
 
         postMotionDelay = 0;
 
-        [bugLeft, bugRight] = ...
-            getMotionLimits(x1, x2, distance * bugHeight);
+        bugLeft = randi([x1 x2]);
+
+        bugRight = sW + bugHeight; % end position is off screen
 
     else
 
@@ -210,23 +219,38 @@ function exitCode = runCondition()
 
     %% Render
 
+    % See note in section 'Limit functions' below on naming conventions,
+    % i.e. distinction between bugLeft, bugRight and bugStart
+
     bugStart = ifelse(bugDir, bugLeft, sW - bugLeft);
 
     motionDistance = abs(bugRight - bugLeft);
 
-    exitCode = runFlashColoration(struct( ...
-        'bugAngle', ifelse(bugDir, 0, 180), ...
-        'motionDistance', motionDistance, ...
-        'bugInitialPos', [bugStart bugY], ...
-        'bodyLateral', 0.5, ...
-        'wing', nan, ...
-        'bugSpeed', bugSpeed, ...
-        'isBodyVisible', isBodyVisible, ...
-        'postMotionDelay', postMotionDelay, ...
-        'bugBody', [1 0 0] ...
+    [exitCode, triggerTime, clickPoints, bugPosPoints] = ...
+        runFlashColoration(struct( ...
+            'bugAngle', ifelse(bugDir, 0, 180), ...
+            'motionDistance', motionDistance, ...
+            'bugInitialPos', [bugStart bugY], ...
+            'bodyLateral', 0.5, ...
+            'wing', nan, ...
+            'bugSpeed', bugSpeed, ...
+            'isBodyVisible', isBodyVisible, ...
+            'postMotionDelay', postMotionDelay, ...
+            'bugBody', [1 0 0] ...
         ));
 
 end
+
+%% Limit functions
+
+% These are helper functions to select bug start and end positions
+% (along the horizontal). x1 < x2 by definition meaning x1 is left and
+% x2 is right. Elsewhere in the code these are referred to as bugLeft
+% and bugRight correspondingly.
+
+% Note that, when the bug is moving leftwards, the start position is
+% bugRight. I've used the name 'bugStart' to refer to whichever of
+% bugLeft/bugRight happens to be the starting position.
 
 function [x1, x2] = getMotionLimitsBothInside(mn, mx, d)
 
@@ -256,6 +280,8 @@ x1 = randi([mn mx]);
 x2 = x1 + d;
 
 end
+
+%% Deprecated
 
 function exitCode = runMockBug()
 

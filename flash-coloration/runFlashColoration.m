@@ -1,8 +1,9 @@
-function [exitCode, clickPoints] = runFlashColoration(args)
+function [exitCode, triggerTime, clickPoints, bugPosPoints] = ...
+    runFlashColoration(args)
 
 % parameters
 
-bugHeight = 100; % pixels
+bugHeight = 80; % pixels
 
 bugDimension = bugHeight * 2; % bug texture size (px)
 
@@ -24,9 +25,7 @@ recordingFrameRate = 60; % fps
 
 postMotionDelay = 0; % seconds
 
-preMotionDelay = 0; % seconds
-
-drawDebugLines = 1; % draw lines across the screen for debugging
+drawDebugLines = 0; % draw lines across the screen for debugging
 
 % bugBody:
 %
@@ -173,31 +172,45 @@ endRecording = @() recordStimulus(recording);
 
 obj1 = onCleanup(endRecording);
 
-t = 0;
-
 % initial motionTriggered is false, unless motionTrigger equals 'auto'
 
 motionTriggered = isequal(motionTrigger, 'auto');
 
+t0 = GetSecs(); % time at beginning of rendering loop
+
+frame = 0;
+
+triggerTime = nan; % time when motion trigger is fired
+
+% Notes on time variable references:
+%
+% t0          : relative to system reference
+% triggerTime : relative to t0
+% tm          : relative to t0
+
 while 1
 
+    % Determine time
+
+    frame = frame + 1;
+
+    tReal = GetSecs() - t0;
+
+    tFrames = frame / recordingFrameRate;
+
+    t = ifelse(isempty(recording), tReal, tFrames);
+
+    % Check motion trigger
+
     if motionTriggered
-
-        frame = frame + 1;
-
-        tReal = GetSecs() - t0;
-
-        tFrames = frame / recordingFrameRate;
-
-        t = ifelse(isempty(recording), tReal, tFrames);
-
-        t = max(t - preMotionDelay, 0);
 
         [mx, my, buttons] = GetMouse(window);
 
         if buttons(1) && ~old_buttons(1)
 
             fprintf('Click at %f, %d, %d\n', t, mx, my);
+
+            clickPoints(end+1, :) = [t mx my]; %#ok<AGROW>
 
         end
 
@@ -209,9 +222,7 @@ while 1
 
         if isequal(motionTrigger, 'auto')
 
-            t0 = GetSecs();
-
-            frame = 0;
+            triggerTime = GetSecs() - t0;
 
             motionTriggered = 1;
 
@@ -225,9 +236,7 @@ while 1
 
             if mouseDist < bufferRadius
 
-                t0 = GetSecs();
-
-                frame = 0;
+                triggerTime = GetSecs() - t0;
 
                 motionTriggered = 1;
 
@@ -240,25 +249,32 @@ while 1
 
     % calculate relative displacement from initial position
 
-    xr = ifelse(t < duration, vx * t, vx * duration);
-    yr = ifelse(t < duration, vy * t, vy * duration) * -1;
+    tm = ifelse(motionTriggered, t - triggerTime, 0);
+
+    % time since beginning of motion (seconds)
+
+    xr = ifelse(tm < duration, vx * tm, vx * duration);
+    yr = ifelse(tm < duration, vy * tm, vy * duration) * -1;
 
     % note: when calculating yr, multiply by -1 because the positive
     % direction of bugAngle y-axis points opposite to screen y-axis.
 
-    inMotion = (t > 0) && (t < duration);
+    inMotion = (tm > 0) && (tm < duration);
 
     xr = round(xr);
     yr = round(yr);
 
     % calculate bug coordinate box
 
-    bugRect = [0 0 w h];
+    bugRectSrc = [0 0 w h];
 
-    bugPos = bugRect ...
-        + bugInitialPos([1 2 1 2]) ...
-        + [xr yr xr yr] ...
+    bugPos = bugInitialPos + [xr yr];
+
+    bugRectDst = bugRectSrc ...
+        + bugPos([1 2 1 2]) ...
         - [1 1 1 1] * bugDimension/2;
+
+    bugPosPoints(end+1, :) = [t bugPos]; %#ok<AGROW>
 
     % draw textures
 
@@ -266,7 +282,7 @@ while 1
 
     Screen('DrawTexture', window, back_txt);
 
-    Screen('DrawTexture', window, wing_txt, bugRect, bugPos, 0);
+    Screen('DrawTexture', window, wing_txt, bugRectSrc, bugRectDst, 0);
 
     if drawDebugLines
 
@@ -287,7 +303,7 @@ while 1
 
     if isBodyVisible(t, inMotion, motionTriggered)
 
-        Screen('DrawTexture', window, bug_txt, bugRect, bugPos, 0);
+        Screen('DrawTexture', window, bug_txt, bugRectSrc, bugRectDst, 0);
 
     end
 
@@ -315,7 +331,7 @@ while 1
 
     end
 
-    if t > (duration + postMotionDelay)
+    if tm > (duration + postMotionDelay)
 
         exitCode = 0;
 
