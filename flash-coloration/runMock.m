@@ -80,7 +80,7 @@ function exitCode = runCondition()
 
         % Fs (static bug, flash-coloration after detection)
 
-        isBodyVisible = @(t, inMotion, motionEnabled) motionEnabled;
+        isBodyVisible = @(t, inMotion, motionTriggered) motionTriggered;
 
         postMotionDelay = staticBugPostMotion;
 
@@ -118,7 +118,7 @@ function exitCode = runCondition()
 
         distance = 6;
 
-        isBodyVisible = @(t, inMotion, motionEnabled) inMotion;
+        isBodyVisible = @(t, inMotion, motionTriggered) inMotion;
 
         postMotionDelay = 0;
 
@@ -131,7 +131,7 @@ function exitCode = runCondition()
 
         distance = 12;
 
-        isBodyVisible = @(t, inMotion, motionEnabled) inMotion;
+        isBodyVisible = @(t, inMotion, motionTriggered) inMotion;
 
         postMotionDelay = 0;
 
@@ -148,7 +148,7 @@ function exitCode = runCondition()
 
         bodyVisibleDuration = bodyDistance / bugSpeed;
 
-        isBodyVisible = @(t, inMotion, motionEnabled) ...
+        isBodyVisible = @(t, inMotion, motionTriggered) ...
             inMotion && (t < bodyVisibleDuration);
 
         postMotionDelay = 0;
@@ -167,7 +167,7 @@ function exitCode = runCondition()
 
         bodyVisibleDuration = bodyDistance / bugSpeed;
 
-        isBodyVisible = @(t, inMotion, motionEnabled) ...
+        isBodyVisible = @(t, inMotion, motionTriggered) ...
             inMotion && (t < bodyVisibleDuration);
 
         postMotionDelay = 0;
@@ -195,7 +195,7 @@ function exitCode = runCondition()
 
         distance = (sW + bugHeight) / bugHeight;
 
-        isBodyVisible = @(t, inMotion, motionEnabled) inMotion;
+        isBodyVisible = @(t, inMotion, motionTriggered) inMotion;
 
         postMotionDelay = 0;
 

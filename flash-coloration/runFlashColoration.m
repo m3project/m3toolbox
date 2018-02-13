@@ -50,11 +50,11 @@ bufferRadius = 100; % pixels
 %
 % Determine when body part is visible.
 %
-% t             : time after motion trigger is fired (seconds)
-% inMotion      : 1 if bug currently moving, 0 otherwise
-% motionEnabled : 1 if trigger fired, 0 otherwise
+% t               : time after motion trigger is fired (seconds)
+% inMotion        : 1 if bug currently moving, 0 otherwise
+% motionTriggered : 1 if trigger fired, 0 otherwise
 
-isBodyVisible = @(t, inMotion, motionEnabled) inMotion;
+isBodyVisible = @(t, inMotion, motionTriggered) inMotion;
 
 % bugInitialPosition
 %
@@ -175,13 +175,13 @@ obj1 = onCleanup(endRecording);
 
 t = 0;
 
-% initial motionEnabled is false, unless motionTrigger equals 'auto'
+% initial motionTriggered is false, unless motionTrigger equals 'auto'
 
-motionEnabled = isequal(motionTrigger, 'auto');
+motionTriggered = isequal(motionTrigger, 'auto');
 
 while 1
 
-    if motionEnabled
+    if motionTriggered
 
         frame = frame + 1;
 
@@ -213,7 +213,7 @@ while 1
 
             frame = 0;
 
-            motionEnabled = 1;
+            motionTriggered = 1;
 
         elseif isequal(motionTrigger, 'buff')
 
@@ -229,7 +229,7 @@ while 1
 
                 frame = 0;
 
-                motionEnabled = 1;
+                motionTriggered = 1;
 
             end
 
@@ -274,7 +274,7 @@ while 1
 
         Screen('DrawLine', window, [1 0 0], sW/2, 0, sW/2, sH, 1);
 
-        if ~motionEnabled
+        if ~motionTriggered
 
             bufferRect = ...
                 bugInitialPos([1 2 1 2]) + [-1 -1 1 1] * bufferRadius;
@@ -285,7 +285,7 @@ while 1
 
     end
 
-    if isBodyVisible(t, inMotion, motionEnabled)
+    if isBodyVisible(t, inMotion, motionTriggered)
 
         Screen('DrawTexture', window, bug_txt, bugRect, bugPos, 0);
 
