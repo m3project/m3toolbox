@@ -274,6 +274,15 @@ while 1
 
         Screen('DrawLine', window, [1 0 0], sW/2, 0, sW/2, sH, 1);
 
+        if ~motionEnabled
+
+            bufferRect = ...
+                bugInitialPos([1 2 1 2]) + [-1 -1 1 1] * bufferRadius;
+
+            Screen('FrameOval', window, [1 0 0], bufferRect);
+
+        end
+
     end
 
     if isBodyVisible(t, inMotion, motionEnabled)
