@@ -235,6 +235,36 @@ function exitCode = runMock()
             'postMotionDelay', postMotionDelay ...
         ));
 
+    %% Plot
+
+    clf; hold on;
+
+    plot(bugPosPoints(:, 1), bugPosPoints(:, 2)); % bug position
+
+    plotMarker = @(t, varargin) plot([1 1] * t, [0 2000], varargin{:});
+
+    plotMarker(triggerTime, 'r');
+
+    nClicks = size(clickPoints, 1);
+
+    for i=1:nClicks
+
+        ct = clickPoints(i, 1); % click time
+
+        cx = clickPoints(i, 2); % click horizontal value
+
+        plot(ct, cx, 'ko');
+
+    end
+
+    xlabel('Time (seconds)');
+
+    ylabel('Bug Horizontal Position (px)');
+
+    ylim([0 2000]);
+
+    grid on; box on;
+
 end
 
 %% Limit functions
