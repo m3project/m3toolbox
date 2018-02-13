@@ -1,4 +1,4 @@
-function exitCode = runMock()
+function exitCode = runColorationExperiment()
 
     condition = 1;
 
