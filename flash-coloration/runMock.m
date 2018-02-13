@@ -210,9 +210,9 @@ function exitCode = runCondition()
 
     %% Render
 
-    bugStart = ifelse(bugDir, bugLeft, bugRight);
+    bugStart = ifelse(bugDir, bugLeft, sW - bugLeft);
 
-    motionDistance = bugRight - bugLeft;
+    motionDistance = abs(bugRight - bugLeft);
 
     exitCode = runFlashColoration(struct( ...
         'bugAngle', ifelse(bugDir, 0, 180), ...
