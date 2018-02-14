@@ -36,7 +36,7 @@ handle = EyelinkInitDefaults(window);
 
 initResult = EyelinkInit(0, 1);
 
-assert(initResult == 0);
+assert(logical(initResult), 'failed to initialize Eyelink');
 
 EyelinkDoTrackerSetup(handle); % launch calibration
 
