@@ -311,7 +311,7 @@ while 1
 
     end
 
-    if isBodyVisible(t, inMotion, motionTriggered)
+    if isBodyVisible(tm, inMotion, motionTriggered)
 
         Screen('DrawTexture', window, bug_txt, bugRectSrc, bugRectDst, 0);
 
