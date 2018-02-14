@@ -1,8 +1,8 @@
-function exitCode = runColorationExperiment()
+function exitCode = runColorationExperiment(condition)
 
-    condition = 1;
+    recordGaze = 1;
 
-    recordGaze = 0;
+    obj1 = onCleanup(@sca);
 
     [sW, sH] = getResolution();
 
@@ -12,13 +12,15 @@ function exitCode = runColorationExperiment()
 
     bugY = sH/2; % bug y position (px)
 
-    bugSpeed = 500; % px/sec
+    bugSpeed = 800; % px/sec
 
     margin = bugHeight;
 
     x1 = margin; x2 = sW - margin; % lower/upper limits of bug end position (px)
 
     %% Eyelink
+
+    createWindow(); % required for Eyelink wrappers
 
     if recordGaze
 
@@ -58,7 +60,7 @@ function exitCode = runColorationExperiment()
     %
     % postMotionDelay: delay after end of motion (seconds)
 
-    staticBugPostMotion = 1; % TODO: check with Diana
+    staticBugPostMotion = 0;
 
     % Travelled distances are expressed with respect to distanceUnit.
 
@@ -67,9 +69,9 @@ function exitCode = runColorationExperiment()
     %
     % Source: http://mathworld.wolfram.com/EquilateralTriangle.html
 
-    bugSideLength = bugHeight / sind(60);
+    % bugSideLength = bugHeight / sind(60); % don't need this for now
 
-    distanceUnit = round(bugSideLength); % TODO: check with Diana: side or height?
+    distanceUnit = round(bugHeight);
 
     if condition == 1
 
@@ -234,6 +236,22 @@ function exitCode = runColorationExperiment()
             'motionDistance', motionDistance, ...
             'postMotionDelay', postMotionDelay ...
         ));
+
+    wait(1e3);
+
+    sca;
+
+    %% Save Eyelink recording data
+
+    if recordGaze
+
+        ds = datestr(now, 'yyyy-mm-dd-HH-MM-SS');
+
+        output_file = sprintf('d:/flash-coloration-data/trial_%s.edf', ds);
+
+        finishEyelinkRecording(file, output_file);
+
+    end
 
     %% Plot
 
