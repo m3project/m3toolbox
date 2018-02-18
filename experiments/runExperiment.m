@@ -293,8 +293,22 @@ for i=firstTrial:trialCount
 %         error('runAfterTrialFun must take either 1 or 2 parameters');
         
 %     end
+
+    if isstruct(resultRow)
+        
+        if isempty(resultSet)
+            
+            resultSet = {};
+            
+        end
+        
+        resultSet(i, 1) = {resultRow}; %#ok
+        
+    else
     
-    resultSet(i, :) = resultRow; %#ok
+        resultSet(i, :) = resultRow; %#ok
+        
+    end
     
     % save results
     
