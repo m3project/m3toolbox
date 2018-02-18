@@ -1,20 +1,109 @@
-function [exitCode, results] = runColorationExperiment(condition)
+function runMantisExperimentFlashColoration()
 
-    recordGaze = 1;
+expt = struct;
+
+expt.genParamSetFun = @genParamSet;
+
+expt.runTrialFun = @(varargin) []; % dummy
+
+expt.runAfterTrialFun = @runAfterTrial;
+
+expt.workDir = 'd:\m3\data\mantisFlashColoration\';
+
+expt.name = 'Mantis Flash Coloration';
+
+expt.defName = 'Sabrina';
+
+expt.recordVideos = 0;
+
+expt.makeBackup = 1;
+
+expt.addTags = {};
+
+runExperiment(expt);
+
+end
+
+function paramSet = genParamSet()
+
+directions = [-1 1];
+
+% Diana: There will be 6 repetition per conditions for the stationary
+% target = Cs and Fs, 6 each.
+
+% GT: Create 3 blocks of 2 directions times [Cs, Fs].
+
+staticConds = createTrialBlocks(3, directions, [1 2]);
+
+assert(size(staticConds, 1) == 12); % must equal 12 trials
+
+% There will be 12 repetitions each per the testing conditions what
+% moves=C, F1 and F2. The moving target will have the reps divided equally
+% per distance (6 and 6) and direction of motion (3 and 3).
+
+% C-6   : condition 3
+% C-12  : condition 4
+% F1-6  : condition 5
+% F1-12 : condition 6
+% F2-6  : condition 7
+% F2-12 : condition 8
+
+% GT: Create 3 blocks of 2 directions times condition in [3:8].
+
+movingConds = createTrialBlocks(3, directions, 3:8);
+
+assert(size(movingConds, 1) == 36);
+
+% Diana: The distractors will have only 4 repetition per each 
+% condition, D1 and D2.
+
+% GT: Create 2 blocks of 2 directions times condition in [9 10].
+
+distConds = createTrialBlocks(2, directions, [9 10]);
+
+assert(size(distConds, 1) == 8);
+
+% GT: Combine conds
+
+conds = [staticConds; movingConds; distConds];
+
+assert(size(conds, 1) == 56);
+
+randOrder = createRandTrial(1:56);
+
+paramSet = conds(randOrder, :);
+
+end
+
+function resultRow = runAfterTrial(paramSetRow)
+
+bugDir = paramSetRow(1);
+
+condition = paramSetRow(2);
+
+[~, results] = runColorationTrial(bugDir, condition);
+
+resultRow = results;
+
+end
+
+%% Stimulus Wrapper
+
+function [exitCode, results] = runColorationTrial(bugDir, condition)
+
+    recordGaze = 0;
 
     [sW, sH] = getResolution();
 
     bugHeight = 100; % px (tip to base)
 
-    bugDir = randi([0 1]); % 0 for leftwards, 1 for rightwards
-
-    bugY = 0.5; % bug vertical position [0, 1] (relative to screen)
+    bugY = sH/2; % bug y position (px)
 
     bugSpeed = 800; % px/sec
 
     margin = bugHeight;
 
-    makePlot = 1;
+    makePlot = 0;
 
     x1 = margin; x2 = sW - margin; % lower/upper limits of bug end position (px)
 
@@ -231,7 +320,7 @@ function [exitCode, results] = runColorationExperiment(condition)
             'bugAngle', ifelse(bugDir, 0, 180), ...
             'onTrigger', onTrigger, ...
             'bodyLateral', 0.5, ...
-            'bugInitialPos', [bugStart sH*bugY], ...
+            'bugInitialPos', [bugStart bugY], ...
             'isBodyVisible', isBodyVisible, ...
             'motionDistance', motionDistance, ...
             'postMotionDelay', postMotionDelay ...
