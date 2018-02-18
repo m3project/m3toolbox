@@ -1,8 +1,6 @@
-function exitCode = runColorationExperiment(condition)
+function [exitCode, results] = runColorationExperiment(condition)
 
     recordGaze = 1;
-
-    obj1 = onCleanup(@sca);
 
     [sW, sH] = getResolution();
 
@@ -16,6 +14,8 @@ function exitCode = runColorationExperiment(condition)
 
     margin = bugHeight;
 
+    makePlot = 1;
+
     x1 = margin; x2 = sW - margin; % lower/upper limits of bug end position (px)
 
     %% Eyelink
@@ -24,7 +24,7 @@ function exitCode = runColorationExperiment(condition)
 
     if recordGaze
 
-        openEyelink();
+        openEyelink(); %#ok<UNRCH>
 
         file = startEyelinkRecording();
 
@@ -237,15 +237,17 @@ function exitCode = runColorationExperiment(condition)
             'postMotionDelay', postMotionDelay ...
         ));
 
-    wait(1e3);
-
-    sca;
+    results = struct( ...
+        'triggerTime', triggerTime, ...
+        'clickPoints', clickPoints, ...
+        'bugPosPoints', bugPosPoints ...
+    );
 
     %% Save Eyelink recording data
 
     if recordGaze
 
-        ds = datestr(now, 'yyyy-mm-dd-HH-MM-SS');
+        ds = datestr(now, 'yyyy-mm-dd-HH-MM-SS'); %#ok<UNRCH>
 
         output_file = sprintf('d:/flash-coloration-data/trial_%s.edf', ds);
 
@@ -255,7 +257,23 @@ function exitCode = runColorationExperiment(condition)
 
     %% Plot
 
+    if makePlot
+
+        plotResults(results); %#ok<UNRCH>
+
+    end
+
+end
+
+function plotResults(results)
+
     clf; hold on;
+
+    bugPosPoints = results.bugPosPoints;
+
+    triggerTime = results.triggerTime;
+
+    clickPoints = results.clickPoints;
 
     plot(bugPosPoints(:, 1), bugPosPoints(:, 2)); % bug position
 
@@ -324,104 +342,3 @@ x1 = randi([mn mx]);
 x2 = x1 + d;
 
 end
-
-%% Deprecated
-
-function exitCode = runMockBug()
-
-bugDir = randi([0 1]); % 0 for leftwards, 1 for rightwards
-
-% bugDir = 1;
-
-bugAngle = ifelse(bugDir, 180, 0);
-
-% bugAngle = 180;
-
-sW = 1920; sH = 1200;
-
-M = 480; % margin (px)
-
-clc
-
-% (randomly) select bug position
-
-% bugX = randi([M sW-M]);
-
-if isequal(bugDir, 0)
-
-    bugX = randi([M sW/2]);
-
-else
-
-    bugX = randi([sW/2 sW-M]);
-
-end
-
-bugY = randi([M sH-M]);
-
-% bugY = 600;
-
-% (randomly) select bug initial displacement
-
-maxDisp = ifelse(bugDir, bugX, sW - bugX) % maximum initial displacement (px)
-
-minDisp = 500; % mininum initial displacement (px)
-
-initDisplacement = randi([minDisp maxDisp])
-
-exitCode = runFlashColoration(struct( ...
-    'bugAngle', bugAngle, ...
-    'initDisplacement', initDisplacement, ...
-    'bugFinalPosition', [bugX bugY] ...
-    ));
-
-if exitCode; return; end
-
-waitKey('Space');
-
-end
-
-function waitKey(key)
-
-% Wait until key is pressed.
-
-while (1)
-
-    drawnow
-
-    [~, ~, keyCode ] = KbCheck;
-
-    if (keyCode(KbName(key)))
-
-        break;
-
-    end
-
-end
-
-end
-
-function waitClick()
-
-% First, wait until any pressed buttons are released.
-
-buttons = 1;
-
-while any(buttons)
-
-    [~, ~, buttons] = GetMouse();
-
-end
-
-% Now wait until any button is pressed.
-
-buttons = 0;
-
-while ~any(buttons)
-
-    [~, ~, buttons] = GetMouse();
-
-end
-
-end
-
