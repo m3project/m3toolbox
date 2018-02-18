@@ -1,13 +1,13 @@
 function showMessage(text, size)
 
 if nargin < 2
-    
+
     text = 'Hello there people!';
-    
+
     text = double(text);
-    
+
     size = 160;
-    
+
 end
 
 Screen('Preference', 'TextRenderer', 1);
