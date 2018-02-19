@@ -54,7 +54,7 @@ movingConds = createTrialBlocks(3, directions, 3:8);
 
 assert(size(movingConds, 1) == 36);
 
-% Diana: The distractors will have only 4 repetition per each 
+% Diana: The distractors will have only 4 repetition per each
 % condition, D1 and D2.
 
 % GT: Create 2 blocks of 2 directions times condition in [9 10].
@@ -84,6 +84,14 @@ condition = paramSetRow(2);
 [~, results] = runColorationTrial(bugDir, condition);
 
 resultRow = results;
+
+% showSymbol('tick');
+
+clearWindow([1 1 1] * 128);
+
+beep
+
+pause(1);
 
 end
 
@@ -149,7 +157,11 @@ function [exitCode, results] = runColorationTrial(bugDir, condition)
     %
     % postMotionDelay: delay after end of motion (seconds)
 
-    staticBugPostMotion = 0;
+    staticBugPostMotion = 60;
+
+    movingBugPostMotion = 60;
+
+    distractorBugPostMotion = 0;
 
     % Travelled distances are expressed with respect to distanceUnit.
 
@@ -190,7 +202,7 @@ function [exitCode, results] = runColorationTrial(bugDir, condition)
 
         isBodyVisible = @(varargin) false;
 
-        postMotionDelay = 0;
+        postMotionDelay = movingBugPostMotion;
 
         [bugLeft, bugRight] = ...
             getMotionLimitsBothInside(x1, x2, distance * distanceUnit);
@@ -203,7 +215,7 @@ function [exitCode, results] = runColorationTrial(bugDir, condition)
 
         isBodyVisible = @(varargin) false;
 
-        postMotionDelay = 0;
+        postMotionDelay = movingBugPostMotion;
 
         [bugLeft, bugRight] = ...
             getMotionLimitsBothInside(x1, x2, distance * distanceUnit);
@@ -216,7 +228,7 @@ function [exitCode, results] = runColorationTrial(bugDir, condition)
 
         isBodyVisible = @(t, inMotion, motionTriggered) inMotion;
 
-        postMotionDelay = 0;
+        postMotionDelay = movingBugPostMotion;
 
         [bugLeft, bugRight] = ...
             getMotionLimitsBothInside(x1, x2, distance * distanceUnit);
@@ -229,7 +241,7 @@ function [exitCode, results] = runColorationTrial(bugDir, condition)
 
         isBodyVisible = @(t, inMotion, motionTriggered) inMotion;
 
-        postMotionDelay = 0;
+        postMotionDelay = movingBugPostMotion;
 
         [bugLeft, bugRight] = ...
             getMotionLimitsBothInside(x1, x2, distance * distanceUnit);
@@ -247,7 +259,7 @@ function [exitCode, results] = runColorationTrial(bugDir, condition)
         isBodyVisible = @(t, inMotion, motionTriggered) ...
             inMotion && (t < bodyVisibleDuration);
 
-        postMotionDelay = 0;
+        postMotionDelay = movingBugPostMotion;
 
         [bugLeft, bugRight] = ...
             getMotionLimitsBothInside(x1, x2, distance * distanceUnit);
@@ -266,7 +278,7 @@ function [exitCode, results] = runColorationTrial(bugDir, condition)
         isBodyVisible = @(t, inMotion, motionTriggered) ...
             inMotion && (t < bodyVisibleDuration);
 
-        postMotionDelay = 0;
+        postMotionDelay = movingBugPostMotion;
 
         [bugLeft, bugRight] = ...
             getMotionLimitsBothInside(x1, x2, distance * distanceUnit);
@@ -277,7 +289,7 @@ function [exitCode, results] = runColorationTrial(bugDir, condition)
 
         isBodyVisible = @(varargin) false;
 
-        postMotionDelay = 0;
+        postMotionDelay = distractorBugPostMotion;
 
         bugLeft = randi([x1 x2]);
 
@@ -290,7 +302,7 @@ function [exitCode, results] = runColorationTrial(bugDir, condition)
 
         isBodyVisible = @(t, inMotion, motionTriggered) inMotion;
 
-        postMotionDelay = 0;
+        postMotionDelay = distractorBugPostMotion;
 
         bugLeft = randi([x1 x2]);
 
@@ -307,7 +319,7 @@ function [exitCode, results] = runColorationTrial(bugDir, condition)
     % See note in section 'Limit functions' below on naming conventions,
     % i.e. distinction between bugLeft, bugRight and bugStart
 
-    bugStart = ifelse(bugDir, bugLeft, sW - bugLeft);
+    bugStart = ifelse(bugDir == 1, bugLeft, sW - bugLeft);
 
     motionDistance = abs(bugRight - bugLeft);
 
@@ -317,13 +329,16 @@ function [exitCode, results] = runColorationTrial(bugDir, condition)
             'onStart', onStart, ...
             'bugBody', [1 0 0], ...
             'bugSpeed', bugSpeed, ...
-            'bugAngle', ifelse(bugDir, 0, 180), ...
+            'bugAngle', ifelse(bugDir == 1, 0, 180), ...
             'onTrigger', onTrigger, ...
             'bodyLateral', 0.5, ...
             'bugInitialPos', [bugStart bugY], ...
             'isBodyVisible', isBodyVisible, ...
             'motionDistance', motionDistance, ...
-            'postMotionDelay', postMotionDelay ...
+            'postMotionDelay', postMotionDelay, ...
+            'previewInsideClicks', 0, ...
+            'escapeOnCatch', 1, ...
+            'enableEscape', 0 ...
         ));
 
     results = struct( ...

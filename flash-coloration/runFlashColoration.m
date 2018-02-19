@@ -23,7 +23,13 @@ videoFile = ''; % leave empty to disable recording
 
 recordingFrameRate = 60; % fps
 
-postMotionDelay = 0; % seconds
+postMotionDelay = 5; % seconds
+
+enableEscape = 1; % exit when Escape or End is pressed
+
+escapeOnCatch = 0; % exit when bug is clicked after end of motion
+
+previewInsideClicks = 0; % show preview of inside-bug clicks
 
 drawDebugLines = 0; % draw lines across the screen for debugging
 
@@ -101,7 +107,7 @@ window = getWindow();
 
 backPattern = genNaturalPattern(struct('makePlot', 0, 'W', sW, 'H', sH));
 
-backPattern = transp(backPattern);
+backPattern = transpose(backPattern);
 
 if isequal(bugBody, 'background')
 
@@ -188,6 +194,10 @@ frame = 0;
 
 triggerTime = nan; % time when motion trigger is fired
 
+bugRectDst = [0 0 0 0]; % initial dummy val (required for checking clicks)
+
+inMotion = 0; % dummy value (required for checking inside clicking)
+
 % Notes on time variable references:
 %
 % t0          : relative to system reference
@@ -216,7 +226,51 @@ while 1
 
         if buttons(1) && ~old_buttons(1)
 
-            clickPoints(end+1, :) = [t mx my]; %#ok<AGROW>
+            % check if click falls inside bug
+
+            bx = round(mx - bugRectDst(1));
+            by = round(my - bugRectDst(2));
+
+            in_x = inrange(bx, 0, bugDimension);
+            in_y = inrange(by, 0, bugDimension);
+
+            inBug = in_x && in_y;
+
+            insideBug = 0;
+
+            if inBug
+
+                if bugWingPattern(by, bx, end)
+
+                    insideBug = 1;
+
+                    if previewInsideClicks
+
+                        bugPreview = bugWingPattern(:, :, end); %#ok<UNRCH>
+
+                        bugPreview(by, bx) = 0;
+
+                        imshow(bugPreview);
+
+                        drawnow
+
+                    end
+
+                end
+
+            end
+
+            clickPoints(end+1, :) = [t mx my insideBug]; %#ok<AGROW>
+
+            % check termination condition
+
+            if escapeOnCatch && ~inMotion && insideBug
+
+                exitCode = 3;
+
+                return;
+
+            end
 
         end
 
@@ -296,7 +350,7 @@ while 1
 
     if drawDebugLines
 
-        Screen('DrawLine', window, [1 0 0], 0, sH/2, sW, sH/2, 1);
+        Screen('DrawLine', window, [1 0 0], 0, sH/2, sW, sH/2, 1); %#ok<UNRCH>
 
         Screen('DrawLine', window, [1 0 0], sW/2, 0, sW/2, sH, 1);
 
@@ -321,23 +375,27 @@ while 1
 
     recording = recordStimulus(recording);
 
-    % checking for key presses
+    if enableEscape
 
-    [~, ~, keyCode ] = KbCheck;
+        % checking for key presses
 
-    if (keyCode(KbName('Escape')))
+        [~, ~, keyCode ] = KbCheck;
 
-        exitCode = 1;
+        if (keyCode(KbName('Escape')))
 
-        return
+            exitCode = 1;
 
-    end
+            return
 
-    if (keyCode(KbName('End')))
+        end
 
-        exitCode = 2;
+        if (keyCode(KbName('End')))
 
-        return
+            exitCode = 2;
+
+            return
+
+        end
 
     end
 
@@ -350,5 +408,13 @@ while 1
     end
 
 end
+
+end
+
+function y = inrange(x, left, width)
+
+    % Return true iff x is inside [left, left+width].
+
+    y = (x > left) && (x < left + width);
 
 end
