@@ -34,6 +34,10 @@ tH = bounds(4);
 tx = (sW - tW)/2;
 ty = (sH - tH)/2;
 
+color = 0.5;
+
+Screen(window, 'FillRect' , color, [0 0 sW sH] );
+
 Screen('DrawText', window, text, tx, ty);
 
 Screen('Flip', window);
