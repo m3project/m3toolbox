@@ -1,4 +1,4 @@
-function runMantisExperimentFlashColoration()
+function runHumanExperimentFlashColoration()
 
 expt = struct;
 
@@ -8,9 +8,11 @@ expt.runTrialFun = @(varargin) []; % dummy
 
 expt.runAfterTrialFun = @runAfterTrial;
 
-expt.workDir = 'd:\m3\data\mantisFlashColoration\';
+expt.runBeforeTrialFun = @(varargin) []; % dummy
 
-expt.name = 'Mantis Flash Coloration';
+expt.workDir = 'd:\m3\data\humanFlashColoration\';
+
+expt.name = 'Human Flash Coloration';
 
 expt.defName = 'Sabrina';
 
@@ -81,17 +83,25 @@ bugDir = paramSetRow(1);
 
 condition = paramSetRow(2);
 
-[~, results] = runColorationTrial(bugDir, condition);
+[exitCode, results] = runColorationTrial(bugDir, condition);
+
+if ismember(exitCode, [1 2])
+    
+    error('Experiment aborted');
+    
+end
+
+caughtBug = exitCode == 3;
+
+showTick = caughtBug;
 
 resultRow = results;
 
-% showSymbol('tick');
+symbol = ifelse(showTick, 'tick', 'cross');
 
-clearWindow([1 1 1] * 128);
+showSymbol(symbol);
 
-beep
-
-pause(1);
+pause(3);
 
 end
 
@@ -323,8 +333,7 @@ function [exitCode, results] = runColorationTrial(bugDir, condition)
 
     motionDistance = abs(bugRight - bugLeft);
 
-    [exitCode, triggerTime, clickPoints, bugPosPoints] = ...
-        runFlashColoration(struct( ...
+    [exitCode, results] = runFlashColoration(struct( ...
             'wing', nan, ...
             'onStart', onStart, ...
             'bugBody', [1 0 0], ...
@@ -338,14 +347,8 @@ function [exitCode, results] = runColorationTrial(bugDir, condition)
             'postMotionDelay', postMotionDelay, ...
             'previewInsideClicks', 0, ...
             'escapeOnCatch', 1, ...
-            'enableEscape', 0 ...
+            'enableEscape', 1 ...
         ));
-
-    results = struct( ...
-        'triggerTime', triggerTime, ...
-        'clickPoints', clickPoints, ...
-        'bugPosPoints', bugPosPoints ...
-    );
 
     %% Save Eyelink recording data
 

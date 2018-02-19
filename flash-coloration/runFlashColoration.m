@@ -1,5 +1,4 @@
-function [exitCode, triggerTime, clickPoints, bugPosPoints] = ...
-    runFlashColoration(args)
+function [exitCode, results] = runFlashColoration(args)
 
 % parameters
 
@@ -194,15 +193,21 @@ frame = 0;
 
 triggerTime = nan; % time when motion trigger is fired
 
+colorationTime = nan; % time when colored body part is hidden
+
 bugRectDst = [0 0 0 0]; % initial dummy val (required for checking clicks)
 
 inMotion = 0; % dummy value (required for checking inside clicking)
+
+bodyVisibleOld = 0; % 1 iff body part was visible on previous frame
 
 % Notes on time variable references:
 %
 % t0          : relative to system reference
 % triggerTime : relative to t0
 % tm          : relative to t0
+
+ShowCursor('arrow');
 
 onStart();
 
@@ -268,7 +273,7 @@ while 1
 
                 exitCode = 3;
 
-                return;
+                break;
 
             end
 
@@ -369,6 +374,20 @@ while 1
 
         Screen('DrawTexture', window, bug_txt, bugRectSrc, bugRectDst, 0);
 
+        bodyVisibleOld = 1;
+
+    else
+
+        if bodyVisibleOld
+
+            % first frame after hiding body part, set ColorationTime
+
+            colorationTime = GetSecs() - t0;
+
+        end
+
+        bodyVisibleOld = 0;
+
     end
 
     Screen('Flip', window);
@@ -385,7 +404,7 @@ while 1
 
             exitCode = 1;
 
-            return
+            break
 
         end
 
@@ -393,7 +412,7 @@ while 1
 
             exitCode = 2;
 
-            return
+            break
 
         end
 
@@ -403,11 +422,18 @@ while 1
 
         exitCode = 0;
 
-        return
+        break
 
     end
 
 end
+
+results = struct( ...
+    'triggerTime', triggerTime, ...
+    'clickPoints', clickPoints, ...
+    'bugPosPoints', bugPosPoints, ...
+    'colorationTime', colorationTime ...
+);
 
 end
 
