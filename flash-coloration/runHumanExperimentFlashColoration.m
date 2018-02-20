@@ -2,7 +2,7 @@ function runHumanExperimentFlashColoration()
 
 expt = struct;
 
-expt.genParamSetFun = @genParamSet;
+expt.genParamSetFun = @genParamSetB;
 
 expt.runTrialFun = @(varargin) []; % dummy
 
@@ -20,9 +20,21 @@ expt.recordVideos = 0;
 
 expt.makeBackup = 1;
 
-expt.addTags = {};
+expt.addTags = {'200'};
 
 runExperiment(expt);
+
+end
+
+function paramSet = genParamSetB()
+
+directions = [-1 1];
+
+conditions = 1:10;
+
+paramSet = createRandTrialBlocks(10, directions, conditions);
+
+assert(size(paramSet, 1) == 200);
 
 end
 
