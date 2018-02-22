@@ -13,23 +13,23 @@
 % createWindow(); % when the stimulus does not require Gamma correction
 % createWindow(G); % when the stimulus requires Gamma = G
 
-function createWindow(Gamma)
+function window = createWindow(Gamma)
 
 applyGamma = nargin > 0;
 
 if nargin < 1
-    
+
     % this is just to stop Matlab complaining when the function is called
-    % with no parameters   
-    
+    % with no parameters
+
     Gamma = 0; % dummy value which is not used since applyGamma = 0
-    
+
 end
 
 if Gamma == 1
-    
+
     error('this call is now deprecated, update to createWindow()');
-    
+
 end
 
 consts = getConstants();
@@ -51,17 +51,19 @@ Screen('Preference','VisualDebugLevel', debug_level);
 m = Screen('Windows');
 
 if (~isempty(m))
-    
+
     if applyGamma
-        
+
         error('attempted to create Window with Gamma while one is open');
-        
+
     else
-    
+
+        window = getWindow();
+
         return;
-    
+
     end
-    
+
 end
 
 % Open a PTB window on the TV
@@ -75,7 +77,7 @@ PsychImaging('AddTask', 'FinalFormatting', 'DisplayColorCorrection', 'SimpleGamm
 if IsWindows
 
     enable10Bit();
-    
+
 end
 
 window = PsychImaging('OpenWindow', consts.SCREEN_ID, consts.MEAN_LUM, ...
@@ -86,7 +88,7 @@ Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 if applyGamma
 
     PsychColorCorrection('SetEncodingGamma', window, 1/Gamma);
-    
+
 end
 
 end
